@@ -1,0 +1,191 @@
+$date October 24, 2025 19:03:13
+$end
+$version DSim 2025.1
+$end
+$timescale 1 ps $end
+$scope module tb_top $end
+$scope module apb_inst $end
+$var wire 32 $ paddr[31:0] $end
+$var wire 1 , pclk $end
+$var wire 1 ' penable $end
+$var reg 32 - prdata[31:0] $end
+$var reg 1 . pready $end
+$var wire 1 # presetn $end
+$var wire 1 ( psel $end
+$var reg 1 / pslverr $end
+$var wire 32 & pwdata[31:0] $end
+$var wire 1 % pwrite $end
+$var reg 32 1 state[31:0] $end
+$upscope $end
+$scope module ifc $end
+$var reg 32 $ paddr[31:0] $end
+$var reg 1 " pclk $end
+$var reg 1 ' penable $end
+$var reg 32 ) prdata[31:0] $end
+$var reg 1 + pready $end
+$var reg 1 # presetn $end
+$var reg 1 ( psel $end
+$var reg 1 * pslverr $end
+$var reg 32 & pwdata[31:0] $end
+$var reg 1 % pwrite $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bx $
+0,
+x'
+bx -
+x.
+1#
+x(
+x/
+bx &
+x%
+b0 1
+bx $
+0"
+x'
+bx )
+x+
+1#
+x(
+x*
+bx &
+x%
+$end
+#1000
+1"
+1,
+b0 -
+0.
+0/
+b01 1
+b0 )
+0+
+0*
+1(
+#2000
+0"
+0,
+#3000
+1"
+1,
+b010 1
+1'
+b010001 $
+1%
+b010001000100001100001100100000 &
+#4000
+0"
+0,
+#5000
+1"
+1,
+1.
+b011 1
+1+
+#6000
+0"
+0,
+#7000
+1"
+1,
+0.
+b01 1
+0+
+#8000
+0"
+0,
+#9000
+1"
+1,
+b010 1
+b0101 $
+b10100110001101001111100110011000 &
+#10000
+0"
+0,
+#11000
+1"
+1,
+1.
+b011 1
+1+
+#12000
+0"
+0,
+#13000
+1"
+1,
+0.
+b01 1
+0+
+#14000
+0"
+0,
+#15000
+1"
+1,
+b010 1
+b011100 $
+b10100010100111111011011110000000 &
+#16000
+0"
+0,
+#17000
+1"
+1,
+1.
+b011 1
+1+
+#18000
+0"
+0,
+#19000
+1"
+1,
+0.
+b01 1
+0+
+#20000
+0"
+0,
+#21000
+1"
+1,
+b010 1
+b01 $
+0%
+b11011010100100101010100110001100 &
+#22000
+0"
+0,
+#23000
+1"
+1,
+bx -
+1.
+b011 1
+bx )
+1+
+#24000
+0"
+0,
+#25000
+1"
+1,
+0.
+b01 1
+0+
+#26000
+0"
+0,
+#27000
+1"
+1,
+b010 1
+b011 $
+1%
+b10101100111111000100111000101010 &
