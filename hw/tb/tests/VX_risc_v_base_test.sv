@@ -1,0 +1,34 @@
+class VX_risc_v_base_test extends uvm_test;
+
+    `uvm_component_utils(VX_risc_v_base_test)
+
+    VX_tb_environment  vx_tb_environment;
+    VX_risc_v_base_seq risc_v_base_seq;
+    
+    virtual VX_uvm_test_if uvm_test_ifc;
+
+    function new(string name="VX_risc_v_base_test", uvm_component parent=null);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        
+        vx_tb_environment = VX_tb_environment::type_id::create("VX_tb_environment", this);
+        risc_v_base_seq   = VX_risc_v_base_seq::type_id::create("VX_risc_v_base_seq");
+
+        if(!uvm_config_db #(virtual VX_uvm_test_if)::get(this, "", "uvm_test_ifc", uvm_test_ifc))
+            `VX_error("VX_RISC_V_BASE_TEST", "Failed to get access to VX_uvm_test_if")
+
+    endfunction
+
+    virtual task run_phase(uvm_phase phase);
+        super.run_phase(phase);
+
+        phase.raise_objection(this);
+            risc_v_base_seq.start(vx_tb_environment.risc_v_agent.vx_risc_v_seqr);
+            uvm_test_ifc.mem_load_seq_done = 1'b1;
+        phase.drop_objection(this);
+    endtask
+
+endclass
