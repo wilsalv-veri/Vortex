@@ -96,12 +96,15 @@ module VX_fetch import VX_gpu_pkg::*; #(
         ("%t: *** %s invalid PC=0x%0h, wid=%0d, tmask=%b (#%0d)", $time, INSTANCE_ID, to_fullPC(schedule_if.data.PC), schedule_if.data.wid, schedule_if.data.tmask, schedule_if.data.uuid))
 
     // Icache Request
-
+    localparam req_addr_start_offset = 2-(`XLEN-PC_BITS); 
+    localparam req_addr_end_offset = req_addr_start_offset + ICACHE_ADDR_WIDTH - 1; 
+    
     assign icache_req_valid = schedule_if.valid && ibuf_ready;
-    assign icache_req_addr  = schedule_if.data.PC[2-(`XLEN-PC_BITS) +: ICACHE_ADDR_WIDTH]; // 4-byte aligned addresses
+    assign icache_req_addr  = schedule_if.data.PC[req_addr_end_offset : req_addr_start_offset]; // 4-byte aligned addresses 
     assign icache_req_tag   = {schedule_if.data.uuid, req_tag};
     assign schedule_if.ready = icache_req_ready && ibuf_ready;
 
+    
     VX_elastic_buffer #(
         .DATAW   (ICACHE_ADDR_WIDTH + ICACHE_TAG_WIDTH),
         .SIZE    (2),

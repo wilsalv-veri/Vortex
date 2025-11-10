@@ -1,5 +1,5 @@
 ROOT_DIR := $(realpath ..)
-include $(ROOT_DIR)/config.mk
+include $(ROOT_DIR)/config.mk.in
 
 HW_DIR := $(VORTEX_HOME)/hw
 SCRIPT_DIR := $(HW_DIR)/scripts

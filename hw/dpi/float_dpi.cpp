@@ -20,7 +20,7 @@
 #include <rvfloats.h>
 #include <util.h>
 #include "svdpi.h"
-#include "verilated_vpi.h"
+//#include "verilated_vpi.h"
 #include "VX_config.h"
 
 using namespace vortex;

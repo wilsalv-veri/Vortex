@@ -81,7 +81,7 @@ module VX_cache_cluster import VX_gpu_pkg::*; #(
     VX_mem_bus_if.slave     core_bus_if [NUM_INPUTS * NUM_REQS],
     VX_mem_bus_if.master    mem_bus_if [MEM_PORTS]
 );
-    localparam NUM_CACHES = `UP(NUM_UNITS);
+    localparam NUM_CACHES = `SIMPLE_UP(NUM_UNITS);
     localparam PASSTHRU   = (NUM_UNITS == 0);
     localparam ARB_TAG_WIDTH = TAG_WIDTH + `ARB_SEL_BITS(NUM_INPUTS, NUM_CACHES);
 
@@ -142,10 +142,18 @@ module VX_cache_cluster import VX_gpu_pkg::*; #(
             `ASSIGN_VX_MEM_BUS_IF (arb_core_bus_if[k * NUM_REQS + i], arb_core_bus_tmp_if[k]);
         end
     end
+     
+    for (genvar i = 0; i < NUM_CACHES; ++i) begin : g_cache_wrap
+        
+        localparam  core_bus_if_start = i*NUM_CACHES;
+        localparam  core_bus_if_end   = core_bus_if_start + NUM_REQS - 1;
+        
+        localparam  mem_bus_if_start = i*NUM_CACHES; 
+        localparam  mem_bus_if_end   = mem_bus_if_start + MEM_PORTS - 1; 
 
-     for (genvar i = 0; i < NUM_CACHES; ++i) begin : g_cache_wrap
         VX_cache_wrap #(
             .INSTANCE_ID  (`SFORMATF(("%s%0d", INSTANCE_ID, i))),
+            .INST_ID      (i),
             .CACHE_SIZE   (CACHE_SIZE),
             .LINE_SIZE    (LINE_SIZE),
             .NUM_BANKS    (NUM_BANKS),
@@ -168,16 +176,19 @@ module VX_cache_cluster import VX_gpu_pkg::*; #(
             .NC_ENABLE    (NC_ENABLE),
             .PASSTHRU     (PASSTHRU)
         ) cache_wrap (
+        
+        
         `ifdef PERF_ENABLE
             .cache_perf  (perf_cache_unit[i]),
         `endif
+         
             .clk         (clk),
             .reset       (reset),
-            .core_bus_if (arb_core_bus_if[i * NUM_REQS +: NUM_REQS]),
-            .mem_bus_if  (cache_mem_bus_if[i * MEM_PORTS +: MEM_PORTS])
+            .core_bus_if (arb_core_bus_if[core_bus_if_start : core_bus_if_end]),  
+            .mem_bus_if  (cache_mem_bus_if[mem_bus_if_start : mem_bus_if_end]) 
         );
     end
-
+    
     for (genvar i = 0; i < MEM_PORTS; ++i) begin : g_mem_bus_if
         VX_mem_bus_if #(
             .DATA_SIZE (LINE_SIZE),
@@ -208,12 +219,12 @@ module VX_cache_cluster import VX_gpu_pkg::*; #(
             .bus_in_if  (arb_core_bus_tmp_if),
             .bus_out_if (mem_bus_tmp_if)
         );
-
+  
         if (WRITE_ENABLE) begin : g_we
             `ASSIGN_VX_MEM_BUS_IF (mem_bus_if[i], mem_bus_tmp_if[0]);
         end else begin : g_ro
             `ASSIGN_VX_MEM_BUS_RO_IF (mem_bus_if[i], mem_bus_tmp_if[0]);
         end
     end
-
+    
 endmodule

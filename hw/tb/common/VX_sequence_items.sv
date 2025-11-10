@@ -4,6 +4,7 @@ class VX_risc_v_inst_item extends uvm_sequence_item;
         super.new(name);
     endfunction
 
+    rand bit eleven, twelve, twenty; 
     rand risc_v_seq_inst_type_t       inst_type;
     rand risc_v_seq_opcode_t          opcode;
     rand risc_v_seq_reg_num_t         rs1;

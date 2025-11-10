@@ -170,6 +170,7 @@ module VX_stream_arb #(
                 assign data_out_w[o]  = data_in_w[arb_index];
             end
 
+            //HERE
             for (genvar i = 0; i < NUM_INPUTS; ++i) begin : g_ready_in
                 localparam o = i % NUM_OUTPUTS;
                 localparam r = i / NUM_OUTPUTS;

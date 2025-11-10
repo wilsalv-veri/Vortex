@@ -255,7 +255,11 @@ module VX_opc_unit import VX_gpu_pkg::*; #(
 
     wire [BANK_DATA_SIZE-1:0] gpr_wr_byteen;
     for (genvar i = 0; i < `SIMD_WIDTH; ++i) begin : g_gpr_wr_byteen
-        assign gpr_wr_byteen[i*XLENB+:XLENB] = {XLENB{writeback_if.data.tmask[i]}};
+    
+        localparam byte_en_start = i*XLENB;
+        localparam byte_en_end   = byte_en_start + XLENB;
+
+        assign gpr_wr_byteen[byte_en_end: byte_en_start] = {XLENB{writeback_if.data.tmask[i]}}; 
     end
 
     // GPR banks

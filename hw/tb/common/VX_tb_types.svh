@@ -1,10 +1,14 @@
 `ifndef VX_TB_TYPES_VH
 `define VX_TB_TYPES_VH
 
+    `define CACHE_LINE_WIDTH  L2_MEM_DATA_WIDTH
+    
     typedef enum {R_TYPE=0,I_TYPE=1,S_TYPE=2,B_TYPE=3,U_TYPE=4,J_TYPE=5} risc_v_seq_inst_type_t;
+    typedef enum {INST=0, DATA=1}                                        cacheline_type_t;
+    typedef enum {GET_INSTR=0, PROCESS_INSTR=1, SEND_INSTR=2} risc_v_driver_state_t;
 
     //RISC_V Instruction Macros
-    `define OPCODE_WIDTH      8
+    `define OPCODE_WIDTH      7
     `define REG_NUM_WIDTH     5
     `define FUNCT3_WIDTH      3
     `define FUNCT7_WIDTH      7
@@ -14,7 +18,7 @@
     `define S_TYPE_IMM1_WIDTH `I_TYPE_IMM_WIDTH
     `define S_TYPE_IMM0_WIDTH 5
     
-    `define B_TYPE_IMM1_WIDTH 7
+    `define B_TYPE_IMM1_WIDTH 6
     `define B_TYPE_IMM0_WIDTH 4
     
     `define U_TYPE_IMM_WIDTH 20
@@ -37,7 +41,10 @@
     typedef bit [`J_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_j_type_imm1_t;
     typedef bit [`J_TYPE_IMM0_WIDTH - 1:0]   risc_v_seq_j_type_imm0_t;
 
-    //Top Level Use
+    
+    //Top Level Use  
+    typedef logic [`CACHE_LINE_WIDTH - 1: 0] risc_v_cacheline_t;
+
     typedef logic [`OPCODE_WIDTH - 1:0 ]     risc_v_opcode_t;
     typedef logic [`REG_NUM_WIDTH - 1:0]     risc_v_reg_num_t;
     typedef logic [`FUNCT3_WIDTH - 1:0 ]     risc_v_funct3_t;
@@ -62,7 +69,7 @@
     } r_type_inst_t;
     
     typedef struct packed{
-        risc_v_i_type_imm_t                  immediate;
+        risc_v_i_type_imm_t                  imm;
         risc_v_reg_num_t                     rs1;
         risc_v_funct3_t                      funct3;
         risc_v_reg_num_t                     rd;
@@ -70,35 +77,35 @@
     } i_type_inst_t;
     
     typedef struct packed{
-        risc_v_s_type_imm1_t                 immediate1;
+        risc_v_s_type_imm1_t                 imm1;
         risc_v_reg_num_t                     rs1;
         risc_v_funct3_t                      funct3;
-        risc_v_s_type_imm0_t                 immediate0;
+        risc_v_s_type_imm0_t                 imm0;
         risc_v_opcode_t                      opcode;
     } s_type_inst_t;
     
     typedef struct packed{
         logic                                twelve;
-        risc_v_b_type_imm1_t                 immediate1;
+        risc_v_b_type_imm1_t                 imm1;
         risc_v_reg_num_t                     rs2;
         risc_v_reg_num_t                     rs1;
         risc_v_funct3_t                      funct3;
-        risc_v_b_type_imm0_t                 immediate0;
+        risc_v_b_type_imm0_t                 imm0;
         logic                                eleven;
         risc_v_opcode_t                      opcode;
     } b_type_inst_t;
 
     typedef struct packed{
-        risc_v_u_type_imm_t                 immediate;
+        risc_v_u_type_imm_t                 imm;
         risc_v_reg_num_t                    rd;
         risc_v_opcode_t                     opcode;
     } u_type_inst_t;
 
     typedef struct packed{
         logic                               twenty;
-        risc_v_j_type_imm1_t                immediate1;
+        risc_v_j_type_imm1_t                imm1;
         logic                               eleven;
-        risc_v_j_type_imm0_t                immediate0;
+        risc_v_j_type_imm0_t                imm0;
         risc_v_reg_num_t                    rd;
         risc_v_opcode_t                     opcode;
     } j_type_inst_t;
@@ -110,6 +117,7 @@
         b_type_inst_t b_type_inst;
         u_type_inst_t u_type_inst;
         j_type_inst_t j_type_inst;
+        logic [PC_BITS:0] inst_data;
     } risc_v_inst_t;
     
 `endif // VX_TB_TYPES_VH

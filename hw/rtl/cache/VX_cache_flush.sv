@@ -114,8 +114,11 @@ module VX_cache_flush import VX_gpu_pkg::*; #(
     assign flush_valid = (state == STATE_FLUSH);
     assign flush_line  = counter[`CS_LINE_SEL_BITS-1:0];
 
+    localparam flush_way_start = `CS_LINE_SEL_BITS;
+    localparam flush_way_end   = flush_way_start + `CS_WAY_SEL_BITS - 1;
+
     if (WRITEBACK && (NUM_WAYS > 1)) begin : g_flush_way
-        assign flush_way = counter[`CS_LINE_SEL_BITS +: `CS_WAY_SEL_BITS];
+        assign flush_way = counter[flush_way_end : flush_way_start]; 
     end else begin : g_flush_way_all
         assign flush_way = '0;
     end

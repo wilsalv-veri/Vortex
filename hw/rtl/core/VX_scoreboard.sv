@@ -158,10 +158,13 @@ module VX_scoreboard import VX_gpu_pkg::*; #(
 
         wire [REG_TYPES-1:0][RV_REGS-1:0] in_use_mask;
         for (genvar i = 0; i < REG_TYPES; ++i) begin : g_in_use_mask
+            localparam in_use_mask_start_idx  = i * RV_REGS; 
+            localparam in_use_mask_end_idx    = in_use_mask_start_idx + RV_REGS; 
+
             wire [RV_REGS-1:0] ibf_reg_mask = ibf_opd_mask[0][i] | ibf_opd_mask[1][i] | ibf_opd_mask[2][i] | ibf_opd_mask[3][i];
             wire [RV_REGS-1:0] stg_reg_mask = stg_opd_mask[0][i] | stg_opd_mask[1][i] | stg_opd_mask[2][i] | stg_opd_mask[3][i];
             wire [RV_REGS-1:0] regs_mask = ibuffer_fire ? ibf_reg_mask : stg_reg_mask;
-            assign in_use_mask[i] = inuse_regs_n[i * RV_REGS +: RV_REGS] & regs_mask;
+            assign in_use_mask[i] = inuse_regs_n[in_use_mask_end_idx : in_use_mask_start_idx] & regs_mask; 
         end
 
         wire [REG_TYPES-1:0] regs_busy;

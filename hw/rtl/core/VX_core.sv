@@ -87,7 +87,8 @@ module VX_core import VX_gpu_pkg::*; #(
     );
 
     `SCOPE_IO_SWITCH (3);
-
+    
+    
     VX_schedule #(
         .INSTANCE_ID (`SFORMATF(("%s-schedule", INSTANCE_ID))),
         .CORE_ID (CORE_ID)
@@ -116,7 +117,8 @@ module VX_core import VX_gpu_pkg::*; #(
 
         .busy           (busy)
     );
-
+    
+    
     VX_fetch #(
         .INSTANCE_ID (`SFORMATF(("%s-fetch", INSTANCE_ID)))
     ) fetch (
@@ -128,6 +130,7 @@ module VX_core import VX_gpu_pkg::*; #(
         .fetch_if       (fetch_if)
     );
 
+    
     VX_decode #(
         .INSTANCE_ID (`SFORMATF(("%s-decode", INSTANCE_ID)))
     ) decode (
@@ -138,6 +141,7 @@ module VX_core import VX_gpu_pkg::*; #(
         .decode_sched_if(decode_sched_if)
     );
 
+    
     VX_issue #(
         .INSTANCE_ID (`SFORMATF(("%s-issue", INSTANCE_ID)))
     ) issue (
@@ -156,6 +160,7 @@ module VX_core import VX_gpu_pkg::*; #(
         .issue_sched_if (issue_sched_if)
     );
 
+    
     VX_execute #(
         .INSTANCE_ID (`SFORMATF(("%s-execute", INSTANCE_ID))),
         .CORE_ID (CORE_ID)
@@ -184,6 +189,7 @@ module VX_core import VX_gpu_pkg::*; #(
         .branch_ctl_if  (branch_ctl_if)
     );
 
+    
     VX_commit #(
         .INSTANCE_ID (`SFORMATF(("%s-commit", INSTANCE_ID)))
     ) commit (
@@ -197,7 +203,7 @@ module VX_core import VX_gpu_pkg::*; #(
         .commit_csr_if  (commit_csr_if),
         .commit_sched_if(commit_sched_if)
     );
-
+    
     VX_mem_unit #(
         .INSTANCE_ID (INSTANCE_ID)
     ) mem_unit (
@@ -288,5 +294,6 @@ module VX_core import VX_gpu_pkg::*; #(
     assign pipeline_perf.load_latency = perf_dcache_lat;
 
 `endif
-
+ 
+    
 endmodule

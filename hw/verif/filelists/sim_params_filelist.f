@@ -1,4 +1,3 @@
-
 //Include Files under $VORTEX/hw/verif/sim_params
 +incdir+$VORTEX/hw/verif/sim_params
 

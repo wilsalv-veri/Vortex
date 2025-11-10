@@ -66,7 +66,11 @@ module VX_lsu_slice import VX_gpu_pkg::*; #(
 
     wire [NUM_LANES-1:0][MEM_FLAGS_WIDTH-1:0] mem_req_flags;
     for (genvar i = 0; i < NUM_LANES; ++i) begin : g_mem_req_flags
-        wire [MEM_ADDRW-1:0] block_addr = full_addr[i][MEM_ASHIFT +: MEM_ADDRW];
+        
+        localparam block_addr_start_idx = MEM_ASHIFT; 
+        localparam block_addr_end_idx   = block_addr_start_idx + MEM_ADDRW; 
+        
+        wire [MEM_ADDRW-1:0] block_addr = full_addr[i][block_addr_end_idx : block_addr_start_idx]; 
         // is I/O address
         wire [MEM_ADDRW-1:0] io_addr_start = MEM_ADDRW'(`XLEN'(`IO_BASE_ADDR) >> MEM_ASHIFT);
         wire [MEM_ADDRW-1:0] io_addr_end = MEM_ADDRW'(`XLEN'(`IO_END_ADDR) >> MEM_ASHIFT);

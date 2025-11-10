@@ -79,14 +79,18 @@ module VX_wctl_unit import VX_gpu_pkg::*; #(
     logic [`NUM_THREADS-1:0] else_tmask;
 
     if (PID_BITS != 0) begin : g_pid
+        
+        reg mask_start = execute_if.data.pid * NUM_LANES;
+        reg mask_end   = mask_start + NUM_LANES;
+
         reg [`NUM_WARPS-1:0][2*`NUM_THREADS-1:0] tmask_table;
 
         wire [2*`NUM_THREADS-1:0] tmask_r = tmask_table[execute_if.data.wid];
 
         always @(*) begin
             {else_tmask, then_tmask} = execute_if.data.sop ? '0 : tmask_r;
-            then_tmask[execute_if.data.pid * NUM_LANES +: NUM_LANES] = taken & execute_if.data.tmask;
-            else_tmask[execute_if.data.pid * NUM_LANES +: NUM_LANES] = ~taken & execute_if.data.tmask;
+            then_tmask[mask_end : mask_start] = taken & execute_if.data.tmask;  
+            else_tmask[mask_end : mask_start] = ~taken & execute_if.data.tmask; 
         end
 
         always @(posedge clk) begin
@@ -111,8 +115,10 @@ module VX_wctl_unit import VX_gpu_pkg::*; #(
     // split
 
     wire [`CLOG2(`NUM_THREADS+1)-1:0] then_tmask_cnt, else_tmask_cnt;
-    `POP_COUNT(then_tmask_cnt, then_tmask);
-    `POP_COUNT(else_tmask_cnt, else_tmask);
+    
+    `POP_COUNT_WITH_LINE(then_tmask_cnt, then_tmask, 118);
+    `POP_COUNT_WITH_LINE(else_tmask_cnt, else_tmask, 119);
+
     wire then_first = (then_tmask_cnt >= else_tmask_cnt);
     wire [`NUM_THREADS-1:0] taken_tmask = then_first ? then_tmask : else_tmask;
     wire [`NUM_THREADS-1:0] ntaken_tmask = then_first ? else_tmask : then_tmask;

@@ -17,25 +17,25 @@ interface VX_warp_ctl_if import VX_gpu_pkg::*; ();
 
     wire        valid;
     wire [NW_WIDTH-1:0] wid;
-    tmc_t       tmc;
-    wspawn_t    wspawn;
-    split_t     split;
-    join_t      sjoin;
-    barrier_t   barrier;
+    wire tmc_t       tmc; 
+    wire wspawn_t    wspawn; 
+    wire split_t     split; 
+    wire join_t      sjoin; 
+    wire barrier_t   barrier; 
 
     wire [NW_WIDTH-1:0] dvstack_wid;
     wire [DV_STACK_SIZEW-1:0] dvstack_ptr;
 
     modport master (
-        output valid,
-        output wid,
-        output wspawn,
-        output tmc,
-        output split,
-        output sjoin,
-        output barrier,
+        inout valid, 
+        inout wid, 
+        inout wspawn,
+        inout tmc, 
+        inout split, 
+        inout sjoin, 
+        inout barrier, 
 
-        output dvstack_wid,
+        inout dvstack_wid, 
         input  dvstack_ptr
     );
 
@@ -49,7 +49,7 @@ interface VX_warp_ctl_if import VX_gpu_pkg::*; ();
         input barrier,
 
         input dvstack_wid,
-        output dvstack_ptr
+        inout dvstack_ptr 
     );
 
 endinterface

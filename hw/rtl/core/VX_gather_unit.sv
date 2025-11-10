@@ -48,10 +48,19 @@ module VX_gather_unit import VX_gpu_pkg::*; #(
         assign result_in_data[i]  = result_if[i].data;
         assign result_if[i].ready = result_in_ready[i];
         if (BLOCK_SIZE != `ISSUE_WIDTH) begin : g_result_in_isw_partial
+            
             if (BLOCK_SIZE != 1) begin : g_block
-                assign result_in_isw[i] = {result_in_data[i][DATA_WIS_OFF+BLOCK_SIZE_W +: (ISSUE_ISW_W-BLOCK_SIZE_W)], BLOCK_SIZE_W'(i)};
+    
+                localparam result_start = DATA_WIS_OFF+BLOCK_SIZE_W;
+                localparam result_end   = result_start + (ISSUE_ISW_W-BLOCK_SIZE_W) - 1;
+
+                assign result_in_isw[i] = {result_in_data[i][result_end : result_start], BLOCK_SIZE_W'(i)}; 
             end else begin : g_no_block
-                assign result_in_isw[i] = result_in_data[i][DATA_WIS_OFF +: ISSUE_ISW_W];
+            
+                localparam result_start = DATA_WIS_OFF;
+                localparam result_end   = result_start + ISSUE_ISW_W - 1;
+
+                assign result_in_isw[i] = result_in_data[i][result_end: result_start]; 
             end
         end else begin : g_result_in_isw_full
             assign result_in_isw[i] = BLOCK_SIZE_W'(i);

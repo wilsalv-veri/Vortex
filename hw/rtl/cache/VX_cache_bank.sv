@@ -479,7 +479,8 @@ module VX_cache_bank import VX_gpu_pkg::*; #(
     wire mshr_release_fire = mshr_finalize_st1 && mshr_release_st1 && ~pipe_stall;
 
     wire [1:0] mshr_dequeue;
-    `POP_COUNT(mshr_dequeue, {replay_fire, mshr_release_fire});
+    `POP_COUNT_WITH_LINE(mshr_dequeue, {replay_fire, mshr_release_fire}, 482);
+
 
     VX_pending_size #(
         .SIZE (MSHR_SIZE),
@@ -497,7 +498,7 @@ module VX_cache_bank import VX_gpu_pkg::*; #(
     );
 
     VX_cache_mshr #(
-        .INSTANCE_ID (`SFORMATF(("%s-mshr", INSTANCE_ID))),
+        .INSTANCE_ID (`SFORMATF(("%s-mshr", INSTANCE_ID))), 
         .BANK_ID     (BANK_ID),
         .LINE_SIZE   (LINE_SIZE),
         .NUM_BANKS   (NUM_BANKS),

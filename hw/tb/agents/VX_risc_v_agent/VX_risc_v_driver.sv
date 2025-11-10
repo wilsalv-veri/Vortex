@@ -5,6 +5,9 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
     localparam INSTRUCTION_INSERTION_MSB = `CACHE_LINE_WIDTH - 1;
     localparam INSTRUCTION_INSERTION_LSB = `CACHE_LINE_WIDTH - PC_BITS;
 
+    localparam REST_OF_CACHELINE_MSB     = INSTRUCTION_INSERTION_LSB - 1;
+    localparam REST_OF_CACHELINE_LSB     = 0;
+
     VX_risc_v_inst_item risc_v_inst_seq_item;
     
     uvm_blocking_get_port #(int) receive_seq_num_insts;
@@ -53,8 +56,6 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
             get_seq_num_insts();
         join_none
         
-        `VX_info("VX_RISC_V_DRIVER", "Got to Forever Main Loop")
-        
         forever @ (posedge mem_load_ifc.clk) begin    
             
             driver_state                <= get_next_state();;
@@ -65,7 +66,6 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
                                             get_instr(); 
                     end
                     PROCESS_INSTR         : process_instr();
-                    SHIFT_CACHELINE       : shift_cacheline();
                     SEND_INSTR            : send_instr();
                 endcase
             end
@@ -82,13 +82,13 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
 
             case(driver_state)
                 GET_INSTR             : next_state  = instr_received ? PROCESS_INSTR : GET_INSTR;
-                PROCESS_INSTR         : next_state  = SHIFT_CACHELINE;
-                SHIFT_CACHELINE      : begin
+                PROCESS_INSTR      : begin
                     if ((inst_count && ((inst_count % INST_PER_CACHE_LINE) == 0))  || inst_count == insts_to_send) 
                                         next_state  = SEND_INSTR;
                     else
                                         next_state =  GET_INSTR;
                 end
+
                 SEND_INSTR             : next_state = GET_INSTR;
             endcase
             return next_state;
@@ -147,20 +147,16 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
             end
         endcase
         
-        inst_count                                                        <= inst_count + 1;
-        instr_received                                                    <= 1'b1;
+        inst_count                                   <= inst_count + 1;
+        instr_received                               <= 1'b1;
     endtask
 
     task process_instr();
         `VX_info("[VX_RISC_V_DRIVER]", $sformatf("Processing Instruction Data: %0h",  risc_v_inst.inst_data));
-        shift_amount                                                      <= get_shift_amount();
-        cacheline[ INSTRUCTION_INSERTION_MSB : INSTRUCTION_INSERTION_LSB] <= risc_v_inst.inst_data;
-        instr_received                                                    <= 1'b0;
+        shift_amount                                 <= get_shift_amount();
+        cacheline                                    <= {risc_v_inst.inst_data, cacheline[REST_OF_CACHELINE_MSB:REST_OF_CACHELINE_LSB]} >> get_shift_amount();
+        instr_received                               <= 1'b0;
         seq_item_port.item_done();
-    endtask
-
-    task shift_cacheline();
-        cacheline                                                         <= cacheline >> shift_amount;    
     endtask
 
     task send_instr();

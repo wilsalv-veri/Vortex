@@ -4,55 +4,66 @@ PROJECT_NAME = "VORTEX"
 project_path = os.getenv(PROJECT_NAME)+'/hw' 
 project_env_var = f"${PROJECT_NAME}"
 
+generate_filelist_path = os.path.abspath(__file__)
+scripts_dir = os.path.dirname(generate_filelist_path)
 
 def generate_filelist(file_name, lines):
-
-
     filelists_directory =  f"{project_path}/verif/filelists"
     abs_path_file_name = f"{filelists_directory}/{file_name}"   
     print(f"ABS_PATH_FILE_NAME:{abs_path_file_name}")
     with open(abs_path_file_name, 'w') as f:
         for line in lines:
-            f.write(line + '\n')
+            f.write(line  + '\n' )
 
 def generate_top_filelist_lines(filelist_names):
-    lines = []
-    lines.append("// Set the include path for UVM macros and other files")
-    lines.append("+incdir+$UVM_HOME/src")
-    lines.append("// Add the UVM package file. It is crucial to compile this before any")
-    lines.append("// files that depend on it")
-    lines.append(f"-f {project_env_var}/hw/verif/filelists/{filelist_names[0]}")
-    lines.append("$UVM_HOME/src/uvm_pkg.sv")
-    lines.append("+define+NOPAE")
-    lines.append("+define+GBAR_ENABLE")
-    lines.append("+define+LMEM_ENABLED")
-    lines.append("\n//Reference other filelists")
+    top_level_lines = []
+    top_level_lines.append(f"-f {project_env_var}/hw/verif/filelists/{filelist_names[0]}\n")
+    top_level_lines.append("// Set the include path for UVM macros and other files")
+    top_level_lines.append("+incdir+$UVM_HOME/src\n")
+    top_level_lines.append("// Add the UVM package file. It is crucial to compile this before any")
+    top_level_lines.append("// files that depend on it")
+    top_level_lines.append("$UVM_HOME/src/uvm_pkg.sv\n")
+    
+    with open(f"{scripts_dir}/top_level_macros.txt", "r") as file:
+        for macro in file:
+            top_level_lines.append(f"+define+{macro.replace("\n","")}")
+
+    top_level_lines.append("\n//Reference other filelists")
     
     for filelist_name in filelist_names[1:]:
-        lines.append(f"-f {project_env_var}/hw/verif/filelists/{filelist_name}")
+        top_level_lines.append(f"-f {project_env_var}/hw/verif/filelists/{filelist_name}")
 
-
-    return lines
+    return top_level_lines
 
 def addLinesUnderCurrentDirectory(cwd_path,include_files):
         
-        supported_formats = ["vh","sv","v", "dir"]
-        #entries = os.listdir(cwd_path)
-        if 'opae' in cwd_path:
+        supported_formats = ["vh","svh","sv","v", "dir"]
+        cwd = get_current_dir_name(cwd_path)
+
+        dont_include_files_under_dir_list = ['opae', 'VX_risc_v_agent']
+        if cwd in dont_include_files_under_dir_list:
             return
-        
+
         entries = []
         file_entries = [entry for entry in os.listdir(cwd_path) if os.path.isfile(os.path.join(cwd_path, entry))]
         dir_entries = [entry for entry in os.listdir(cwd_path) if os.path.isdir(os.path.join(cwd_path, entry))]
         
+        if cwd == 'tb':
+            sort_by_match(dir_entries, "tests")
+            sort_by_match(dir_entries, "seqs")
+            sort_by_match(dir_entries, "agents")
+            sort_by_match(dir_entries, "memory_model")
+            sort_by_match(dir_entries, "interfaces")
+            sort_by_match(dir_entries, "common")
+
         sort_by_match(file_entries, "_pkg")
         sort_by_match(file_entries, ".vh")
+        sort_by_match(file_entries, ".svh")
         
         entries.extend(file_entries)
         entries.extend(dir_entries)
-        #print(f"Entries in '{cwd_path}':")
+
         for entry in entries:
-            #os.path.isfile(os.path.join(rtl_path, entry))
             
             abs_path = os.path.join(cwd_path, entry)
             directory = os.path.isdir(abs_path)
@@ -63,23 +74,29 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
             else:
                 format = "dir"
             
-            if directory:
+            if ((cwd == 'rtl') and directory):
                 entry = ensure_dependent_order(entry)
                 abs_path = os.path.join(cwd_path, entry)
                 directory = os.path.isdir(abs_path)
                 path = abs_path.replace(entry,"")
 
+            #Files to skip
+            hidden_file        = entry[0] == "."
+            unsupported_format = (format not in supported_formats) 
+            common_pkg_files   = cwd == 'common' and "pkg" not in entry
 
-            if entry[0] == "." or ((not directory) and (format not in supported_formats)) :
-                continue
+            if hidden_file or unsupported_format or common_pkg_files:
+                continue          
             
-                
             includeLine = filelistIncludeLine(entry, path, directory)
             includeLine.add_line(include_files)
         
             if directory:
                 addLinesUnderCurrentDirectory(abs_path, include_files)
-                include_files.append("\n")
+                include_files.append("")
+
+        if cwd == 'tb':
+             sort_by_match(include_files, "tb_top.sv", False)
 
 def ensure_dependent_order(dir_name):
     #FPU Must come before Interface directory
@@ -92,21 +109,28 @@ def ensure_dependent_order(dir_name):
         return dir_name
 
 
-def get_real_dir_name(dir_name):
+def get_current_dir_name(dir_name):
     
     if "/" in dir_name:
         dir_name = dir_name.split("/")[-1]
     
     return dir_name
 
-def sort_by_match(file_entries, match_string=".vh"):
+def sort_by_match(file_entries, match_string=".vh", inc_order=True):
 
     copy_entries = file_entries.copy()
-    
+    insert_idx_dict = {True:0,False:-1}
+    inserted_new_line = False
+
     for idx, entry in enumerate(copy_entries):
         if match_string in entry:
             file_entries.pop(idx)
-            file_entries.insert(0,entry)
+
+            if not inc_order and not inserted_new_line:
+                file_entries.insert(insert_idx_dict[inc_order], "")
+                inserted_new_line = True
+
+            file_entries.insert(insert_idx_dict[inc_order],entry)
         
 class filelistIncludeLine:
 
@@ -123,9 +147,9 @@ class filelistIncludeLine:
         filePath = f"{self.rel_path}{self.name}"
 
         if self.directory:
-            lineList.append(f"\n//Include Files under {filePath}")
+            lineList.append(f"//Include Files under {filePath}")
         
-        line = [filePath,f"+incdir+{filePath}\n"][int(self.directory)]
+        line = [filePath,f"+incdir+{filePath}\n"][int(self.directory)] 
         lineList.append(line)
     
     def set_rel_path(self):
@@ -150,7 +174,7 @@ if __name__ == "__main__":
         include_files = []
 
         dir_name = path[ path.index(project_path) + len(project_path) + 1:]
-        dir_name = get_real_dir_name(dir_name)
+        dir_name = get_current_dir_name(dir_name)
         
         includeLine = filelistIncludeLine(dir_name, path.replace(dir_name,""), True)
         includeLine.add_line(include_files)    

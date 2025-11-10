@@ -31,13 +31,13 @@ interface VX_result_if import VX_gpu_pkg::*; #(
         logic                       eop;
     } data_t;
 
-    logic  valid;
-    data_t data;
+    wire       valid; 
+    wire data_t data; 
     logic  ready;
 
     modport master (
-        output valid,
-        output data,
+        inout valid, 
+        inout data, 
         input  ready
     );
 

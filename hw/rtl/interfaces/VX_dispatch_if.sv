@@ -15,13 +15,13 @@
 
 interface VX_dispatch_if import VX_gpu_pkg::*; ();
 
-    logic  valid;
-    dispatch_t data;
+    wire            valid; 
+    wire dispatch_t data; 
     logic  ready;
 
     modport master (
-        output valid,
-        output data,
+        inout valid, 
+        inout data, 
         input  ready
     );
 

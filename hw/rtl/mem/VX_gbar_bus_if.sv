@@ -25,16 +25,16 @@ interface VX_gbar_bus_if import VX_gpu_pkg::*; ();
         logic [NB_WIDTH-1:0] id;
     } rsp_data_t;
 
-    logic  req_valid;
-    req_data_t req_data;
-    logic  req_ready;
+    wire            req_valid; 
+    wire req_data_t req_data; 
+    logic           req_ready;
 
     logic  rsp_valid;
     rsp_data_t rsp_data;
 
     modport master (
-        output req_valid,
-        output req_data,
+        inout  req_valid, 
+        inout  req_data, 
         input  req_ready,
 
         input  rsp_valid,

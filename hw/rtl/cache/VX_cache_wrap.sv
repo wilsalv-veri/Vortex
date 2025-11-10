@@ -14,7 +14,9 @@
 `include "VX_cache_define.vh"
 
 module VX_cache_wrap import VX_gpu_pkg::*; #(
-    parameter `STRING INSTANCE_ID    = "",
+    parameter `STRING INSTANCE_ID   = "",
+
+    parameter INST_ID               = 0, 
 
     parameter TAG_SEL_IDX           = 0,
 
@@ -75,15 +77,16 @@ module VX_cache_wrap import VX_gpu_pkg::*; #(
     input wire clk,
     input wire reset,
 
-    // PERF
+// PERF
 `ifdef PERF_ENABLE
     output cache_perf_t     cache_perf,
 `endif
 
-    VX_mem_bus_if.slave     core_bus_if [NUM_REQS],
-    VX_mem_bus_if.master    mem_bus_if [MEM_PORTS]
+    VX_mem_bus_if.slave     core_bus_if[NUM_REQS],
+    VX_mem_bus_if.master    mem_bus_if[MEM_PORTS] 
 );
 
+    
     `STATIC_ASSERT(NUM_BANKS == (1 << `CLOG2(NUM_BANKS)), ("invalid parameter"))
 
     localparam CACHE_MEM_TAG_WIDTH = `CACHE_MEM_TAG_WIDTH(MSHR_SIZE, NUM_BANKS, MEM_PORTS, UUID_WIDTH);
@@ -148,7 +151,7 @@ module VX_cache_wrap import VX_gpu_pkg::*; #(
             `ASSIGN_VX_MEM_BUS_IF (mem_bus_tmp_if[i], mem_bus_cache_if[i]);
         end
     end
-
+    
     for (genvar i = 0; i < MEM_PORTS; ++i) begin : g_mem_bus_if
         if (WRITE_ENABLE) begin : g_we
             `ASSIGN_VX_MEM_BUS_IF (mem_bus_if[i], mem_bus_tmp_if[i]);
@@ -161,6 +164,7 @@ module VX_cache_wrap import VX_gpu_pkg::*; #(
 
         VX_cache #(
             .INSTANCE_ID  (INSTANCE_ID),
+            .INST_ID      (INST_ID),
             .CACHE_SIZE   (CACHE_SIZE),
             .LINE_SIZE    (LINE_SIZE),
             .NUM_BANKS    (NUM_BANKS),

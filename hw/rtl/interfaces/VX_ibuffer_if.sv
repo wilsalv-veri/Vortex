@@ -17,7 +17,7 @@ interface VX_ibuffer_if import VX_gpu_pkg::*; ();
 
     logic     valid;
     ibuffer_t data;
-    logic     ready;
+    wire      ready; 
 
     modport master (
         output valid,
@@ -28,7 +28,7 @@ interface VX_ibuffer_if import VX_gpu_pkg::*; ();
     modport slave (
         input  valid,
         input  data,
-        output ready
+        inout ready 
     );
 
 endinterface

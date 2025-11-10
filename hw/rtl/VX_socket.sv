@@ -250,6 +250,6 @@ module VX_socket import VX_gpu_pkg::*; #(
         );
     end
 
-    `BUFFER_EX(busy, (| per_core_busy), 1'b1, 1, (`SOCKET_SIZE > 1));
+    `BUFFER_EX_WITH_LINE(busy, (| per_core_busy), 1'b1, 1, (`SOCKET_SIZE > 1), 253); 
 
 endmodule

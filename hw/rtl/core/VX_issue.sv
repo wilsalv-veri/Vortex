@@ -53,8 +53,11 @@ module VX_issue import VX_gpu_pkg::*; #(
     `SCOPE_IO_SWITCH (`ISSUE_WIDTH);
 
     for (genvar issue_id = 0; issue_id < `ISSUE_WIDTH; ++issue_id) begin : g_slices
-        VX_decode_if slice_decode_if();
+        
+        localparam ibuf_pop_start_idx = issue_id * PER_ISSUE_WARPS;
+        localparam ibuf_pop_end_idx = ibuf_pop_start_idx + PER_ISSUE_WARPS;
 
+        VX_decode_if slice_decode_if();
         VX_dispatch_if per_issue_dispatch_if[NUM_EX_UNITS]();
 
         assign slice_decode_if.valid = decode_if.valid && (decode_isw == issue_id);
@@ -62,7 +65,7 @@ module VX_issue import VX_gpu_pkg::*; #(
         assign decode_ready_in[issue_id] = slice_decode_if.ready;
 
     `ifndef L1_ENABLE
-        assign decode_if.ibuf_pop[issue_id * PER_ISSUE_WARPS +: PER_ISSUE_WARPS] = slice_decode_if.ibuf_pop;
+        assign decode_if.ibuf_pop[ibuf_pop_end_idx : ibuf_pop_start_idx] = slice_decode_if.ibuf_pop; 
     `endif
 
         VX_issue_slice #(

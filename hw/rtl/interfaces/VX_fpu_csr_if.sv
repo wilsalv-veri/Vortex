@@ -15,19 +15,19 @@
 
 interface VX_fpu_csr_if import VX_gpu_pkg::*, VX_fpu_pkg::*; ();
 
-    wire                    write_enable;
-    wire [NW_WIDTH-1:0]     write_wid;
-    fflags_t                write_fflags;
+    wire                         write_enable;
+    wire [NW_WIDTH-1:0]          write_wid;
+    wire fflags_t                write_fflags; 
 
-    wire [NW_WIDTH-1:0]     read_wid;
-    wire [INST_FRM_BITS-1:0] read_frm;
+    wire [NW_WIDTH-1:0]          read_wid;
+    wire [INST_FRM_BITS-1:0]     read_frm;
 
     modport master (
-        output write_enable,
-        output write_wid,
-        output write_fflags,
+        inout write_enable, 
+        inout write_wid, 
+        inout write_fflags, 
 
-        output read_wid,
+        inout read_wid, 
         input  read_frm
     );
 

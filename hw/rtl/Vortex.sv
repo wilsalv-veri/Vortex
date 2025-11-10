@@ -158,7 +158,7 @@ module Vortex import VX_gpu_pkg::*; (
         );
     end
 
-    `BUFFER_EX(busy, (| per_cluster_busy), 1'b1, 1, (`NUM_CLUSTERS > 1));
+    `BUFFER_EX_WITH_LINE(busy, (| per_cluster_busy), 1'b1, 1, (`NUM_CLUSTERS > 1), 162);
 
 `ifdef PERF_ENABLE
 

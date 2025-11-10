@@ -40,22 +40,22 @@ interface VX_mem_bus_if import VX_gpu_pkg::*; #(
         tag_t                   tag;
     } rsp_data_t;
 
-    logic  req_valid;
-    req_data_t req_data;
-    logic  req_ready;
+    wire            req_valid;
+    wire req_data_t req_data; 
+    logic           req_ready;
 
-    logic  rsp_valid;
-    rsp_data_t rsp_data;
-    logic  rsp_ready;
+    logic           rsp_valid;
+    rsp_data_t      rsp_data;
+    wire            rsp_ready; 
 
     modport master (
-        output req_valid,
-        output req_data,
+        inout  req_valid, 
+        inout  req_data, 
         input  req_ready,
 
         input  rsp_valid,
         input  rsp_data,
-        output rsp_ready
+        inout  rsp_ready 
     );
 
     modport slave (

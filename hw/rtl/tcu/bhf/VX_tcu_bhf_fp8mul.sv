@@ -143,7 +143,7 @@ module VX_tcu_bhf_fp8mul (
         `ifdef FP16_ACC
             .out(fp16_recoded),
             .exceptionFlags(fp16_exception_flags)
-        `ifdef FP32_ACC
+        `elsif FP32_ACC
             .out(fp32_recoded),
             .exceptionFlags(fp32_exception_flags)
         `endif
@@ -151,8 +151,8 @@ module VX_tcu_bhf_fp8mul (
 
     `ifdef FP16_ACC
         assign y = fp16_recoded;
-    `endif FP32_ACC
-        assign y = fp32_recoded
+    `elsif FP32_ACC
+        assign y = fp32_recoded;
     `endif
 
     /*

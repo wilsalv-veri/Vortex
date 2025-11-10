@@ -22,20 +22,20 @@ interface VX_schedule_if import VX_gpu_pkg::*; ();
         logic [PC_BITS-1:0]     PC;
     } data_t;
 
-    logic  valid;
-    data_t data;
-    logic  ready;
+    wire        valid; 
+    wire data_t data; 
+    logic       ready;
 
     modport master (
-        output valid,
-        output data,
-        input  ready
+        inout   valid, 
+        inout   data, 
+        input   ready
     );
 
     modport slave (
-        input  valid,
-        input  data,
-        output ready
+        input   valid,
+        input   data,
+        output  ready
     );
 
 endinterface

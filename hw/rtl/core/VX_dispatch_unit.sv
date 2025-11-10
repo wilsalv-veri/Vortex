@@ -79,7 +79,11 @@ module VX_dispatch_unit import VX_gpu_pkg::*; #(
         wire [BATCH_COUNT_W-1:0] batch_idx_n;
         wire [BATCH_COUNT-1:0] valid_batches;
         for (genvar i = 0; i < BATCH_COUNT; ++i) begin : g_valid_batches
-            assign valid_batches[i] = | dispatch_valid[i * BLOCK_SIZE +: BLOCK_SIZE];
+
+            localparam valid_start = i * BLOCK_SIZE;
+            localparam valid_end   = valid_start + BLOCK_SIZE - 1;
+
+            assign valid_batches[i] = | dispatch_valid[valid_end: valid_start]; 
         end
 
         VX_generic_arbiter #(
@@ -114,19 +118,38 @@ module VX_dispatch_unit import VX_gpu_pkg::*; #(
 
     for (genvar block_idx = 0; block_idx < BLOCK_SIZE; ++block_idx) begin : g_blocks
 
+        localparam wis_start     = DATA_TMASK_OFF + `SIMD_WIDTH + SIMD_IDX_W;
+        localparam wis_end       = wis_start + ISSUE_WIS_W - 1;
+
+        localparam sid_start     = DATA_TMASK_OFF + `SIMD_WIDTH ;
+        localparam sid_end       = sid_start + SIMD_IDX_W - 1;
+
+        localparam tmask_start   = DATA_TMASK_OFF;
+        localparam tmask_end     = tmask_start + `SIMD_WIDTH - 1;
+
+        localparam rsdata0_start = DATA_REGS_OFF + 2 * `SIMD_WIDTH * `XLEN;
+        localparam rsdata0_end   = rsdata0_start + (`SIMD_WIDTH * `XLEN) - 1;
+
+        localparam rsdata1_start = DATA_REGS_OFF + 1 * `SIMD_WIDTH * `XLEN;
+        localparam rsdata1_end   = rsdata1_start + (`SIMD_WIDTH * `XLEN) - 1;
+
+        localparam rsdata2_start = DATA_REGS_OFF + 0 * `SIMD_WIDTH * `XLEN;
+        localparam rsdata2_end   = rsdata2_start + (`SIMD_WIDTH * `XLEN) - 1;
+
+
         wire [ISSUE_W-1:0] issue_idx = issue_indices[block_idx];
-        wire [ISSUE_WIS_W-1:0] dispatch_wis = dispatch_data[issue_idx][DATA_TMASK_OFF + `SIMD_WIDTH + SIMD_IDX_W +: ISSUE_WIS_W];
-        wire [SIMD_IDX_W-1:0] dispatch_sid = dispatch_data[issue_idx][DATA_TMASK_OFF + `SIMD_WIDTH +: SIMD_IDX_W];
+        wire [ISSUE_WIS_W-1:0] dispatch_wis = dispatch_data[issue_idx][wis_end: wis_start]; 
+        wire [SIMD_IDX_W-1:0] dispatch_sid = dispatch_data[issue_idx][sid_end: sid_start]; 
         wire dispatch_sop = dispatch_data[issue_idx][1];
         wire dispatch_eop = dispatch_data[issue_idx][0];
 
         wire [`SIMD_WIDTH-1:0] dispatch_tmask;
         wire [2:0][`SIMD_WIDTH-1:0][`XLEN-1:0] dispatch_rsdata;
 
-        assign dispatch_tmask = dispatch_data[issue_idx][DATA_TMASK_OFF +: `SIMD_WIDTH];
-        assign dispatch_rsdata[0] = dispatch_data[issue_idx][DATA_REGS_OFF + 2 * `SIMD_WIDTH * `XLEN +: `SIMD_WIDTH * `XLEN];
-        assign dispatch_rsdata[1] = dispatch_data[issue_idx][DATA_REGS_OFF + 1 * `SIMD_WIDTH * `XLEN +: `SIMD_WIDTH * `XLEN];
-        assign dispatch_rsdata[2] = dispatch_data[issue_idx][DATA_REGS_OFF + 0 * `SIMD_WIDTH * `XLEN +: `SIMD_WIDTH * `XLEN];
+        assign dispatch_tmask = dispatch_data[issue_idx][tmask_end : tmask_start]; 
+        assign dispatch_rsdata[0] = dispatch_data[issue_idx][rsdata0_end: rsdata0_start]; 
+        assign dispatch_rsdata[1] = dispatch_data[issue_idx][rsdata1_end: rsdata1_start]; 
+        assign dispatch_rsdata[2] = dispatch_data[issue_idx][rsdata2_end: rsdata2_start]; 
 
         wire valid_p, ready_p;
 

@@ -18,7 +18,7 @@ interface VX_commit_sched_if ();
     wire [`NUM_WARPS-1:0] committed_warps;
 
     modport master (
-        output committed_warps
+        inout committed_warps 
     );
 
     modport slave (

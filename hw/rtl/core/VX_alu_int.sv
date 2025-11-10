@@ -143,9 +143,19 @@ module VX_alu_int import VX_gpu_pkg::*; #(
     // SHFL
     if (NUM_LANES > 1) begin : g_shfl
         for (genvar i = 0; i < NUM_LANES; ++i) begin : g_i
-            wire [LANE_BITS-1:0] bval = alu_in2[i][0 +: LANE_BITS];
-            wire [LANE_BITS-1:0] cval = alu_in2[i][6 +: LANE_BITS];
-            wire [LANE_BITS-1:0] mask = alu_in2[i][12 +: LANE_BITS];
+            
+            
+            localparam bval_start = 0;
+            localparam cval_start = 6;
+            localparam mask_start = 12;
+            
+            localparam bval_end   = bval_start + LANE_BITS;
+            localparam cval_end   = cval_start + LANE_BITS;
+            localparam mask_end   = mask_start + LANE_BITS;
+
+            wire [LANE_BITS-1:0] bval = alu_in2[i][bval_end : bval_start];  
+            wire [LANE_BITS-1:0] cval = alu_in2[i][cval_end : cval_start]; 
+            wire [LANE_BITS-1:0] mask = alu_in2[i][mask_end : mask_start];  
             wire [LANE_BITS-1:0] minLane = (LANE_BITS'(i) & mask);
             wire [LANE_BITS-1:0] maxLane = minLane | (cval & ~(mask));
 

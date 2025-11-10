@@ -59,8 +59,9 @@ module VX_cache_init import VX_gpu_pkg::*; #(
         wire [NUM_REQS_W-1:0] core_bus_out_cnt;
         wire [NUM_BANKS_W-1:0] bank_req_cnt;
 
-        `POP_COUNT(core_bus_out_cnt, core_bus_out_fire);
-        `POP_COUNT(bank_req_cnt, bank_req_fire);
+        `POP_COUNT_WITH_LINE(core_bus_out_cnt, core_bus_out_fire, 62);
+        `POP_COUNT_WITH_LINE(bank_req_cnt, bank_req_fire, 63);
+        
         `UNUSED_VAR (core_bus_out_cnt)
 
         VX_pending_size #(

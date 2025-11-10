@@ -15,6 +15,7 @@
 
 module VX_cache import VX_gpu_pkg::*; #(
     parameter `STRING INSTANCE_ID   = "",
+    parameter INST_ID = 0,
 
     // Number of Word requests per cycle
     parameter NUM_REQS              = 4,
@@ -278,25 +279,37 @@ module VX_cache import VX_gpu_pkg::*; #(
         assign core_req_addr[i]   = core_bus2_if[i].req_data.addr;
         assign core_req_data[i]   = core_bus2_if[i].req_data.data;
         assign core_req_tag[i]    = core_bus2_if[i].req_data.tag;
-        assign core_req_flags[i]  = `UP(MEM_FLAGS_WIDTH)'(core_bus2_if[i].req_data.flags);
+        assign core_req_flags[i]  = `SIMPLE_UP(MEM_FLAGS_WIDTH)'(core_bus2_if[i].req_data.flags); 
         assign core_bus2_if[i].req_ready = core_req_ready[i];
     end
 
     for (genvar i = 0; i < NUM_REQS; ++i) begin : g_core_req_wsel
+    
+        localparam req_wsel_start = 0;
+        localparam req_wsel_end   = req_wsel_start + WORD_SEL_BITS - 1;
+        
         if (WORDS_PER_LINE > 1) begin : g_wsel
-            assign core_req_wsel[i] = core_req_addr[i][0 +: WORD_SEL_BITS];
+            assign core_req_wsel[i] = core_req_addr[i][req_wsel_end : req_wsel_start]; 
         end else begin : g_no_wsel
             assign core_req_wsel[i] = '0;
         end
     end
 
     for (genvar i = 0; i < NUM_REQS; ++i) begin : g_core_req_line_addr
-        assign core_req_line_addr[i] = core_req_addr[i][(BANK_SEL_BITS + WORD_SEL_BITS) +: LINE_ADDR_WIDTH];
+
+        localparam req_addr_start = (BANK_SEL_BITS + WORD_SEL_BITS);
+        localparam req_addr_end   = req_addr_start + LINE_ADDR_WIDTH - 1;
+
+        assign core_req_line_addr[i] = core_req_addr[i][req_addr_end : req_addr_start];
     end
 
     for (genvar i = 0; i < NUM_REQS; ++i) begin : g_core_req_bid
+        
+        localparam req_bid_start = WORD_SEL_BITS;
+        localparam req_bid_end   = req_bid_start + BANK_SEL_BITS - 1;
+        
         if (NUM_BANKS > 1) begin : g_multibanks
-            assign core_req_bid[i] = core_req_addr[i][WORD_SEL_BITS +: BANK_SEL_BITS];
+            assign core_req_bid[i] = core_req_addr[i][req_bid_end : req_bid_start]; 
         end else begin : g_singlebank
             assign core_req_bid[i] = '0;
         end
@@ -362,7 +375,7 @@ module VX_cache import VX_gpu_pkg::*; #(
     for (genvar bank_id = 0; bank_id < NUM_BANKS; ++bank_id) begin : g_banks
         VX_cache_bank #(
             .BANK_ID      (bank_id),
-            .INSTANCE_ID  (`SFORMATF(("%s-bank%0d", INSTANCE_ID, bank_id))),
+            .INSTANCE_ID  (`SFORMATF(("%s-bank%0d", INSTANCE_ID, bank_id))), 
             .CACHE_SIZE   (CACHE_SIZE),
             .LINE_SIZE    (LINE_SIZE),
             .NUM_BANKS    (NUM_BANKS),

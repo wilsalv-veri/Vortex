@@ -28,10 +28,9 @@ package VX_tb_top_pkg;
 
     typedef logic [`MEM_ADDR_WIDTH - `CLOG2(`L1_LINE_SIZE) - 1:0]  addr_t;
     typedef logic [L1_MEM_ARB_TAG_WIDTH - 1:0] tag_t;
-    typedef logic [`L1_LINE_SIZE*8 - 1:0] cache_line_t;
     
-    typedef enum {MEM_LOAD_IDLE=0, MEM_LOAD_DONE=1} memory_load_state_t;
-    typedef enum {IDLE=0, EXECUTE_OPERATION=1, EXECUTE_OPERATION_READ=2} memory_state_t;
+    typedef enum logic  {MEM_LOAD_IDLE=0, MEM_LOAD_DONE=1} memory_load_state_t;
+    typedef enum  logic [2:0] {LOAD_IDLE, CORE_REQ_IDLE, EXECUTE_OPERATION, EXECUTE_OPERATION_READ} memory_state_t;
     typedef enum {READ=0, WRITE=1} mem_operation_t;
     
     task VX_init_tb_top_if(virtual VX_tb_top_if tb_top_if);
@@ -61,11 +60,11 @@ package VX_tb_top_pkg;
             VX_toggle_mem_load_reset(tb_top_if);
             VX_toggle_mem_reset(tb_top_if);
         join
-        tb_top_if.start_mem_loader    = 1'b1;
-        tb_top_if.load_mem            = 1'b1;
-        wait(tb_top_if.mem_loader_done);
-        tb_top_if.start_mem_loader    = 1'b0;
-        tb_top_if.load_mem            = 1'b0;
+        //tb_top_if.start_mem_loader    = 1'b1;
+        //tb_top_if.load_mem            = 1'b1;
+        //wait(tb_top_if.mem_loader_done);
+        //tb_top_if.start_mem_loader    = 1'b0;
+        //tb_top_if.load_mem            = 1'b0;
     endtask
 
     task VX_toggle_mem_load_reset(virtual VX_tb_top_if tb_top_if);
@@ -116,6 +115,10 @@ package VX_tb_top_pkg;
             VX_toggle_icache_reset(tb_top_if);
             VX_toggle_dcache_reset(tb_top_if);
             VX_toggle_core_reset(tb_top_if);
+
+            //Should add here?
+            VX_toggle_mem_load_reset(tb_top_if);
+            VX_toggle_mem_reset(tb_top_if);
         join
     endtask
 

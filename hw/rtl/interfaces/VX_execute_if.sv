@@ -34,20 +34,20 @@ interface VX_execute_if import VX_gpu_pkg::*; #(
         logic                           eop;
     } data_t;
 
-    logic  valid;
-    data_t data;
-    logic  ready;
+    wire        valid; 
+    wire data_t data; 
+    wire        ready; 
 
     modport master (
-        output valid,
-        output data,
+        inout valid, 
+        inout data, 
         input  ready
     );
 
     modport slave (
         input  valid,
         input  data,
-        output ready
+        inout  ready 
     );
 
 endinterface

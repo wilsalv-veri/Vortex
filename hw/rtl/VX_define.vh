@@ -204,7 +204,18 @@
         .data_out (out) \
     )
 
+`define POP_COUNT_EX_WITH_LINE(out, in, model,LINE_NUM) \
+    VX_popcount #( \
+        .N ($bits(in)), \
+        .MODEL (model) \
+    ) __pop_count_ex``LINE_NUM( \
+        .data_in  (in), \
+        .data_out (out) \
+    )
+
+
 `define POP_COUNT(out, in) `POP_COUNT_EX(out, in, 1)
+`define POP_COUNT_WITH_LINE(out,in, LINE_NUM) `POP_COUNT_EX_WITH_LINE(out,in,1, LINE_NUM)
 
 `define CONCAT(out, left_in, right_in, L, R) \
     /* verilator lint_off GENUNNAMED */ \
@@ -230,7 +241,35 @@
         .data_out (dst) \
     )
 
+`define BUFFER_EX_WITH_LINE(dst, src, ena, resetw, latency, LINE_NUM) \
+    VX_pipe_register #( \
+        .DATAW  ($bits(dst)), \
+        .RESETW (resetw), \
+        .DEPTH  (latency) \
+    ) __buffer_ex``LINE_NUM ( \
+        .clk      (clk), \
+        .reset    (reset), \
+        .enable   (ena), \
+        .data_in  (src), \
+        .data_out (dst) \
+    )
+
+`define BUFFER_EX_WITH_SIZE_AND_LINE(size, dst, src, ena, resetw, latency, LINE_NUM) \
+    VX_pipe_register #( \
+        .DATAW  (size), \
+        .RESETW (resetw), \
+        .DEPTH  (latency) \
+    ) __buffer_ex``LINE_NUM ( \
+        .clk      (clk), \
+        .reset    (reset), \
+        .enable   (ena), \
+        .data_in  (src), \
+        .data_out (dst) \
+    )
+
+
 `define BUFFER(dst, src) `BUFFER_EX(dst, src, 1'b1, $bits(dst), 1)
+`define BUFFER_WITH_LINE(dst,src, LINE_NUM) `BUFFER_EX_WITH_LINE(dst, src, 1'b1, $bits(dst), 1, LINE_NUM)
 
 `define NEG_EDGE(dst, src) \
     VX_edge_trigger #( \

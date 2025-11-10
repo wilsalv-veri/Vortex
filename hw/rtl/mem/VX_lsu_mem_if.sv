@@ -43,31 +43,31 @@ interface VX_lsu_mem_if import VX_gpu_pkg::*; #(
         tag_t                                  tag;
     } rsp_data_t;
 
-    logic  req_valid;
-    req_data_t req_data;
-    logic  req_ready;
+    wire            req_valid;
+    wire req_data_t req_data; 
+    wire            req_ready;
 
-    logic  rsp_valid;
-    rsp_data_t rsp_data;
-    logic  rsp_ready;
+    wire            rsp_valid; 
+    wire rsp_data_t rsp_data;
+    wire            rsp_ready; 
 
     modport master (
-        output req_valid,
-        output req_data,
+        inout req_valid,
+        inout req_data, 
         input  req_ready,
 
         input  rsp_valid,
         input  rsp_data,
-        output rsp_ready
+        inout rsp_ready 
     );
 
     modport slave (
         input  req_valid,
         input  req_data,
-        output req_ready,
+        inout req_ready, 
 
-        output rsp_valid,
-        output rsp_data,
+        inout rsp_valid, 
+        inout rsp_data, 
         input  rsp_ready
     );
 

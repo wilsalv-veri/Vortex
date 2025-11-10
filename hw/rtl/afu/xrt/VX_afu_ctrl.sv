@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-`include "vortex_afu.vh"
+`include "vortex_afu_xrt.vh"
 
 module VX_afu_ctrl import VX_gpu_pkg::*; #(
     parameter S_AXI_ADDR_WIDTH = 8,

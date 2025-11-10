@@ -42,7 +42,7 @@ module VX_schedule import VX_gpu_pkg::*; #(
     VX_sched_csr_if.master  sched_csr_if,
 
     // status
-    output wire             busy
+    inout wire             busy
 );
     `UNUSED_SPARAM (INSTANCE_ID)
     `UNUSED_PARAM (CORE_ID)
@@ -101,8 +101,9 @@ module VX_schedule import VX_gpu_pkg::*; #(
     reg is_single_warp;
 
     wire [`CLOG2(`NUM_WARPS+1)-1:0] active_warps_cnt;
-    `POP_COUNT(active_warps_cnt, active_warps);
-
+    
+    `POP_COUNT_WITH_LINE(active_warps_cnt,active_warps,106);
+    
     always @(*) begin
         active_warps_n  = active_warps;
         stalled_warps_n = stalled_warps;
@@ -179,7 +180,7 @@ module VX_schedule import VX_gpu_pkg::*; #(
                 stalled_warps_n[warp_ctl_if.wid] = 0; // unlock warp
             end
         end
-
+    
     `ifdef GBAR_ENABLE
         if (gbar_bus_if.rsp_valid && (gbar_req_id == gbar_bus_if.rsp_data.id)) begin
             barrier_ctrs_n[warp_ctl_if.barrier.id] = '0; // reset barrier counter
@@ -274,7 +275,7 @@ module VX_schedule import VX_gpu_pkg::*; #(
     end
 
     // barrier handling
-
+    
 `ifdef GBAR_ENABLE
     assign gbar_bus_if.req_valid        = gbar_req_valid;
     assign gbar_bus_if.req_data.id      = gbar_req_id;
@@ -356,7 +357,7 @@ module VX_schedule import VX_gpu_pkg::*; #(
         .valid_out (schedule_if.valid),
         .ready_out (schedule_if.ready)
     );
-
+    
     // Track pending instructions per warp
 
     wire [`NUM_WARPS-1:0] pending_warp_empty;
@@ -387,8 +388,9 @@ module VX_schedule import VX_gpu_pkg::*; #(
 
     wire no_pending_instr = (& pending_warp_empty);
 
-    `BUFFER_EX(busy, (active_warps != 0 || ~no_pending_instr), 1'b1, 1, 1);
-
+    //FIXME: Change macro name to something better
+    `BUFFER_EX_WITH_SIZE_AND_LINE(1'b1, busy, (active_warps != 0 || ~no_pending_instr), 1'b1, 1, 1, 394);
+    
     // export CSRs
     assign sched_csr_if.cycles = cycles;
     assign sched_csr_if.active_warps = active_warps;
@@ -442,5 +444,6 @@ module VX_schedule import VX_gpu_pkg::*; #(
         end
     end
 `endif
+    
 
 endmodule

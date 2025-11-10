@@ -173,10 +173,12 @@ module VX_cache_bypass import VX_gpu_pkg::*; #(
         logic [CORE_DATA_WIDTH-1:0] core_rsp_nc_arb_data_w;
         wire [MEM_TAG_NC2_WIDTH-1:0] core_req_nc_arb_tag_w;
         wire [MEM_TAG_NC1_WIDTH-1:0] core_rsp_nc_arb_tag_w;
-
+        
+        
         if (WORDS_PER_LINE > 1) begin : g_multi_word_line
             wire [WSEL_BITS-1:0] rsp_wsel;
             wire [WSEL_BITS-1:0] req_wsel = core_req_nc_arb_addr[WSEL_BITS-1:0];
+            
             always @(*) begin
                 core_req_nc_arb_byteen_w = '0;
                 core_req_nc_arb_byteen_w[req_wsel] = core_req_nc_arb_byteen;
@@ -201,7 +203,12 @@ module VX_cache_bypass import VX_gpu_pkg::*; #(
                 .sel_out  (rsp_wsel),
                 .data_out (core_rsp_nc_arb_tag_w)
             );
-            assign core_req_nc_arb_addr_w   = core_req_nc_arb_addr[WSEL_BITS +: MEM_ADDR_WIDTH];
+
+    
+            localparam req_nc_arb_addr_w_start = WSEL_BITS;
+            localparam req_nc_arb_addr_w_end   = req_nc_arb_addr_w_start + MEM_ADDR_WIDTH - 1;
+             
+            assign core_req_nc_arb_addr_w   = core_req_nc_arb_addr[req_nc_arb_addr_w_end: req_nc_arb_addr_w_start];
             assign core_rsp_nc_arb_data_w   = mem_bus_out_nc_if[i].rsp_data.data[rsp_wsel * CORE_DATA_WIDTH +: CORE_DATA_WIDTH];
         end else begin : g_single_word_line
             assign core_req_nc_arb_addr_w   = core_req_nc_arb_addr;

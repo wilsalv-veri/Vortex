@@ -1,6 +1,5 @@
 `timescale 1ns/1ps
 
-
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
@@ -114,6 +113,7 @@ class apb_monitor extends uvm_monitor;
   apb_txn txn;
   virtual apb_if ifc;
   uvm_analysis_port #(apb_txn) send;
+  
   
   function new(string name="apb_monitor", uvm_component parent=null);
     super.new(name, parent);
@@ -259,7 +259,11 @@ class apb_test extends uvm_test;
   
 endclass
 
-    
+
+typedef struct {
+  int age;
+  int id;
+} student_t;
 
 module tb_top;
   
@@ -276,7 +280,7 @@ module tb_top;
     uvm_config_db #(virtual apb_if)::set(null, "*", "ifc", ifc);
     run_test("apb_test");
   end
-
+  
   initial begin
     $display("TB_TOP running at time %0t", $time);
     $dumpfile("waves.vcd");
@@ -286,9 +290,4 @@ module tb_top;
     $finish();
   end
 
-  
-    
 endmodule
-
-
-

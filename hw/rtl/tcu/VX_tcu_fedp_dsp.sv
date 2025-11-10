@@ -207,7 +207,9 @@ module VX_tcu_fedp_dsp #(
         always @(*) begin
             dpi_fmul(enable, int'(0), a_h, b_h, 3'b0, c_h, fflags);
         end
-        `BUFFER_EX(mult_result[i], c_h[31:0], enable, 0, FMUL_LATENCY);
+        
+        `BUFFER_EX_WITH_LINE(mult_result[i], c_h[31:0], enable, 0, FMUL_LATENCY, 211);
+
     `else
         xil_fmul fmul (
             .aclk                (clk),
@@ -242,7 +244,9 @@ module VX_tcu_fedp_dsp #(
             always @(*) begin
                 dpi_fadd(enable, int'(0), a_h, b_h, 3'b0, c_h, fflags);
             end
-            `BUFFER_EX(red_in[lvl+1][i], c_h[31:0], enable, 0, FADD_LATENCY);
+            
+            `BUFFER_EX_WITH_LINE(red_in[lvl+1][i], c_h[31:0], enable, 0, FADD_LATENCY, 248);
+
         `else
             xil_fadd fadd_red (
                 .aclk                (clk),
@@ -285,7 +289,9 @@ module VX_tcu_fedp_dsp #(
     always @(*) begin
         dpi_fadd(enable, int'(0), a_h, b_h, 3'b0, c_h, fflags);
     end
-    `BUFFER_EX(acc, c_h[31:0], enable, 0, FADD_LATENCY);
+
+    `BUFFER_EX_WITH_LINE(acc, c_h[31:0], enable, 0, FADD_LATENCY, 293);
+    
 `else
     xil_fadd fadd_acc (
         .aclk                (clk),

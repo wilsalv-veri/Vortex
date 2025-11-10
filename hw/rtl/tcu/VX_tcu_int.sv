@@ -117,12 +117,13 @@ module VX_tcu_int import VX_gpu_pkg::*, VX_tcu_pkg::*; #(
             wire [TCU_TC_K-1:0][`XLEN-1:0] a_row_r, b_col_r;
             wire [`XLEN-1:0] c_val_r;
 
-            `BUFFER_EX (
+            `BUFFER_EX_WITH_LINE (
                 {a_row_r, b_col_r, c_val_r, fmt_s_r,    fmt_d_r},
                 {a_row,   b_col,   c_val,   fmt_s[2:0], fmt_d[2:0]},
                 fedp_enable,
                 0, // resetw
-                1  // depth
+                1,  // depth
+                126   //LINE_NUM
             );
 
             VX_tcu_fedp_int #(

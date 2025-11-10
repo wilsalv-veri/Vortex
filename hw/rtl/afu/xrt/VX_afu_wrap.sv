@@ -13,13 +13,22 @@
 //
 // Reference: https://www.xilinx.com/developer/articles/porting-rtl-designs-to-vitis-rtl-kernels.html
 
-`include "vortex_afu.vh"
+`include "vortex_afu_xrt.vh"
+
+//Original 
+`ifdef PLATFORM_MERGED_MEMORY_INTERFACE
+  `define AXI_MEM_REPEAT_COUNT 1
+`else
+  `define AXI_MEM_REPEAT_COUNT `PLATFORM_MEMORY_NUM_BANKS
+`endif
+
+
 
 module VX_afu_wrap import VX_gpu_pkg::*; #(
 	parameter C_S_AXI_CTRL_ADDR_WIDTH = 8,
 	parameter C_S_AXI_CTRL_DATA_WIDTH = 32,
-	parameter C_M_AXI_MEM_ID_WIDTH    = `PLATFORM_MEMORY_ID_WIDTH,
-	parameter C_M_AXI_MEM_DATA_WIDTH  = `PLATFORM_MEMORY_DATA_SIZE * 8,
+	parameter C_M_AXI_MEM_ID_WIDTH    = `PLATFORM_MEMORY_ID_WIDTH, //32
+	parameter C_M_AXI_MEM_DATA_WIDTH  = `PLATFORM_MEMORY_DATA_SIZE * 8, //512
 	parameter C_M_AXI_MEM_ADDR_WIDTH  = 64,
 `ifdef PLATFORM_MERGED_MEMORY_INTERFACE
 	parameter C_M_AXI_MEM_NUM_BANKS   = 1
@@ -32,12 +41,18 @@ module VX_afu_wrap import VX_gpu_pkg::*; #(
     input wire reset,
 
     // AXI4 master interface
-`ifdef PLATFORM_MERGED_MEMORY_INTERFACE
-	`REPEAT (1, GEN_AXI_MEM, REPEAT_COMMA),
-`else
-	`REPEAT (`PLATFORM_MEMORY_NUM_BANKS, GEN_AXI_MEM, REPEAT_COMMA),
-`endif
-    // AXI4-Lite slave interface
+	
+	//AXI_MEM_REPEAT_COUNT
+	//`ifdef PLATFORM_MERGED_MEMORY_INTERFACE
+	//	`REPEAT (1, GEN_AXI_MEM, REPEAT_COMMA),
+	//`else
+		//`REPEAT (`PLATFORM_MEMORY_NUM_BANKS, GEN_AXI_MEM, `REPEAT_COMMA),
+		`GEN_AXI_MEM(0),
+		`GEN_AXI_MEM(1),
+	//`endif
+    
+	
+	// AXI4-Lite slave interface
     input  wire                                 s_axi_ctrl_awvalid,
     output wire                                 s_axi_ctrl_awready,
     input  wire [C_S_AXI_CTRL_ADDR_WIDTH-1:0]   s_axi_ctrl_awaddr,
@@ -61,8 +76,13 @@ module VX_afu_wrap import VX_gpu_pkg::*; #(
     output wire [1:0]                           s_axi_ctrl_bresp,
 
     output wire                                 interrupt
+	
 );
 	localparam M_AXI_MEM_ADDR_WIDTH = `PLATFORM_MEMORY_ADDR_WIDTH;
+	localparam my_param = `PLATFORM_MEMORY_ID_WIDTH;
+	logic hello;
+
+	assign  hello = m_axi_mem_0_awready;
 
 	typedef enum logic [1:0] {
 		STATE_IDLE = 0,
@@ -108,7 +128,9 @@ module VX_afu_wrap import VX_gpu_pkg::*; #(
 `ifdef PLATFORM_MERGED_MEMORY_INTERFACE
 	`REPEAT (1, AXI_MEM_TO_ARRAY, REPEAT_SEMICOLON);
 `else
-	`REPEAT (`PLATFORM_MEMORY_NUM_BANKS, AXI_MEM_TO_ARRAY, REPEAT_SEMICOLON);
+	//`REPEAT (`PLATFORM_MEMORY_NUM_BANKS, AXI_MEM_TO_ARRAY, REPEAT_SEMICOLON);
+	`AXI_MEM_TO_ARRAY(0);
+	`AXI_MEM_TO_ARRAY(1);
 `endif
 
 	reg [`CLOG2(`RESET_DELAY+1)-1:0] vx_reset_ctr;
@@ -221,8 +243,9 @@ module VX_afu_wrap import VX_gpu_pkg::*; #(
 		assign m_axi_wr_rsp_fire[i] = m_axi_mem_bvalid_a[i] && m_axi_mem_bready_a[i];
 	end
 
-	`POP_COUNT(cur_wr_reqs, m_axi_wr_req_fire);
-	`POP_COUNT(cur_wr_rsps, m_axi_wr_rsp_fire);
+	`POP_COUNT_WITH_LINE(cur_wr_reqs, m_axi_wr_req_fire, 246);
+	`POP_COUNT_WITH_LINE(cur_wr_rsps, m_axi_wr_rsp_fire, 247);
+
 
 	wire signed [NUM_MEM_BANKS_SIZEW:0] reqs_sub = (NUM_MEM_BANKS_SIZEW+1)'(cur_wr_reqs) -
 	                                                     (NUM_MEM_BANKS_SIZEW+1)'(cur_wr_rsps);
@@ -286,9 +309,10 @@ module VX_afu_wrap import VX_gpu_pkg::*; #(
 	wire [M_AXI_MEM_ADDR_WIDTH-1:0] m_axi_mem_awaddr_u [C_M_AXI_MEM_NUM_BANKS];
 	wire [M_AXI_MEM_ADDR_WIDTH-1:0] m_axi_mem_araddr_u [C_M_AXI_MEM_NUM_BANKS];
 
-	for (genvar i = 0; i < C_M_AXI_MEM_NUM_BANKS; ++i) begin : g_addressing
-		assign m_axi_mem_awaddr_a[i] = C_M_AXI_MEM_ADDR_WIDTH'(m_axi_mem_awaddr_u[i]) + C_M_AXI_MEM_ADDR_WIDTH'(`PLATFORM_MEMORY_OFFSET);
-		assign m_axi_mem_araddr_a[i] = C_M_AXI_MEM_ADDR_WIDTH'(m_axi_mem_araddr_u[i]) + C_M_AXI_MEM_ADDR_WIDTH'(`PLATFORM_MEMORY_OFFSET);
+	for (genvar i = 0; i < C_M_AXI_MEM_NUM_BANKS; ++i) begin 
+		//: g_addressing
+		assign m_axi_mem_awaddr_a[i] = m_axi_mem_awaddr_u[i] + `PLATFORM_MEMORY_OFFSET;//C_M_AXI_MEM_ADDR_WIDTH'(m_axi_mem_awaddr_u[i]) + C_M_AXI_MEM_ADDR_WIDTH'(`PLATFORM_MEMORY_OFFSET);
+		assign m_axi_mem_araddr_a[i] = m_axi_mem_araddr_u[i] + `PLATFORM_MEMORY_OFFSET;//C_M_AXI_MEM_ADDR_WIDTH'(m_axi_mem_araddr_u[i]) + C_M_AXI_MEM_ADDR_WIDTH'(`PLATFORM_MEMORY_OFFSET);
 	end
 
 	`SCOPE_IO_SWITCH (2);

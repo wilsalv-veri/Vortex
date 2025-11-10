@@ -19,7 +19,7 @@
 #include <iostream>
 
 #include "svdpi.h"
-#include "verilated_vpi.h"
+//#include "verilated_vpi.h"
 
 #ifdef XLEN_64
 #define iword_t   int64_t
@@ -183,7 +183,7 @@ void dpi_idiv(bool enable, bool is_signed, iword_t a, iword_t b, iword_t* quotie
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+/*
 void dpi_trace(int level, const char* format, ...) {
   if (level > DEBUG_LEVEL)
     return;
@@ -193,7 +193,7 @@ void dpi_trace(int level, const char* format, ...) {
 	va_start(va, format);
 	vprintf(format, va);
 	va_end(va);
-}
+}*/
 
 void dpi_trace_start() {
   sim_trace_enable(true);

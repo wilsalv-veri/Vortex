@@ -1,4 +1,3 @@
-
 //Include Files under $VORTEX/hw/rtl
 +incdir+$VORTEX/hw/rtl
 
@@ -13,7 +12,6 @@ $VORTEX/hw/rtl/Vortex.sv
 $VORTEX/hw/rtl/Vortex_axi.sv
 $VORTEX/hw/rtl/VX_socket.sv
 $VORTEX/hw/rtl/VX_cluster.sv
-
 //Include Files under $VORTEX/hw/rtl/mem
 +incdir+$VORTEX/hw/rtl/mem
 
@@ -29,8 +27,6 @@ $VORTEX/hw/rtl/mem/VX_gbar_unit.sv
 $VORTEX/hw/rtl/mem/VX_local_mem_top.sv
 $VORTEX/hw/rtl/mem/VX_mem_arb.sv
 $VORTEX/hw/rtl/mem/VX_mem_switch.sv
-
-
 
 //Include Files under $VORTEX/hw/rtl/fpu
 +incdir+$VORTEX/hw/rtl/fpu
@@ -49,8 +45,6 @@ $VORTEX/hw/rtl/fpu/VX_fcvt_unit.sv
 $VORTEX/hw/rtl/fpu/VX_fpu_ncp.sv
 $VORTEX/hw/rtl/fpu/VX_fpu_dsp.sv
 $VORTEX/hw/rtl/fpu/VX_fp_classifier.sv
-
-
 
 //Include Files under $VORTEX/hw/rtl/interfaces
 +incdir+$VORTEX/hw/rtl/interfaces
@@ -76,8 +70,6 @@ $VORTEX/hw/rtl/interfaces/VX_sched_csr_if.sv
 $VORTEX/hw/rtl/interfaces/VX_scoreboard_if.sv
 $VORTEX/hw/rtl/interfaces/VX_dcr_bus_if.sv
 
-
-
 //Include Files under $VORTEX/hw/rtl/tcu
 +incdir+$VORTEX/hw/rtl/tcu
 
@@ -90,7 +82,6 @@ $VORTEX/hw/rtl/tcu/VX_tcu_int.sv
 $VORTEX/hw/rtl/tcu/VX_tcu_unit.sv
 $VORTEX/hw/rtl/tcu/VX_tcu_uops.sv
 $VORTEX/hw/rtl/tcu/VX_tcu_fedp_dpi.sv
-
 //Include Files under $VORTEX/hw/rtl/tcu/bhf
 +incdir+$VORTEX/hw/rtl/tcu/bhf
 
@@ -101,9 +92,6 @@ $VORTEX/hw/rtl/tcu/bhf/VX_tcu_bhf_fp8mul.sv
 $VORTEX/hw/rtl/tcu/bhf/VX_tcu_bhf_bf16mul.sv
 $VORTEX/hw/rtl/tcu/bhf/VX_tcu_bhf_fp16add.sv
 $VORTEX/hw/rtl/tcu/bhf/VX_tcu_bhf_tf32mul.sv
-
-
-
 
 
 //Include Files under $VORTEX/hw/rtl/core
@@ -144,8 +132,6 @@ $VORTEX/hw/rtl/core/VX_alu_muldiv.sv
 $VORTEX/hw/rtl/core/VX_decode.sv
 $VORTEX/hw/rtl/core/VX_csr_unit.sv
 $VORTEX/hw/rtl/core/VX_issue_slice.sv
-
-
 
 //Include Files under $VORTEX/hw/rtl/libs
 +incdir+$VORTEX/hw/rtl/libs
@@ -214,8 +200,6 @@ $VORTEX/hw/rtl/libs/VX_scan.sv
 $VORTEX/hw/rtl/libs/VX_stream_omega.sv
 $VORTEX/hw/rtl/libs/VX_stream_arb.sv
 
-
-
 //Include Files under $VORTEX/hw/rtl/cache
 +incdir+$VORTEX/hw/rtl/cache
 
@@ -233,16 +217,11 @@ $VORTEX/hw/rtl/cache/VX_cache_flush.sv
 $VORTEX/hw/rtl/cache/VX_cache_bank.sv
 $VORTEX/hw/rtl/cache/VX_cache_top.sv
 
-
-
 //Include Files under $VORTEX/hw/rtl/afu
 +incdir+$VORTEX/hw/rtl/afu
 
-
 //Include Files under $VORTEX/hw/rtl/afu/opae
 +incdir+$VORTEX/hw/rtl/afu/opae
-
-
 
 
 //Include Files under $VORTEX/hw/rtl/afu/xrt
@@ -252,7 +231,5 @@ $VORTEX/hw/rtl/afu/xrt/vortex_afu_xrt.vh
 $VORTEX/hw/rtl/afu/xrt/vortex_afu.v
 $VORTEX/hw/rtl/afu/xrt/VX_afu_ctrl.sv
 $VORTEX/hw/rtl/afu/xrt/VX_afu_wrap.sv
-
-
 
 

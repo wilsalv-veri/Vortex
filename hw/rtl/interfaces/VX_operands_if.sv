@@ -15,13 +15,13 @@
 
 interface VX_operands_if import VX_gpu_pkg::*; ();
 
-    logic  valid;
-    operands_t data;
+    wire           valid; 
+    wire operands_t data; 
     logic  ready;
 
     modport master (
-        output valid,
-        output data,
+        inout valid, 
+        inout data, 
         input  ready
     );
 

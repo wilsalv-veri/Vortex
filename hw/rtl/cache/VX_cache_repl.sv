@@ -58,16 +58,21 @@ module plru_encoder #(
     input wire [`UP(NUM_WAYS-1)-1:0] lru_in,
     output wire [WAY_IDX_WIDTH-1:0] way_idx
 );
+    
     if (NUM_WAYS > 1) begin : g_enc
         wire [WAY_IDX_BITS-1:0] tmp;
         for (genvar i = 0; i < WAY_IDX_BITS; ++i) begin : g_i
+            
+            localparam data_start = ((2**i)-1);
+            localparam data_end   = data_start + (2**i) - 1;
+
             if (i == 0) begin : g_i_0
                 assign tmp[WAY_IDX_WIDTH-1] = lru_in[0];
             end else begin : g_i_n
                 VX_mux #(
                     .N (2**i)
                 ) mux (
-                    .data_in  (lru_in[((2**i)-1)+:(2**i)]),
+                    .data_in  (lru_in[data_end: data_start]), 
                     .sel_in   (tmp[WAY_IDX_BITS-1-:i]),
                     .data_out (tmp[WAY_IDX_BITS-1-i])
                 );

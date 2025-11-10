@@ -86,7 +86,8 @@ module VX_commit import VX_gpu_pkg::*; #(
 
     for (genvar i = 0; i < `ISSUE_WIDTH; ++i) begin : g_commit_size
         wire [COMMIT_SIZEW-1:0] count;
-        `POP_COUNT(count, per_issue_commit_tmask[i]);
+        `POP_COUNT_WITH_LINE(count, per_issue_commit_tmask[i], 89);
+        
         assign commit_size[i] = count;
     end
 

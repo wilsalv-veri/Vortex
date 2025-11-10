@@ -197,8 +197,10 @@ module VX_stream_omega #(
             end
         end
 
-        `BUFFER(per_cycle_collision_r, per_cycle_collision);
-        `POP_COUNT(collision_count, per_cycle_collision_r);
+        `BUFFER_WITH_LINE(per_cycle_collision_r, per_cycle_collision, 201);
+        
+        `POP_COUNT_WITH_LINE(collision_count, per_cycle_collision_r, 204);
+
 
         always @(posedge clk) begin
             if (reset) begin

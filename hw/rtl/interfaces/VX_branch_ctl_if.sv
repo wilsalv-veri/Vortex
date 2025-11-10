@@ -21,10 +21,10 @@ interface VX_branch_ctl_if import VX_gpu_pkg::*; ();
     wire [PC_BITS-1:0]  dest;
 
     modport master (
-        output valid,
-        output wid,
-        output taken,
-        output dest
+        inout valid, 
+        inout wid, 
+        inout taken, 
+        inout dest 
     );
 
     modport slave (

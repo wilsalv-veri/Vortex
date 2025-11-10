@@ -51,13 +51,39 @@ module VX_execute import VX_gpu_pkg::*; #(
     VX_fpu_csr_if fpu_csr_if[`NUM_FPU_BLOCKS]();
 `endif
 
+    
+    localparam alu_dispatch_start_idx = EX_ALU * `ISSUE_WIDTH;
+    localparam alu_dispatch_end_idx   = alu_dispatch_start_idx + `ISSUE_WIDTH - 1;
+    localparam alu_commit_start_idx   = EX_ALU * `ISSUE_WIDTH;
+    localparam alu_commit_end_idx     = alu_commit_start_idx + `ISSUE_WIDTH - 1;
+    
+    localparam lsu_dispatch_start_idx = EX_LSU * `ISSUE_WIDTH;
+    localparam lsu_dispatch_end_idx   = lsu_dispatch_start_idx + `ISSUE_WIDTH - 1;
+    localparam lsu_commit_start_idx   = EX_LSU * `ISSUE_WIDTH;
+    localparam lsu_commit_end_idx     = lsu_commit_start_idx + `ISSUE_WIDTH - 1;
+    
+    localparam fpu_dispatch_start_idx = EX_FPU * `ISSUE_WIDTH;
+    localparam fpu_dispatch_end_idx   = fpu_dispatch_start_idx + `ISSUE_WIDTH - 1;
+    localparam fpu_commit_start_idx   = EX_FPU * `ISSUE_WIDTH;
+    localparam fpu_commit_end_idx     = fpu_commit_start_idx + `ISSUE_WIDTH - 1;
+
+    localparam tcu_dispatch_start_idx = EX_TCU * `ISSUE_WIDTH;
+    localparam tcu_dispatch_end_idx   = tcu_dispatch_start_idx + `ISSUE_WIDTH - 1;
+    localparam tcu_commit_start_idx   = EX_TCU * `ISSUE_WIDTH;
+    localparam tcu_commit_end_idx     = tcu_commit_start_idx + `ISSUE_WIDTH - 1;
+
+    localparam sfu_dispatch_start_idx = EX_SFU * `ISSUE_WIDTH;
+    localparam sfu_dispatch_end_idx   = sfu_dispatch_start_idx + `ISSUE_WIDTH - 1;
+    localparam sfu_commit_start_idx   = EX_SFU * `ISSUE_WIDTH;
+    localparam sfu_commit_end_idx     = sfu_commit_start_idx + `ISSUE_WIDTH - 1;
+
     VX_alu_unit #(
         .INSTANCE_ID (`SFORMATF(("%s-alu", INSTANCE_ID)))
     ) alu_unit (
         .clk            (clk),
         .reset          (reset),
-        .dispatch_if    (dispatch_if[EX_ALU * `ISSUE_WIDTH +: `ISSUE_WIDTH]),
-        .commit_if      (commit_if[EX_ALU * `ISSUE_WIDTH +: `ISSUE_WIDTH]),
+        .dispatch_if    (dispatch_if[alu_dispatch_end_idx : alu_dispatch_start_idx]), 
+        .commit_if      (commit_if[alu_commit_end_idx: alu_commit_start_idx]), 
         .branch_ctl_if  (branch_ctl_if)
     );
 
@@ -69,8 +95,8 @@ module VX_execute import VX_gpu_pkg::*; #(
         `SCOPE_IO_BIND  (0)
         .clk            (clk),
         .reset          (reset),
-        .dispatch_if    (dispatch_if[EX_LSU * `ISSUE_WIDTH +: `ISSUE_WIDTH]),
-        .commit_if      (commit_if[EX_LSU * `ISSUE_WIDTH +: `ISSUE_WIDTH]),
+        .dispatch_if    (dispatch_if[lsu_dispatch_end_idx : lsu_dispatch_start_idx]),
+        .commit_if      (commit_if[lsu_commit_end_idx: lsu_commit_start_idx]), 
         .lsu_mem_if     (lsu_mem_if)
     );
 
@@ -80,8 +106,8 @@ module VX_execute import VX_gpu_pkg::*; #(
     ) fpu_unit (
         .clk            (clk),
         .reset          (reset),
-        .dispatch_if    (dispatch_if[EX_FPU * `ISSUE_WIDTH +: `ISSUE_WIDTH]),
-        .commit_if      (commit_if[EX_FPU * `ISSUE_WIDTH +: `ISSUE_WIDTH]),
+        .dispatch_if    (dispatch_if[fpu_dispatch_end_idx : fpu_dispatch_start_idx]), 
+        .commit_if      (commit_if[fpu_commit_end_idx : fpu_commit_start_idx]), 
         .fpu_csr_if     (fpu_csr_if)
     );
 `endif
@@ -92,8 +118,8 @@ module VX_execute import VX_gpu_pkg::*; #(
     ) tcu_unit (
         .clk            (clk),
         .reset          (reset),
-        .dispatch_if    (dispatch_if[EX_TCU * `ISSUE_WIDTH +: `ISSUE_WIDTH]),
-        .commit_if      (commit_if[EX_TCU * `ISSUE_WIDTH +: `ISSUE_WIDTH])
+        .dispatch_if    (dispatch_if[tcu_dispatch_end_idx : tcu_dispatch_start_idx]), 
+        .commit_if      (commit_if[tcu_commit_end_idx : tcu_commit_start_idx]) 
     );
 `endif
 
@@ -108,8 +134,8 @@ module VX_execute import VX_gpu_pkg::*; #(
         .pipeline_perf  (pipeline_perf),
     `endif
         .base_dcrs      (base_dcrs),
-        .dispatch_if    (dispatch_if[EX_SFU * `ISSUE_WIDTH +: `ISSUE_WIDTH]),
-        .commit_if      (commit_if[EX_SFU * `ISSUE_WIDTH +: `ISSUE_WIDTH]),
+        .dispatch_if    (dispatch_if[sfu_dispatch_end_idx : sfu_dispatch_start_idx]), 
+        .commit_if      (commit_if[sfu_commit_end_idx : sfu_commit_start_idx]), 
     `ifdef EXT_F_ENABLE
         .fpu_csr_if     (fpu_csr_if),
     `endif
