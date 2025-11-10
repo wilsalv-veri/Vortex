@@ -3,9 +3,9 @@
 
     `define CACHE_LINE_WIDTH  L2_MEM_DATA_WIDTH
     
-    typedef enum {R_TYPE=0,I_TYPE=1,S_TYPE=2,B_TYPE=3,U_TYPE=4,J_TYPE=5} risc_v_seq_inst_type_t;
-    typedef enum {INST=0, DATA=1}                                        cacheline_type_t;
-    typedef enum {GET_INSTR=0, PROCESS_INSTR=1, SEND_INSTR=2} risc_v_driver_state_t;
+    typedef enum {R_TYPE=0,I_TYPE=1,S_TYPE=2,B_TYPE=3,U_TYPE=4,J_TYPE=5, DATA_TYPE=6} risc_v_seq_inst_type_t;
+    typedef enum {INST=0, DATA=1}                                                     cacheline_type_t;
+    typedef enum {GET_INSTR=0, PROCESS_INSTR=1, SEND_INSTR=2}                         risc_v_driver_state_t;
 
     //RISC_V Instruction Macros
     `define OPCODE_WIDTH      7
@@ -26,6 +26,8 @@
     `define J_TYPE_IMM1_WIDTH 10
     `define J_TYPE_IMM0_WIDTH 8
 
+    `define SEQ_RAW_DATA_WIDTH PC_BITS
+
     //Sequence Use
     typedef bit [`OPCODE_WIDTH - 1:0 ]       risc_v_seq_opcode_t;
     typedef bit [`REG_NUM_WIDTH - 1:0]       risc_v_seq_reg_num_t;
@@ -41,6 +43,7 @@
     typedef bit [`J_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_j_type_imm1_t;
     typedef bit [`J_TYPE_IMM0_WIDTH - 1:0]   risc_v_seq_j_type_imm0_t;
 
+    typedef bit [`SEQ_RAW_DATA_WIDTH - 1:0]  risc_v_seq_data_t;
     
     //Top Level Use  
     typedef logic [`CACHE_LINE_WIDTH - 1: 0] risc_v_cacheline_t;

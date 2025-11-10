@@ -32,11 +32,14 @@ $VORTEX/hw/tb/memory_model/memory_bfm.sv
 +incdir+$VORTEX/hw/tb/seqs
 
 $VORTEX/hw/tb/seqs/VX_risc_v_base_seq.sv
+$VORTEX/hw/tb/seqs/VX_risc_v_base_instr_seq.sv
+$VORTEX/hw/tb/seqs/VX_risc_v_base_data_seq.sv
 
 //Include Files under $VORTEX/hw/tb/tests
 +incdir+$VORTEX/hw/tb/tests
 
 $VORTEX/hw/tb/tests/VX_risc_v_base_test.sv
+$VORTEX/hw/tb/tests/VX_risc_v_base_instr_seq_test.sv
 
 $VORTEX/hw/tb/tb_top.sv
 

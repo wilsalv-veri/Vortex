@@ -23,6 +23,8 @@ class VX_risc_v_inst_item extends uvm_sequence_item;
     rand risc_v_seq_j_type_imm1_t     j_type_imm1;
     rand risc_v_seq_j_type_imm0_t     j_type_imm0;
 
+    rand risc_v_seq_data_t            program_data;
+
     `uvm_object_utils_begin(VX_risc_v_inst_item);
     
     `uvm_field_enum(risc_v_seq_inst_type_t, inst_type, UVM_ALL_ON)

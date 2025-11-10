@@ -55,6 +55,10 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
             sort_by_match(dir_entries, "memory_model")
             sort_by_match(dir_entries, "interfaces")
             sort_by_match(dir_entries, "common")
+        elif cwd == 'seqs':
+            sort_by_match(file_entries, "base_seq")
+        elif cwd == 'tests':
+            sort_by_match(file_entries, "base_test")
 
         sort_by_match(file_entries, "_pkg")
         sort_by_match(file_entries, ".vh")

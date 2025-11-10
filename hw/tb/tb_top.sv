@@ -2,10 +2,8 @@ import uvm_pkg::*;
 import VX_tb_top_pkg::*;
 import VX_gpu_pkg::*;
 
-
 `include "uvm_macros.svh"
 `include "VX_types.vh"
-
 
 module tb_top ;
    
@@ -244,9 +242,7 @@ module tb_top ;
         uvm_config_db #(virtual VX_risc_v_inst_if)::set(null, "*", "riscv_inst_ifc", riscv_inst_ifc);   
         uvm_config_db #(virtual VX_fetch_if)::set(null, "*", "fetch_if", core.fetch_if);
 
-
-        run_test("VX_risc_v_base_test");
-        //$dumpfile("waves.vcd");
+        run_test();
         $dumpvars(0, tb_top);
         $display("TB_TOP finished at time %0t", $time);
         $finish();

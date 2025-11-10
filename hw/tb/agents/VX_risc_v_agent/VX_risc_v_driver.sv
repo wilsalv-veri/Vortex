@@ -17,14 +17,15 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
     risc_v_cacheline_t cacheline = 512'b0;
     
     risc_v_driver_state_t driver_state = GET_INSTR;
+    cacheline_type_t      cache_line_type;
     
     virtual VX_risc_v_inst_if riscv_inst_ifc;
     virtual VX_mem_load_if    mem_load_ifc;
 
-    int inst_count        = 0;
-    int insts_to_send     = 0;
-    int shift_amount      = 0;
-    logic instr_received  = 1'b0;
+    int   inst_count        = 0;
+    int   insts_to_send     = 0;
+    int   shift_amount      = 0;
+    logic instr_received    = 1'b0;
 
     function new(string name="VX_risc_v_driver", uvm_component parent=null);
         super.new(name, parent);
@@ -58,7 +59,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
         
         forever @ (posedge mem_load_ifc.clk) begin    
             
-            driver_state                <= get_next_state();;
+            driver_state                   <= get_next_state();;
             if (! mem_load_ifc.load_valid) begin
                 case(driver_state)
                     GET_INSTR             : begin 
@@ -98,7 +99,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
         seq_item_port.get_next_item(risc_v_inst_seq_item);
         
         `VX_info("[VX_RISC_V_DRIVER]", $sformatf("Instruction Received! Type:%s", risc_v_inst_seq_item.inst_type.name));
-            
+        cache_line_type                              <= INST;    
         case(risc_v_inst_seq_item.inst_type)
             R_TYPE: begin
                 risc_v_inst.r_type_inst.funct7       <= risc_v_inst_seq_item.funct7;
@@ -145,6 +146,11 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
                 risc_v_inst.j_type_inst.rd           <= risc_v_inst_seq_item.rd;
                 risc_v_inst.j_type_inst.opcode       <= risc_v_inst_seq_item.opcode;
             end
+            DATA_TYPE: begin
+                risc_v_inst.inst_data                <= risc_v_inst_seq_item.program_data;
+                cache_line_type                      <= DATA;    
+       
+            end
         endcase
         
         inst_count                                   <= inst_count + 1;
@@ -167,7 +173,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
             
         mem_load_ifc.cacheline                   <= cacheline;
         mem_load_ifc.load_valid                  <= 1'b1;
-        mem_load_ifc.cacheline_type              <= INST;
+        mem_load_ifc.cacheline_type              <= cache_line_type;
     endtask
 
     function int get_shift_amount();
