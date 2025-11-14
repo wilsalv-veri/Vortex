@@ -233,15 +233,53 @@ module tb_top ;
         .busy           (per_core_busy[core_id])
     );
 
+
+    initial begin
+        uvm_config_db #(virtual VX_uvm_test_if                      )::set(null, "*", "uvm_test_ifc", uvm_test_ifc);
+        uvm_config_db #(virtual VX_mem_load_if                      )::set(null, "*", "mem_load_ifc", mem_load_ifc);
+        uvm_config_db #(virtual VX_risc_v_inst_if                   )::set(null, "*", "riscv_inst_ifc", riscv_inst_ifc);   
+                        
+        //Core Interfaces          
+        uvm_config_db #(virtual VX_schedule_if                      )::set(null, "*", "schedule_if", core.schedule_if);
+        uvm_config_db #(virtual VX_fetch_if                         )::set(null, "*", "fetch_if", core.fetch_if);
+        uvm_config_db #(virtual VX_fetch_if                         )::set(null, "*", "fetch_if", core.fetch_if);
+        uvm_config_db #(virtual VX_decode_if                        )::set(null, "*", "decode_if", core.decode_if);
+        uvm_config_db #(virtual VX_sched_csr_if                     )::set(null, "*", "sched_csr_if", core.sched_csr_if);
+        uvm_config_db #(virtual VX_decode_sched_if                  )::set(null, "*", "decode_sched_if", core.decode_sched_if);
+        uvm_config_db #(virtual VX_commit_sched_if                  )::set(null, "*", "commit_sched_if", core.commit_sched_if);
+        uvm_config_db #(virtual VX_commit_csr_if                    )::set(null, "*", "commit_csr_if", core.commit_csr_if);
+        uvm_config_db #(virtual VX_warp_ctl_if                      )::set(null, "*", "warp_ctl_if", core.warp_ctl_if);
+       
+    end
+
+    genvar idx;
+    generate 
+        //initial begin
+            for( idx=0; idx < `ISSUE_WIDTH; idx++) begin
+                initial begin
+                    uvm_config_db #(virtual VX_issue_sched_if               )::set(null, "*", $sformatf("issue_sched_if[%0d]", idx), core.issue_sched_if[idx]);
+                    uvm_config_db #(virtual VX_writeback_if                 )::set(null, "*", $sformatf("writeback_if[%0d]", idx  ), core.writeback_if[idx]);
+                end
+            end
+
+            for(idx=0; idx < `NUM_ALU_BLOCKS; idx++)begin
+                initial begin
+                    uvm_config_db #(virtual VX_branch_ctl_if                )::set(null, "*", "branch_ctl_if", core.branch_ctl_if[idx]);
+                end
+            end
+            for(idx=0; idx < NUM_EX_UNITS * `ISSUE_WIDTH; idx++)begin
+                initial begin
+                    uvm_config_db #(virtual VX_dispatch_if                  )::set(null, "*", $sformatf("dispatch_if[%0d]",idx) , core.dispatch_if[idx]);
+                    uvm_config_db #(virtual VX_commit_if                    )::set(null, "*", $sformatf("commit_if[%0d]",idx), core.commit_if[idx]);
+                end
+            end
+        //end
+    endgenerate
+
     //Run Test 
     initial begin
-        $display("TB_TOP running at time %0t", $time);
+        $display("TB_TOP running at time %0t", $time);   
         
-        uvm_config_db #(virtual VX_uvm_test_if)::set(null, "*", "uvm_test_ifc", uvm_test_ifc);
-        uvm_config_db #(virtual VX_mem_load_if)::set(null, "*", "mem_load_ifc", mem_load_ifc);
-        uvm_config_db #(virtual VX_risc_v_inst_if)::set(null, "*", "riscv_inst_ifc", riscv_inst_ifc);   
-        uvm_config_db #(virtual VX_fetch_if)::set(null, "*", "fetch_if", core.fetch_if);
-
         run_test();
         $dumpvars(0, tb_top);
         $display("TB_TOP finished at time %0t", $time);

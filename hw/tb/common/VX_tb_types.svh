@@ -3,13 +3,15 @@
 
     `define CACHE_LINE_WIDTH  L2_MEM_DATA_WIDTH
     
-    typedef enum {R_TYPE=0,I_TYPE=1,S_TYPE=2,B_TYPE=3,U_TYPE=4,J_TYPE=5, DATA_TYPE=6} risc_v_seq_inst_type_t;
-    typedef enum {INST=0, DATA=1}                                                     cacheline_type_t;
-    typedef enum {GET_INSTR=0, PROCESS_INSTR=1, SEND_INSTR=2}                         risc_v_driver_state_t;
+    typedef enum {R_TYPE=0,R4_TYPE=1,I_TYPE=2,S_TYPE=3,B_TYPE=4,
+                  U_TYPE=5, J_TYPE=6,F_TYPE=7,V_TYPE=8}                  risc_v_seq_inst_type_t;
+    typedef enum {INST=0, DATA=1}                                        risc_v_data_type_t;
+    typedef enum {GET_INSTR=0, PROCESS_INSTR=1, SEND_INSTR=2}            risc_v_driver_state_t;
 
     //RISC_V Instruction Macros
     `define OPCODE_WIDTH      7
     `define REG_NUM_WIDTH     5
+    `define FUNCT2_WIDTH      2
     `define FUNCT3_WIDTH      3
     `define FUNCT7_WIDTH      7
 
@@ -17,51 +19,151 @@
     
     `define S_TYPE_IMM1_WIDTH `I_TYPE_IMM_WIDTH
     `define S_TYPE_IMM0_WIDTH 5
-    
+   
+    `define IMM_WIDTH 32
     `define B_TYPE_IMM1_WIDTH 6
     `define B_TYPE_IMM0_WIDTH 4
     
     `define U_TYPE_IMM_WIDTH 20
-    
+    `define J_TYPE_IMM_WIDTH 20
+
     `define J_TYPE_IMM1_WIDTH 10
     `define J_TYPE_IMM0_WIDTH 8
 
+
     `define SEQ_RAW_DATA_WIDTH PC_BITS
 
+    `define IMM_11 11
+    `define IMM_12 12
+    `define IMM_20 20
+
+    //Fence Insts
+    `define FM_WIDTH 4
+    `define PI_WIDTH 1
+    `define PO_WIDTH `PI_WIDTH
+    `define PR_WIDTH `PI_WIDTH
+    `define PW_WIDTH `PI_WIDTH
+    `define SI_WIDTH `PI_WIDTH
+    `define SO_WIDTH `PI_WIDTH
+    `define SR_WIDTH `PI_WIDTH
+    `define SW_WIDTH `PI_WIDTH
+
+    //Vec Insts
+
+    `define VF_UNARY_WIDTH  6    
+    `define VF_VM_WIDTH     1
+    `define VF_NCVT_WIDTH   `REG_NUM_WIDTH    
+    `define VF_OPFVV_WIDTH  `FUNCT3_WIDTH   
+    
     //Sequence Use
     typedef bit [`OPCODE_WIDTH - 1:0 ]       risc_v_seq_opcode_t;
     typedef bit [`REG_NUM_WIDTH - 1:0]       risc_v_seq_reg_num_t;
+    typedef bit [`FUNCT2_WIDTH - 1:0 ]       risc_v_seq_funct2_t;
     typedef bit [`FUNCT3_WIDTH - 1:0 ]       risc_v_seq_funct3_t;
     typedef bit [`FUNCT7_WIDTH - 1:0 ]       risc_v_seq_funct7_t;
+    typedef bit [`IMM_WIDTH - 1:0    ]       risc_v_seq_imm_t;
+    typedef bit [`FM_WIDTH - 1:0     ]       risc_v_seq_fm_t;
+
+    
 
     typedef bit [`I_TYPE_IMM_WIDTH - 1:0]    risc_v_seq_i_type_imm_t;
     typedef bit [`S_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_s_type_imm1_t;
     typedef bit [`S_TYPE_IMM0_WIDTH - 1:0]   risc_v_seq_s_type_imm0_t;
+    
     typedef bit [`B_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_b_type_imm1_t;
     typedef bit [`B_TYPE_IMM0_WIDTH - 1:0]   risc_v_seq_b_type_imm0_t;
+    
     typedef bit [`U_TYPE_IMM_WIDTH - 1:0]    risc_v_seq_u_type_imm_t;
+    
     typedef bit [`J_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_j_type_imm1_t;
     typedef bit [`J_TYPE_IMM0_WIDTH - 1:0]   risc_v_seq_j_type_imm0_t;
 
-    typedef bit [`SEQ_RAW_DATA_WIDTH - 1:0]  risc_v_seq_data_t;
+    typedef bit [`PI_WIDTH - 1:0]            risc_v_seq_fence_pi_t;
+    typedef bit [`PO_WIDTH - 1:0]            risc_v_seq_fence_po_t;
+    typedef bit [`PR_WIDTH - 1:0]            risc_v_seq_fence_pr_t;
+    typedef bit [`PW_WIDTH - 1:0]            risc_v_seq_fence_pw_t;
+    typedef bit [`SI_WIDTH - 1:0]            risc_v_seq_fence_si_t;
+    typedef bit [`SO_WIDTH - 1:0]            risc_v_seq_fence_so_t;
+    typedef bit [`SR_WIDTH - 1:0]            risc_v_seq_fence_sr_t;
+    typedef bit [`SW_WIDTH - 1:0]            risc_v_seq_fence_sw_t;
+
+    typedef bit [`VF_UNARY_WIDTH - 1:0]      risc_v_vfunary_seq_t;
+    typedef bit [`VF_VM_WIDTH - 1:0]         risc_v_vm_seq_t;
+    typedef bit [`VF_NCVT_WIDTH - 1:0]       risc_v_vfncvt_seq_t;
+    typedef bit [`VF_OPFVV_WIDTH - 1:0]      risc_v_opfvv_seq_t;
+    
+
+    typedef struct packed{
+        risc_v_seq_fence_pi_t                   pi;
+        risc_v_seq_fence_po_t                   po;
+        risc_v_seq_fence_pr_t                   pr;
+        risc_v_seq_fence_pw_t                   pw;
+       
+    }risc_v_seq_pred_t;
+
+    typedef struct packed{
+        risc_v_seq_fence_si_t                   si;
+        risc_v_seq_fence_so_t                   so;
+        risc_v_seq_fence_sr_t                   sr;
+        risc_v_seq_fence_sw_t                   sw;
+       
+    }risc_v_seq_succ_t;
+
+    typedef bit [`SEQ_RAW_DATA_WIDTH - 1:0]   risc_v_seq_data_t;
     
     //Top Level Use  
-    typedef logic [`CACHE_LINE_WIDTH - 1: 0] risc_v_cacheline_t;
+    typedef logic [`CACHE_LINE_WIDTH - 1: 0]  risc_v_cacheline_t;
+    typedef logic [`SEQ_RAW_DATA_WIDTH - 1:0] risc_v_cacheline_data_t; 
 
-    typedef logic [`OPCODE_WIDTH - 1:0 ]     risc_v_opcode_t;
-    typedef logic [`REG_NUM_WIDTH - 1:0]     risc_v_reg_num_t;
-    typedef logic [`FUNCT3_WIDTH - 1:0 ]     risc_v_funct3_t;
-    typedef logic [`FUNCT7_WIDTH - 1:0 ]     risc_v_funct7_t;
+    typedef logic [`OPCODE_WIDTH - 1:0 ]      risc_v_opcode_t;
+    typedef logic [`REG_NUM_WIDTH - 1:0]      risc_v_reg_num_t;
+    typedef logic [`FUNCT2_WIDTH - 1:0 ]      risc_v_funct2_t;
+    typedef logic [`FUNCT3_WIDTH - 1:0 ]      risc_v_funct3_t;
+    typedef logic [`FUNCT7_WIDTH - 1:0 ]      risc_v_funct7_t;
+    typedef logic [`FM_WIDTH - 1:0     ]      risc_v_fm_t;
 
-    typedef logic [`I_TYPE_IMM_WIDTH - 1:0]  risc_v_i_type_imm_t;
-    typedef logic [`S_TYPE_IMM1_WIDTH - 1:0] risc_v_s_type_imm1_t;
-    typedef logic [`S_TYPE_IMM0_WIDTH - 1:0] risc_v_s_type_imm0_t;
-    typedef logic [`B_TYPE_IMM1_WIDTH - 1:0] risc_v_b_type_imm1_t;
-    typedef logic [`B_TYPE_IMM0_WIDTH - 1:0] risc_v_b_type_imm0_t;
-    typedef logic [`U_TYPE_IMM_WIDTH - 1:0]  risc_v_u_type_imm_t;
-    typedef logic [`J_TYPE_IMM1_WIDTH - 1:0] risc_v_j_type_imm1_t;
-    typedef logic [`J_TYPE_IMM0_WIDTH - 1:0] risc_v_j_type_imm0_t;
 
+    typedef logic [`I_TYPE_IMM_WIDTH - 1:0]   risc_v_i_type_imm_t;
+    typedef logic [`S_TYPE_IMM1_WIDTH - 1:0]  risc_v_s_type_imm1_t;
+    typedef logic [`S_TYPE_IMM0_WIDTH - 1:0]  risc_v_s_type_imm0_t;
+    typedef logic [`B_TYPE_IMM1_WIDTH - 1:0]  risc_v_b_type_imm1_t;
+    typedef logic [`B_TYPE_IMM0_WIDTH - 1:0]  risc_v_b_type_imm0_t;
+    typedef logic [`U_TYPE_IMM_WIDTH - 1:0]   risc_v_u_type_imm_t;
+    typedef logic [`J_TYPE_IMM_WIDTH - 1:0]   risc_v_j_type_imm_t;
+
+    typedef logic [`PI_WIDTH - 1:0]           risc_v_fence_pi_t;
+    typedef logic [`PO_WIDTH - 1:0]           risc_v_fence_po_t;
+    typedef logic [`PR_WIDTH - 1:0]           risc_v_fence_pr_t;
+    typedef logic [`PW_WIDTH - 1:0]           risc_v_fence_pw_t;
+    typedef logic [`SI_WIDTH - 1:0]           risc_v_fence_si_t;
+    typedef logic [`SO_WIDTH - 1:0]           risc_v_fence_so_t;
+    typedef logic [`SR_WIDTH - 1:0]           risc_v_fence_sr_t;
+    typedef logic [`SW_WIDTH - 1:0]           risc_v_fence_sw_t;
+
+    typedef struct packed{
+        risc_v_fence_pi_t                   pi;
+        risc_v_fence_po_t                   po;
+        risc_v_fence_pr_t                   pr;
+        risc_v_fence_pw_t                   pw;
+       
+    }risc_v_pred_t;
+
+    typedef struct packed{
+        risc_v_fence_si_t                   si;
+        risc_v_fence_so_t                   so;
+        risc_v_fence_sr_t                   sr;
+        risc_v_fence_sw_t                   sw;
+       
+    }risc_v_succ_t;
+
+    typedef bit [`VF_UNARY_WIDTH - 1:0]       risc_v_vfunary_t;
+    typedef bit [`VF_VM_WIDTH - 1:0]          risc_v_vm_t;
+    typedef bit [`VF_NCVT_WIDTH - 1:0]        risc_v_vfncvt_t;
+    typedef bit [`VF_OPFVV_WIDTH - 1:0]       risc_v_opfvv_t;
+   
+
+     //********************Instruction Types*********************************/
+    
     typedef struct packed{
         risc_v_funct7_t                      funct7;
         risc_v_reg_num_t                     rs2;
@@ -70,7 +172,17 @@
         risc_v_reg_num_t                     rd;
         risc_v_opcode_t                      opcode;
     } r_type_inst_t;
-    
+
+    typedef struct packed{
+        risc_v_reg_num_t                     rs3;
+        risc_v_funct2_t                      funct2;
+        risc_v_reg_num_t                     rs2;
+        risc_v_reg_num_t                     rs1;
+        risc_v_funct3_t                      funct3;
+        risc_v_reg_num_t                     rd;
+        risc_v_opcode_t                      opcode;
+    } r4_type_inst_t;
+
     typedef struct packed{
         risc_v_i_type_imm_t                  imm;
         risc_v_reg_num_t                     rs1;
@@ -105,22 +217,39 @@
     } u_type_inst_t;
 
     typedef struct packed{
-        logic                               twenty;
-        risc_v_j_type_imm1_t                imm1;
-        logic                               eleven;
-        risc_v_j_type_imm0_t                imm0;
+        risc_v_j_type_imm_t                 imm;
         risc_v_reg_num_t                    rd;
         risc_v_opcode_t                     opcode;
     } j_type_inst_t;
 
+    typedef struct packed{
+        risc_v_fm_t                         fm;
+        risc_v_pred_t                       pred;
+        risc_v_succ_t                       succ;
+        risc_v_reg_num_t                    rs1;
+        risc_v_funct3_t                     funct3;
+        risc_v_reg_num_t                    rd;
+    }f_type_inst_t;
+
+    typedef struct packed{
+        risc_v_vfunary_t                  vfunary; 
+        risc_v_vm_t                         vm;
+        risc_v_reg_num_t                    vs2;
+        risc_v_vfncvt_t                     vfncvtbf16;
+        risc_v_opfvv_t                      opfvv;
+        risc_v_reg_num_t                    vd;
+    }v_type_inst_t;
+    
     typedef union {
-        r_type_inst_t r_type_inst;
-        i_type_inst_t i_type_inst;
-        s_type_inst_t s_type_inst;
-        b_type_inst_t b_type_inst;
-        u_type_inst_t u_type_inst;
-        j_type_inst_t j_type_inst;
-        logic [PC_BITS:0] inst_data;
-    } risc_v_inst_t;
+        r_type_inst_t                       r_type_inst;
+        i_type_inst_t                       i_type_inst;
+        s_type_inst_t                       s_type_inst;
+        b_type_inst_t                       b_type_inst;
+        u_type_inst_t                       u_type_inst;
+        j_type_inst_t                       j_type_inst;
+        f_type_inst_t                       f_type_inst;
+        v_type_inst_t                       v_type_inst;
+        risc_v_cacheline_data_t             data;
+    }risc_v_inst_t;
     
 `endif // VX_TB_TYPES_VH

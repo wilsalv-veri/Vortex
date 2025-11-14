@@ -54,6 +54,7 @@ module VX_operands import VX_gpu_pkg::*; #(
     wire [`NUM_OPCS-1:0] scoreboard_ready_in;
     assign scoreboard_if.ready = scoreboard_ready_in[sb_opc];
 
+    //HERE
     for (genvar i = 0; i < `NUM_OPCS; i++) begin : g_collectors
         // select scoreboard interface
         VX_scoreboard_if opc_scoreboard_if();

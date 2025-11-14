@@ -6,6 +6,10 @@ $VORTEX/hw/tb/VX_tb_top_pkg.sv
 +incdir+$VORTEX/hw/tb/common
 
 $VORTEX/hw/tb/common/VX_tb_common_pkg.sv
+//Include Files under $VORTEX/hw/tb/common/seq_items
++incdir+$VORTEX/hw/tb/common/seq_items
+
+
 
 //Include Files under $VORTEX/hw/tb/interfaces
 +incdir+$VORTEX/hw/tb/interfaces

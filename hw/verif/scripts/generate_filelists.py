@@ -85,11 +85,13 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
                 path = abs_path.replace(entry,"")
 
             #Files to skip
-            hidden_file        = entry[0] == "."
-            unsupported_format = (format not in supported_formats) 
-            common_pkg_files   = cwd == 'common' and "pkg" not in entry
-
-            if hidden_file or unsupported_format or common_pkg_files:
+            skip_list = []
+            skip_list.append(entry[0] == ".") #hidden files
+            skip_list.append(format not in supported_formats) #unsupported_format
+            skip_list.append((cwd == 'common') and ("pkg" not in entry) and not directory) #common_pkg_files
+            skip_list.append(cwd == 'seq_items')
+            
+            if True in skip_list:
                 continue          
             
             includeLine = filelistIncludeLine(entry, path, directory)

@@ -1,4 +1,4 @@
-class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
+class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
 
     `uvm_component_utils(VX_risc_v_driver)
 
@@ -8,16 +8,16 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
     localparam REST_OF_CACHELINE_MSB     = INSTRUCTION_INSERTION_LSB - 1;
     localparam REST_OF_CACHELINE_LSB     = 0;
 
-    VX_risc_v_inst_item risc_v_inst_seq_item;
+    VX_risc_v_seq_item risc_v_seq_item;
     
     uvm_blocking_get_port #(int) receive_seq_num_insts;
 
     //For instruction type creation
-    risc_v_inst_t      risc_v_inst;
-    risc_v_cacheline_t cacheline = 512'b0;
+    risc_v_cacheline_data_t data_word;
+    risc_v_cacheline_t      cacheline = 512'b0;
     
-    risc_v_driver_state_t driver_state = GET_INSTR;
-    cacheline_type_t      cache_line_type;
+    risc_v_driver_state_t   driver_state = GET_INSTR;
+    risc_v_data_type_t      data_type;
     
     virtual VX_risc_v_inst_if riscv_inst_ifc;
     virtual VX_mem_load_if    mem_load_ifc;
@@ -36,7 +36,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
 
         `VX_info("VX_RISC_V_DRIVER", "Built Monitor")
         
-        risc_v_inst_seq_item  = VX_risc_v_inst_item::type_id::create("riscv_driver_inst");
+        risc_v_seq_item  = VX_risc_v_seq_item::type_id::create("riscv_driver_item");
         
         receive_seq_num_insts = new("UVM_GET_SEQ_NUM_INSTS", this);
         
@@ -96,72 +96,19 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
     endfunction
 
     task get_instr();
-        seq_item_port.get_next_item(risc_v_inst_seq_item);
-        
-        `VX_info("[VX_RISC_V_DRIVER]", $sformatf("Instruction Received! Type:%s", risc_v_inst_seq_item.inst_type.name));
-        cache_line_type                              <= INST;    
-        case(risc_v_inst_seq_item.inst_type)
-            R_TYPE: begin
-                risc_v_inst.r_type_inst.funct7       <= risc_v_inst_seq_item.funct7;
-                risc_v_inst.r_type_inst.rs2          <= risc_v_inst_seq_item.rs2;
-                risc_v_inst.r_type_inst.rs1          <= risc_v_inst_seq_item.rs1;
-                risc_v_inst.r_type_inst.funct3       <= risc_v_inst_seq_item.funct3;
-                risc_v_inst.r_type_inst.rd           <= risc_v_inst_seq_item.rd;
-                risc_v_inst.r_type_inst.opcode       <= risc_v_inst_seq_item.opcode;
-            end  
-            I_TYPE: begin  
-                risc_v_inst.i_type_inst.imm          <= risc_v_inst_seq_item.i_type_imm;
-                risc_v_inst.i_type_inst.rs1          <= risc_v_inst_seq_item.rs1;
-                risc_v_inst.i_type_inst.funct3       <= risc_v_inst_seq_item.funct3;
-                risc_v_inst.i_type_inst.rd           <= risc_v_inst_seq_item.rd;
-                risc_v_inst.i_type_inst.opcode       <= risc_v_inst_seq_item.opcode;
-            end  
-            S_TYPE: begin  
-                risc_v_inst.s_type_inst.imm1         <= risc_v_inst_seq_item.s_type_imm1;
-                risc_v_inst.s_type_inst.rs1          <= risc_v_inst_seq_item.rs1;
-                risc_v_inst.s_type_inst.funct3       <= risc_v_inst_seq_item.funct3;
-                risc_v_inst.s_type_inst.imm0         <= risc_v_inst_seq_item.s_type_imm0;
-                risc_v_inst.s_type_inst.opcode       <= risc_v_inst_seq_item.opcode;
-            end  
-            B_TYPE: begin  
-                risc_v_inst.b_type_inst.twelve       <= risc_v_inst_seq_item.twelve;
-                risc_v_inst.b_type_inst.imm1         <= risc_v_inst_seq_item.b_type_imm1;
-                risc_v_inst.b_type_inst.rs2          <= risc_v_inst_seq_item.rs2;
-                risc_v_inst.b_type_inst.rs1          <= risc_v_inst_seq_item.rs1;
-                risc_v_inst.b_type_inst.funct3       <= risc_v_inst_seq_item.funct3;
-                risc_v_inst.b_type_inst.imm0         <= risc_v_inst_seq_item.b_type_imm0;
-                risc_v_inst.b_type_inst.eleven       <= risc_v_inst_seq_item.eleven;
-                risc_v_inst.b_type_inst.opcode       <= risc_v_inst_seq_item.opcode;
-            end  
-            U_TYPE: begin  
-                risc_v_inst.u_type_inst.imm          <= risc_v_inst_seq_item.u_type_imm;
-                risc_v_inst.u_type_inst.rd           <= risc_v_inst_seq_item.rd;
-                risc_v_inst.u_type_inst.opcode       <= risc_v_inst_seq_item.opcode;
-            end  
-            J_TYPE: begin  
-                risc_v_inst.j_type_inst.twenty       <= risc_v_inst_seq_item.twenty;
-                risc_v_inst.j_type_inst.imm1         <= risc_v_inst_seq_item.j_type_imm1;
-                risc_v_inst.j_type_inst.eleven       <= risc_v_inst_seq_item.eleven;
-                risc_v_inst.j_type_inst.imm0         <= risc_v_inst_seq_item.j_type_imm0;
-                risc_v_inst.j_type_inst.rd           <= risc_v_inst_seq_item.rd;
-                risc_v_inst.j_type_inst.opcode       <= risc_v_inst_seq_item.opcode;
-            end
-            DATA_TYPE: begin
-                risc_v_inst.inst_data                <= risc_v_inst_seq_item.program_data;
-                cache_line_type                      <= DATA;    
-       
-            end
-        endcase
-        
-        inst_count                                   <= inst_count + 1;
-        instr_received                               <= 1'b1;
+        seq_item_port.get_next_item(risc_v_seq_item);
+            
+        data_type                       <= risc_v_seq_item.data_type;
+        data_word                       <= risc_v_seq_item.raw_data;
+        inst_count                      <= inst_count + 1;
+        instr_received                  <= 1'b1;
     endtask
 
     task process_instr();
-        `VX_info("[VX_RISC_V_DRIVER]", $sformatf("Processing Instruction Data: %0h",  risc_v_inst.inst_data));
-        shift_amount                                 <= get_shift_amount();
-        cacheline                                    <= {risc_v_inst.inst_data, cacheline[REST_OF_CACHELINE_MSB:REST_OF_CACHELINE_LSB]} >> get_shift_amount();
-        instr_received                               <= 1'b0;
+        `VX_info("[VX_RISC_V_DRIVER]", $sformatf("Processing Instruction Data: %0h",  data_word));
+        shift_amount                    <= get_shift_amount();
+        cacheline                       <= {data_word, cacheline[REST_OF_CACHELINE_MSB:REST_OF_CACHELINE_LSB]} >> get_shift_amount();
+        instr_received                  <= 1'b0;
         seq_item_port.item_done();
     endtask
 
@@ -173,7 +120,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_inst_item);
             
         mem_load_ifc.cacheline                   <= cacheline;
         mem_load_ifc.load_valid                  <= 1'b1;
-        mem_load_ifc.cacheline_type              <= cache_line_type;
+        mem_load_ifc.data_type                   <= data_type;
     endtask
 
     function int get_shift_amount();

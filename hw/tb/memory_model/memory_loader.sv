@@ -42,7 +42,7 @@ always_comb begin
         
                 req_valid               = 1'b1;
                 rw                      = 1'b1;
-                addr                    = (mem_load_if.cacheline_type == INST) ? 
+                addr                    = (mem_load_if.data_type == INST) ? 
                                            (MEM_LOAD_BOOT_ADDR + inst_cacheline_count) : 
                                            MEM_LOAD_DATA_BASE_ADDR + data_cacheline_count;
                 data                    = mem_load_if.cacheline;
@@ -79,7 +79,7 @@ always @ (posedge clk)begin
             if (mem_load_if.load_valid)begin
                     load_ready               <= 1'b0;
 
-                    if(mem_load_if.cacheline_type == INST) 
+                    if(mem_load_if.data_type == INST) 
                         inst_cacheline_count <=  inst_cacheline_count + 1;
                     else 
                         data_cacheline_count <=  data_cacheline_count + 1;

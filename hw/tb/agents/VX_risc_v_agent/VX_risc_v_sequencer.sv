@@ -1,4 +1,4 @@
-class VX_risc_v_sequencer extends uvm_sequencer #(VX_risc_v_inst_item);
+class VX_risc_v_sequencer extends uvm_sequencer #(VX_risc_v_seq_item);
 
     `uvm_component_utils(VX_risc_v_sequencer)
 

@@ -1,13 +1,13 @@
 import VX_tb_common_pkg::*; 
 
-class VX_risc_v_base_seq extends uvm_sequence #(VX_risc_v_inst_item);
+class VX_risc_v_base_seq extends uvm_sequence #(VX_risc_v_seq_item);
 
     `uvm_object_utils(VX_risc_v_base_seq)
 
     `uvm_declare_p_sequencer(VX_risc_v_sequencer)
     
     rand int num_of_cachelines;
-    VX_risc_v_inst_item risc_v_inst;
+    VX_risc_v_seq_item risc_v_seq_item;
     
     function new(string name="VX_risc_v_base_seq");
         super.new(name);
