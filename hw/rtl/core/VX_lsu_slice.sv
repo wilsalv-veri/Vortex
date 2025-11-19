@@ -43,6 +43,10 @@ module VX_lsu_slice import VX_gpu_pkg::*; #(
     // tag = uuid + tag_id
     localparam TAG_WIDTH = UUID_WIDTH + TAG_ID_WIDTH;
 
+    //Adding for debugability
+    lsu_args_t lsu_args;
+    assign lsu_args = execute_if.data.op_args.lsu;
+
     VX_result_if #(
         .NUM_LANES (NUM_LANES)
     ) result_rsp_if();

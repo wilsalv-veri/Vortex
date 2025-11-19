@@ -15,6 +15,9 @@ class VX_risc_v_monitor extends uvm_monitor;
         if(! uvm_config_db #(virtual VX_decode_if) ::get(this, "", "decode_if", decode_if))
             `VX_error("VX_RISC_V_MONITOR", "Failed to get access to decode_if")
     
+        if(! uvm_config_db #(virtual VX_warp_ctl_if) ::get(this, "", "warp_ctl_if", warp_ctl_if))
+            `VX_error("VX_RISC_V_MONITOR", "Failed to get access to warp_ctl_if")
+    
         for( int idx=0; idx < `ISSUE_WIDTH; idx++) begin
             if(! uvm_config_db #(virtual VX_writeback_if) ::get(this, "", $sformatf("writeback_if[%0d]", idx), writeback_if[idx]))
                 `VX_error("VX_RISC_V_MONITOR", "Failed to get access to writeback_if")
@@ -22,14 +25,7 @@ class VX_risc_v_monitor extends uvm_monitor;
     endfunction
 
     virtual task run_phase(uvm_phase phase);
-        super.run_phase(phase);
-
-        phase.raise_objection(this);
-            
-            wait(writeback_if[0].valid);
-            `VX_info("VX_RISC_V_MONITOR", "Observed Writeback Valid")
-            #30; //Feq clks of delay to see what comes after
-        phase.drop_objection(this);
+        super.run_phase(phase);    
     endtask
 
 endclass

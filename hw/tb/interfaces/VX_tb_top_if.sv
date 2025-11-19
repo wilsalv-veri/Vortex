@@ -21,7 +21,7 @@ endinterface
 
 interface VX_uvm_test_if ();
     logic mem_load_seq_done;
-
+    logic core_busy;
     modport slave(input mem_load_seq_done);
     modport master(output mem_load_seq_done);
 endinterface

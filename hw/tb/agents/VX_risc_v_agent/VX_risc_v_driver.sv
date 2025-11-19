@@ -22,8 +22,8 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     virtual VX_risc_v_inst_if riscv_inst_ifc;
     virtual VX_mem_load_if    mem_load_ifc;
 
-    int   inst_count        = 0;
-    int   insts_to_send     = 0;
+    int   word_count        = 0;
+    int   words_to_send     = 0;
     int   shift_amount      = 0;
     logic instr_received    = 1'b0;
 
@@ -34,10 +34,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
-        `VX_info("VX_RISC_V_DRIVER", "Built Monitor")
-        
-        risc_v_seq_item  = VX_risc_v_seq_item::type_id::create("riscv_driver_item");
-        
+        risc_v_seq_item       = VX_risc_v_seq_item::type_id::create("riscv_driver_item");
         receive_seq_num_insts = new("UVM_GET_SEQ_NUM_INSTS", this);
         
         if (!uvm_config_db #(virtual VX_risc_v_inst_if)::get(this, "", "riscv_inst_ifc", riscv_inst_ifc))
@@ -84,7 +81,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
             case(driver_state)
                 GET_INSTR             : next_state  = instr_received ? PROCESS_INSTR : GET_INSTR;
                 PROCESS_INSTR      : begin
-                    if ((inst_count && ((inst_count % INST_PER_CACHE_LINE) == 0))  || inst_count == insts_to_send) 
+                    if ((word_count && ((word_count % INST_PER_CACHE_LINE) == 0))  || word_count == words_to_send) 
                                         next_state  = SEND_INSTR;
                     else
                                         next_state =  GET_INSTR;
@@ -100,20 +97,18 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
             
         data_type                       <= risc_v_seq_item.data_type;
         data_word                       <= risc_v_seq_item.raw_data;
-        inst_count                      <= inst_count + 1;
+        word_count                      <= word_count + 1;
         instr_received                  <= 1'b1;
     endtask
 
     task process_instr();
-        `VX_info("[VX_RISC_V_DRIVER]", $sformatf("Processing Instruction Data: %0h",  data_word));
         shift_amount                    <= get_shift_amount();
         cacheline                       <= {data_word, cacheline[REST_OF_CACHELINE_MSB:REST_OF_CACHELINE_LSB]} >> get_shift_amount();
         instr_received                  <= 1'b0;
         seq_item_port.item_done();
     endtask
 
-    task send_instr();
-       
+    task send_instr(); 
         `VX_info("VX_RISC_V_DRIVER", "Waiting For Load Ready")
         wait(mem_load_ifc.load_ready);
         `VX_info("VX_RISC_V_DRIVER", "Sending Cacheline")
@@ -124,25 +119,25 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     endtask
 
     function int get_shift_amount();
-        return (inst_count  == insts_to_send) ? 
-                        (INST_PER_CACHE_LINE - (inst_count % INST_PER_CACHE_LINE))*PC_BITS : PC_BITS;
+        return (word_count  == words_to_send) ? 
+                        (INST_PER_CACHE_LINE - (word_count % INST_PER_CACHE_LINE))*PC_BITS : PC_BITS;
         
     endfunction
 
     task get_seq_num_insts();
 
-        int num_insts;
+        int num_words;
         
         forever begin
-            receive_seq_num_insts.get(num_insts);
-            `VX_info("VX_RISC_V_DRIVER", $sformatf("Number of Insts Received: %0d", num_insts))
+            receive_seq_num_insts.get(num_words);
+            `VX_info("VX_RISC_V_DRIVER", $sformatf("Number of Words To Send: %0d", num_words))
         
-            if (inst_count == insts_to_send)begin
-                inst_count    = 0;
-                insts_to_send = num_insts;
+            if (word_count == words_to_send)begin
+                word_count    = 0;
+                words_to_send = num_words;
             end
             else 
-                insts_to_send += num_insts;
+                words_to_send += num_words;
         end
         
     endtask

@@ -53,6 +53,10 @@ module VX_alu_int import VX_gpu_pkg::*; #(
     reg [NUM_LANES-1:0][`XLEN-1:0] alu_result;
     wire [NUM_LANES-1:0][`XLEN-1:0] alu_result_r;
 
+    //Adding for debugability
+    alu_args_t alu_args;
+    assign alu_args = execute_if.data.op_args.alu;
+
 `ifdef XLEN_64
     wire is_alu_w = execute_if.data.op_args.alu.is_w;
 `else

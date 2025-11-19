@@ -19,7 +19,7 @@ package VX_tb_common_pkg;
     virtual VX_dispatch_if      dispatch_if[NUM_EX_UNITS * `ISSUE_WIDTH];
     virtual VX_commit_if        commit_if[NUM_EX_UNITS * `ISSUE_WIDTH];
     virtual VX_writeback_if     writeback_if[`ISSUE_WIDTH];
-
+   
     localparam INST_PER_CACHE_LINE = L2_MEM_DATA_WIDTH / PC_BITS; 
 
     `include "VX_tb_types.svh"
@@ -34,7 +34,7 @@ package VX_tb_common_pkg;
     `include "VX_risc_v_Jtype_seq_item.sv"
     `include "VX_risc_v_Ftype_seq_item.sv"
     `include "VX_risc_v_Vtype_seq_item.sv"
-    
+     
     `include "VX_tb_define.svh"
     
     `include "VX_risc_v_sequencer.sv"
@@ -42,6 +42,11 @@ package VX_tb_common_pkg;
     `include "VX_risc_v_monitor.sv"
     `include "VX_risc_v_agent.sv"
     `include "VX_tb_environment.sv"
+
+    `include "VX_risc_v_base_seq.sv"
+    `include "VX_risc_v_base_instr_seq.sv"
+    `include "VX_risc_v_base_data_seq.sv"
+
     
 endpackage
 

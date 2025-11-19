@@ -133,7 +133,8 @@
     end
 `endif
 
-`define SFORMATF(x) $sformatf x
+//`define SFORMATF(x) $sformatf x
+`define SFORMATF(x) ""
 
 `else // SYNTHESIS
 

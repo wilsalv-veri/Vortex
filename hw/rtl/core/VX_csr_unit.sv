@@ -52,6 +52,10 @@ module VX_csr_unit import VX_gpu_pkg::*; #(
     wire                            csr_wr_enable;
     wire                            csr_req_ready;
 
+    //Adding for debugability
+    csr_args_t csr_args;
+    assign csr_args = execute_if.data.op_args.csr;
+
     wire [`VX_CSR_ADDR_BITS-1:0] csr_addr = execute_if.data.op_args.csr.addr;
     wire [RV_REGS_BITS-1:0] csr_imm = execute_if.data.op_args.csr.imm;
 

@@ -90,7 +90,7 @@ module VX_core import VX_gpu_pkg::*; #(
     
     
     VX_schedule #(
-        .INSTANCE_ID (`SFORMATF(("%s-schedule", INSTANCE_ID))),
+        .INSTANCE_ID (`SFORMATF(("%s-schedule", INSTANCE_ID))), 
         .CORE_ID (CORE_ID)
     ) schedule (
         .clk            (clk),

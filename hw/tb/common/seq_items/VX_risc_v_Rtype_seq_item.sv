@@ -32,7 +32,7 @@ class VX_risc_v_Rtype_seq_item extends VX_risc_v_inst_seq_item;
         this.funct3   = funct3;
         this.rd       = rd;
         this.opcode   = opcode;
-        this.raw_data = {this.funct7,this.rs2,this.rs1,this.rd,this.opcode};
+        this.raw_data = {this.funct7,this.rs2,this.rs1,this.funct3,this.rd,this.opcode};
     endfunction
 
     static function VX_risc_v_Rtype_seq_item create_instruction_with_fields(

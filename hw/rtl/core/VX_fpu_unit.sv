@@ -35,6 +35,7 @@ module VX_fpu_unit import VX_gpu_pkg::*, VX_fpu_pkg::*; #(
     localparam IBUF_DATAW = UUID_WIDTH + NW_WIDTH + NUM_LANES + PC_BITS + NUM_REGS_BITS + PID_WIDTH + 1 + 1;
     localparam PARTIAL_BW = (BLOCK_SIZE != `ISSUE_WIDTH) || (NUM_LANES != `SIMD_WIDTH);
 
+    
     VX_execute_if #(
         .NUM_LANES (NUM_LANES)
     ) per_block_execute_if[BLOCK_SIZE]();
@@ -56,6 +57,10 @@ module VX_fpu_unit import VX_gpu_pkg::*, VX_fpu_pkg::*; #(
 
     for (genvar block_idx = 0; block_idx < BLOCK_SIZE; ++block_idx) begin : g_blocks
         `UNUSED_VAR (per_block_execute_if[block_idx].data.wb)
+
+        //Adding for debugability
+        fpu_args_t fpu_args[BLOCK_SIZE];
+        assign fpu_args[block_idx] = per_block_execute_if[block_idx].data.op_args.fpu;
 
         // Store request info
         wire fpu_req_valid, fpu_req_ready;

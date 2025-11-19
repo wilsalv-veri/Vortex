@@ -35,15 +35,30 @@ $VORTEX/hw/tb/memory_model/memory_bfm.sv
 //Include Files under $VORTEX/hw/tb/seqs
 +incdir+$VORTEX/hw/tb/seqs
 
-$VORTEX/hw/tb/seqs/VX_risc_v_base_seq.sv
-$VORTEX/hw/tb/seqs/VX_risc_v_base_instr_seq.sv
-$VORTEX/hw/tb/seqs/VX_risc_v_base_data_seq.sv
+//Include Files under $VORTEX/hw/tb/seqs/base_seqs
++incdir+$VORTEX/hw/tb/seqs/base_seqs
+
+
+//Include Files under $VORTEX/hw/tb/seqs/warp_ctl_seqs
++incdir+$VORTEX/hw/tb/seqs/warp_ctl_seqs
+
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_doa_seq.sv
+
 
 //Include Files under $VORTEX/hw/tb/tests
 +incdir+$VORTEX/hw/tb/tests
 
-$VORTEX/hw/tb/tests/VX_risc_v_base_test.sv
-$VORTEX/hw/tb/tests/VX_risc_v_base_instr_seq_test.sv
+//Include Files under $VORTEX/hw/tb/tests/base_tests
++incdir+$VORTEX/hw/tb/tests/base_tests
+
+$VORTEX/hw/tb/tests/base_tests/VX_risc_v_base_test.sv
+$VORTEX/hw/tb/tests/base_tests/VX_risc_v_base_instr_seq_test.sv
+
+//Include Files under $VORTEX/hw/tb/tests/warp_ctl_tests
++incdir+$VORTEX/hw/tb/tests/warp_ctl_tests
+
+$VORTEX/hw/tb/tests/warp_ctl_tests/VX_tmc_doa_test.sv
+
 
 $VORTEX/hw/tb/tb_top.sv
 

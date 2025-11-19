@@ -46,6 +46,17 @@ module VX_decode import VX_gpu_pkg::*; #(
     reg [EX_BITS-1:0] ex_type;
     reg [INST_OP_BITS-1:0] op_type;
     op_args_t op_args;
+
+    //Edits For debug
+    //Adding these for debug visibility
+    //Unions are not expanded into their components so 
+    //data appears as data blob in waveform
+    alu_args_t  alu_args;
+    fpu_args_t  fpu_args;
+    lsu_args_t  lsu_args;
+    csr_args_t  csr_args;
+    wctl_args_t wctl_args;
+    
     reg_idx_t rd_v, rs1_v, rs2_v, rs3_v;
     reg use_rd, use_rs1, use_rs2, use_rs3;
     reg is_wstall;
@@ -159,19 +170,20 @@ module VX_decode import VX_gpu_pkg::*; #(
             INST_I: begin
                 ex_type = EX_ALU;
                 op_type = INST_OP_BITS'(r_type);
-                op_args.alu.xtype = ALU_TYPE_ARITH;
-                op_args.alu.is_w = 0;
-                op_args.alu.use_PC = 0;
-                op_args.alu.use_imm = 1;
-                op_args.alu.imm = `SEXT(`XLEN, i_imm);
+                alu_args.xtype = ALU_TYPE_ARITH;
+                alu_args.is_w = 0;
+                alu_args.use_PC = 0;
+                alu_args.use_imm = 1;
+                alu_args.imm = `SEXT(`XLEN, i_imm);
+                op_args.alu = alu_args;
                 `USED_IREG (rd);
                 `USED_IREG (rs1);
             end
             INST_R: begin
                 ex_type = EX_ALU;
-                op_args.alu.is_w = 0;
-                op_args.alu.use_PC = 0;
-                op_args.alu.use_imm = 0;
+                alu_args.is_w = 0;
+                alu_args.use_PC = 0;
+                alu_args.use_imm = 0; 
                 `USED_IREG (rd);
                 `USED_IREG (rs1);
                 `USED_IREG (rs2);
@@ -180,40 +192,42 @@ module VX_decode import VX_gpu_pkg::*; #(
                     INST_R_F7_MUL: begin
                         // MUL, MULH, MULHSU, MULHU
                         op_type = INST_OP_BITS'(m_type);
-                        op_args.alu.xtype = ALU_TYPE_MULDIV;
+                        alu_args.xtype = ALU_TYPE_MULDIV;
                     end
                 `endif
                 `ifdef EXT_ZICOND_ENABLE
                     INST_R_F7_ZICOND: begin
                         // CZERO-EQZ, CZERO-NEZ
                         op_type = funct3[1] ? INST_OP_BITS'(INST_ALU_CZNE) : INST_OP_BITS'(INST_ALU_CZEQ);
-                        op_args.alu.xtype = ALU_TYPE_ARITH;
+                        alu_args.xtype = ALU_TYPE_ARITH;
                     end
                 `endif
                     default: begin
                         op_type = INST_OP_BITS'(r_type);
-                        op_args.alu.xtype = ALU_TYPE_ARITH;
+                        alu_args.xtype = ALU_TYPE_ARITH;
                     end
                 endcase
+                op_args.alu = alu_args;
             end
         `ifdef XLEN_64
             INST_I_W: begin
                 // ADDIW, SLLIW, SRLIW, SRAIW
                 ex_type = EX_ALU;
                 op_type = INST_OP_BITS'(r_type);
-                op_args.alu.xtype = ALU_TYPE_ARITH;
-                op_args.alu.is_w = 1;
-                op_args.alu.use_PC = 0;
-                op_args.alu.use_imm = 1;
-                op_args.alu.imm = `SEXT(`XLEN, iw_imm);
+                alu_args.xtype = ALU_TYPE_ARITH;
+                alu_args.is_w = 1;
+                alu_args.use_PC = 0;
+                alu_args.use_imm = 1;
+                alu_args.imm = `SEXT(`XLEN, iw_imm);
+                op_args.alu = alu_args;
                 `USED_IREG (rd);
                 `USED_IREG (rs1);
             end
             INST_R_W: begin
                 ex_type = EX_ALU;
-                op_args.alu.is_w = 1;
-                op_args.alu.use_PC = 0;
-                op_args.alu.use_imm = 0;
+                alu_args.is_w = 1;
+                alu_args.use_PC = 0;
+                alu_args.use_imm = 0;
                 `USED_IREG (rd);
                 `USED_IREG (rs1);
                 `USED_IREG (rs2);
@@ -222,56 +236,61 @@ module VX_decode import VX_gpu_pkg::*; #(
                     INST_R_F7_MUL: begin
                         // MULW, DIVW, DIVUW, REMW, REMUW
                         op_type = INST_OP_BITS'(m_type);
-                        op_args.alu.xtype = ALU_TYPE_MULDIV;
+                        alu_args.xtype = ALU_TYPE_MULDIV;
                     end
                 `endif
                     default: begin
                         // ADDW, SUBW, SLLW, SRLW, SRAW
                         op_type = INST_OP_BITS'(r_type);
-                        op_args.alu.xtype = ALU_TYPE_ARITH;
+                        alu_args.xtype = ALU_TYPE_ARITH;
                     end
                 endcase
+                op_args.alu = alu_args;
             end
         `endif
             INST_LUI: begin
                 ex_type = EX_ALU;
                 op_type = INST_OP_BITS'(INST_ALU_LUI);
-                op_args.alu.xtype = ALU_TYPE_ARITH;
-                op_args.alu.is_w = 0;
-                op_args.alu.use_PC = 0;
-                op_args.alu.use_imm = 1;
-                op_args.alu.imm = {{`XLEN-31{ui_imm[19]}}, ui_imm[18:0], 12'(0)};
+                alu_args.xtype = ALU_TYPE_ARITH;
+                alu_args.is_w = 0;
+                alu_args.use_PC = 0;
+                alu_args.use_imm = 1;
+                alu_args.imm = {{`XLEN-31{ui_imm[19]}}, ui_imm[18:0], 12'(0)};
+                op_args.alu = alu_args;
                 `USED_IREG (rd);
             end
             INST_AUIPC: begin
                 ex_type = EX_ALU;
                 op_type = INST_OP_BITS'(INST_ALU_AUIPC);
-                op_args.alu.xtype = ALU_TYPE_ARITH;
-                op_args.alu.is_w = 0;
-                op_args.alu.use_PC = 1;
-                op_args.alu.use_imm = 1;
-                op_args.alu.imm = {{`XLEN-31{ui_imm[19]}}, ui_imm[18:0], 12'(0)};
+                alu_args.xtype = ALU_TYPE_ARITH;
+                alu_args.is_w = 0;
+                alu_args.use_PC = 1;
+                alu_args.use_imm = 1;
+                alu_args.imm = {{`XLEN-31{ui_imm[19]}}, ui_imm[18:0], 12'(0)};
+                op_args.alu = alu_args;
                 `USED_IREG (rd);
             end
             INST_JAL: begin
                 ex_type = EX_ALU;
                 op_type = INST_OP_BITS'(INST_BR_JAL);
-                op_args.alu.xtype = ALU_TYPE_BRANCH;
-                op_args.alu.is_w = 0;
-                op_args.alu.use_PC = 1;
-                op_args.alu.use_imm = 1;
-                op_args.alu.imm = `SEXT(`XLEN, jal_imm);
+                alu_args.xtype = ALU_TYPE_BRANCH;
+                alu_args.is_w = 0;
+                alu_args.use_PC = 1;
+                alu_args.use_imm = 1;
+                alu_args.imm = `SEXT(`XLEN, jal_imm);
+                op_args.alu = alu_args;
                 is_wstall = 1;
                 `USED_IREG (rd);
             end
             INST_JALR: begin
                 ex_type = EX_ALU;
                 op_type = INST_OP_BITS'(INST_BR_JALR);
-                op_args.alu.xtype = ALU_TYPE_BRANCH;
-                op_args.alu.is_w = 0;
-                op_args.alu.use_PC = 0;
-                op_args.alu.use_imm = 1;
-                op_args.alu.imm = `SEXT(`XLEN, u_12);
+                alu_args.xtype = ALU_TYPE_BRANCH;
+                alu_args.is_w = 0;
+                alu_args.use_PC = 0;
+                alu_args.use_imm = 1;
+                alu_args.imm = `SEXT(`XLEN, u_12);
+                op_args.alu = alu_args;
                 is_wstall = 1;
                 `USED_IREG (rd);
                 `USED_IREG (rs1);
@@ -279,11 +298,12 @@ module VX_decode import VX_gpu_pkg::*; #(
             INST_B: begin
                 ex_type = EX_ALU;
                 op_type = INST_OP_BITS'(b_type);
-                op_args.alu.xtype = ALU_TYPE_BRANCH;
-                op_args.alu.is_w = 0;
-                op_args.alu.use_PC = 1;
-                op_args.alu.use_imm = 1;
-                op_args.alu.imm = `SEXT(`XLEN, b_imm);
+                alu_args.xtype = ALU_TYPE_BRANCH;
+                alu_args.is_w = 0;
+                alu_args.use_PC = 1;
+                alu_args.use_imm = 1;
+                alu_args.imm = `SEXT(`XLEN, b_imm);
+                op_args.alu = alu_args;
                 is_wstall = 1;
                 `USED_IREG (rs1);
                 `USED_IREG (rs2);
@@ -291,31 +311,35 @@ module VX_decode import VX_gpu_pkg::*; #(
             INST_FENCE: begin
                 ex_type = EX_LSU;
                 op_type = INST_LSU_FENCE;
-                op_args.lsu.is_store = 0;
-                op_args.lsu.is_float = 0;
-                op_args.lsu.offset = 0;
+                lsu_args.is_store = 0;
+                lsu_args.is_float = 0;
+                lsu_args.offset = 0;
+                op_args.lsu = lsu_args;
             end
             INST_SYS : begin
                 if (funct3[1:0] != 0) begin
                     ex_type = EX_SFU;
                     op_type = INST_OP_BITS'(inst_sfu_csr(funct3));
-                    op_args.csr.addr = u_12;
-                    op_args.csr.use_imm = funct3[2];
+                    csr_args.addr = u_12;
+                    csr_args.use_imm = funct3[2];
+                    
                     is_wstall = is_fpu_csr; // only stall for FPU CSRs
                     `USED_IREG (rd);
                     if (funct3[2]) begin
-                        op_args.csr.imm = rs1;
+                        csr_args.imm = rs1;
                     end else begin
                         `USED_IREG (rs1);
                     end
+                    op_args.csr = csr_args;
                 end else begin
                     ex_type = EX_ALU;
                     op_type = INST_OP_BITS'(s_type);
-                    op_args.alu.xtype = ALU_TYPE_BRANCH;
-                    op_args.alu.is_w = 0;
-                    op_args.alu.use_imm = 1;
-                    op_args.alu.use_PC  = 1;
-                    op_args.alu.imm = `XLEN'd4;
+                    alu_args.xtype = ALU_TYPE_BRANCH;
+                    alu_args.is_w = 0;
+                    alu_args.use_imm = 1;
+                    alu_args.use_PC  = 1;
+                    alu_args.imm = `XLEN'd4;
+                    op_args.alu = alu_args;
                     is_wstall = 1;
                     `USED_IREG (rd);
                 end
@@ -326,9 +350,10 @@ module VX_decode import VX_gpu_pkg::*; #(
             INST_L: begin
                 ex_type = EX_LSU;
                 op_type = INST_OP_BITS'({1'b0, funct3});
-                op_args.lsu.is_store = 0;
-                op_args.lsu.is_float = opcode[2];
-                op_args.lsu.offset = u_12;
+                lsu_args.is_store = 0;
+                lsu_args.is_float = opcode[2];
+                lsu_args.offset = u_12;
+                op_args.lsu = lsu_args;
                 `USED_IREG (rs1);
                 `USED_IREG (rd);
             `ifdef EXT_F_ENABLE
@@ -341,9 +366,10 @@ module VX_decode import VX_gpu_pkg::*; #(
             INST_S: begin
                 ex_type = EX_LSU;
                 op_type = INST_OP_BITS'({1'b1, funct3});
-                op_args.lsu.is_store = 1;
-                op_args.lsu.is_float = opcode[2];
-                op_args.lsu.offset = s_imm;
+                lsu_args.is_store = 1;
+                lsu_args.is_float = opcode[2];
+                lsu_args.offset = s_imm;
+                op_args.lsu = lsu_args;
                 `USED_IREG (rs1);
                 `USED_IREG (rs2);
             `ifdef EXT_F_ENABLE
@@ -358,9 +384,10 @@ module VX_decode import VX_gpu_pkg::*; #(
             begin
                 ex_type = EX_FPU;
                 op_type = INST_OP_BITS'({2'b00, 1'b1, opcode[3]});
-                op_args.fpu.frm = funct3;
-                op_args.fpu.fmt[0] = funct2[0]; // float/double
-                op_args.fpu.fmt[1] = opcode[3] ^ opcode[2]; // SUB
+                fpu_args.frm = funct3;
+                fpu_args.fmt[0] = funct2[0]; // float/double
+                fpu_args.fmt[1] = opcode[3] ^ opcode[2]; // SUB
+                op_args.fpu = fpu_args;
                 `USED_FREG (rd);
                 `USED_FREG (rs1);
                 `USED_FREG (rs2);
@@ -368,17 +395,16 @@ module VX_decode import VX_gpu_pkg::*; #(
             end
             INST_FCI: begin
                 ex_type = EX_FPU;
-                op_args.fpu.frm = funct3;
-                op_args.fpu.fmt[0] = funct2[0]; // float/double
-                op_args.fpu.fmt[1] = rs2[1]; // CVT W/L
-
+                fpu_args.frm = funct3;
+                fpu_args.fmt[0] = funct2[0]; // float/double
+                fpu_args.fmt[1] = rs2[1]; // CVT W/L
                 case (funct5)
                     5'b00000, // FADD
                     5'b00001, // FSUB
                     5'b00010: // FMUL
                     begin
                         op_type = INST_OP_BITS'({2'b00, 1'b0, funct5[1]});
-                        op_args.fpu.fmt[1] = funct5[0]; // SUB
+                        fpu_args.fmt[1] = funct5[0]; // SUB
                         `USED_FREG (rd);
                         `USED_FREG (rs1);
                         `USED_FREG (rs2);
@@ -386,7 +412,7 @@ module VX_decode import VX_gpu_pkg::*; #(
                     5'b00100: begin
                         // NCP: FSGNJ=0, FSGNJN=1, FSGNJX=2
                         op_type = INST_OP_BITS'(INST_FPU_MISC);
-                        op_args.fpu.frm = INST_FRM_BITS'(funct3[1:0]);
+                        fpu_args.frm = INST_FRM_BITS'(funct3[1:0]);
                         `USED_FREG (rd);
                         `USED_FREG (rs1);
                         `USED_FREG (rs2);
@@ -394,7 +420,7 @@ module VX_decode import VX_gpu_pkg::*; #(
                     5'b00101: begin
                         // NCP: FMIN=6, FMAX=7
                         op_type = INST_OP_BITS'(INST_FPU_MISC);
-                        op_args.fpu.frm = INST_FRM_BITS'(funct3[0] ? 7 : 6);
+                        fpu_args.frm = INST_FRM_BITS'(funct3[0] ? 7 : 6);
                         `USED_FREG (rd);
                         `USED_FREG (rs1);
                         `USED_FREG (rs2);
@@ -443,11 +469,11 @@ module VX_decode import VX_gpu_pkg::*; #(
                         if (funct3[0]) begin
                             // NCP: FCLASS=3
                             op_type = INST_OP_BITS'(INST_FPU_MISC);
-                            op_args.fpu.frm = INST_FRM_BITS'(3);
+                            fpu_args.frm = INST_FRM_BITS'(3);
                         end else begin
                             // NCP: FMV.X.W=4
                             op_type = INST_OP_BITS'(INST_FPU_MISC);
-                            op_args.fpu.frm = INST_FRM_BITS'(4);
+                            fpu_args.frm = INST_FRM_BITS'(4);
                         end
                         `USED_IREG (rd);
                         `USED_FREG (rs1);
@@ -455,12 +481,13 @@ module VX_decode import VX_gpu_pkg::*; #(
                     5'b11110: begin
                         // NCP: FMV.W.X=5
                         op_type = INST_OP_BITS'(INST_FPU_MISC);
-                        op_args.fpu.frm = INST_FRM_BITS'(5);
+                        fpu_args.frm = INST_FRM_BITS'(5);
                         `USED_FREG (rd);
                         `USED_IREG (rs1);
                     end
                 default:;
                 endcase
+                op_args.fpu = fpu_args;
             end
         `endif
             INST_EXT1: begin
@@ -480,7 +507,7 @@ module VX_decode import VX_gpu_pkg::*; #(
                             end
                             3'h2: begin // SPLIT
                                 op_type = INST_OP_BITS'(INST_SFU_SPLIT);
-                                op_args.wctl.is_neg = rs2[0];
+                                wctl_args.is_neg = rs2[0];
                                 `USED_IREG (rs1);
                                 `USED_IREG (rd);
                             end
@@ -495,16 +522,18 @@ module VX_decode import VX_gpu_pkg::*; #(
                             end
                             3'h5: begin // PRED
                                 op_type = INST_OP_BITS'(INST_SFU_PRED);
-                                op_args.wctl.is_neg = rd[0];
+                                wctl_args.is_neg = rd[0];
                                 `USED_IREG (rs1);
                                 `USED_IREG (rs2);
                             end
                             default:;
                         endcase
+                         op_args.wctl = wctl_args;
                     end
                     7'h01: begin // VOTE, SHFL
                         ex_type = EX_ALU;
-                        op_args.alu.xtype = ALU_TYPE_OTHER;
+                        alu_args.xtype = ALU_TYPE_OTHER;
+                        op_args.alu = alu_args;
                         use_rd  = 1;
                         `USED_IREG (rd);
                         `USED_IREG (rs1);
@@ -519,10 +548,10 @@ module VX_decode import VX_gpu_pkg::*; #(
                             3'h0: begin // WMMA
                                 ex_type = EX_TCU;
                                 op_type = INST_OP_BITS'(INST_TCU_WMMA);
-                                op_args.tcu.fmt_s  = rs1[3:0];
-                                op_args.tcu.fmt_d  = rd[3:0];
-                                op_args.tcu.step_m = '0;
-                                op_args.tcu.step_n = '0;
+                                tcu_args.fmt_s  = rs1[3:0];
+                                tcu_args.fmt_d  = rd[3:0];
+                                tcu_args.step_m = '0;
+                                tcu_args.step_n = '0;
                                 `USED_IREG (rd);
                                 `USED_IREG (rs1);
                                 `USED_IREG (rs2);

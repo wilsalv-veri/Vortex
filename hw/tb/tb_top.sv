@@ -5,7 +5,7 @@ import VX_gpu_pkg::*;
 `include "uvm_macros.svh"
 `include "VX_types.vh"
 
-module tb_top ;
+module VX_tb_top ;
    
     //Interfaces
     VX_tb_top_if             tb_top_if();
@@ -27,7 +27,6 @@ module tb_top ;
     logic [VX_DCR_ADDR_WIDTH-1:0] write_addr;
     logic [VX_DCR_DATA_WIDTH-1:0] write_data;
  
-    wire [`SOCKET_SIZE-1:0] per_core_busy;
     
     //Clk Gen
     always #1 tb_top_if.clk = ~tb_top_if.clk;
@@ -230,7 +229,7 @@ module tb_top ;
         .gbar_bus_if    (per_core_gbar_bus_if[core_id]),
     `endif
 
-        .busy           (per_core_busy[core_id])
+        .busy           (uvm_test_ifc.core_busy)
     );
 
 
@@ -281,7 +280,7 @@ module tb_top ;
         $display("TB_TOP running at time %0t", $time);   
         
         run_test();
-        $dumpvars(0, tb_top);
+        $dumpvars(0, VX_tb_top);
         $display("TB_TOP finished at time %0t", $time);
         $finish();
     end

@@ -56,9 +56,9 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
             sort_by_match(dir_entries, "interfaces")
             sort_by_match(dir_entries, "common")
         elif cwd == 'seqs':
-            sort_by_match(file_entries, "base_seq")
+            sort_by_match(dir_entries, "base_seqs", inc_order=False)
         elif cwd == 'tests':
-            sort_by_match(file_entries, "base_test")
+            sort_by_match(dir_entries, "base_tests",inc_order=False)
 
         sort_by_match(file_entries, "_pkg")
         sort_by_match(file_entries, ".vh")
@@ -67,6 +67,7 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
         entries.extend(file_entries)
         entries.extend(dir_entries)
 
+     
         for entry in entries:
             
             abs_path = os.path.join(cwd_path, entry)
@@ -83,13 +84,16 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
                 abs_path = os.path.join(cwd_path, entry)
                 directory = os.path.isdir(abs_path)
                 path = abs_path.replace(entry,"")
-
-            #Files to skip
+    
+            if not len(entry):
+                continue
+            
             skip_list = []
             skip_list.append(entry[0] == ".") #hidden files
             skip_list.append(format not in supported_formats) #unsupported_format
             skip_list.append((cwd == 'common') and ("pkg" not in entry) and not directory) #common_pkg_files
             skip_list.append(cwd == 'seq_items')
+            skip_list.append(cwd == 'base_seqs')
             
             if True in skip_list:
                 continue          

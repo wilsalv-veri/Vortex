@@ -1,5 +1,3 @@
-import VX_tb_common_pkg::*; 
-
 class VX_risc_v_base_data_seq extends VX_risc_v_base_seq;
 
     `uvm_object_utils(VX_risc_v_base_data_seq)
@@ -15,18 +13,21 @@ class VX_risc_v_base_data_seq extends VX_risc_v_base_seq;
     endfunction
 
     task body(); 
-        num_of_cachelines = 1;
-
-        super.body();
         add_data();
+        num_of_words = data_word_queue.size();
+        super.body();
+        
         send_data();  
     endtask
 
-    task add_data();
-        risc_v_seq_item           = VX_risc_v_seq_item::type_id::create($sformatf("riscv_inst_data%0d", 0));
+    /*
+     * risc_v_seq_item           = VX_risc_v_seq_item::type_id::create($sformatf("riscv_inst_data%0d", 0));
         risc_v_seq_item.data_type = DATA;
         risc_v_seq_item.raw_data  = 32'hcafebabe;
         data_word_queue.push_back(risc_v_seq_item);
+     */
+    task add_data();
+        //Do Nothing: To be implemented in derived classes
     endtask
 
     task send_data();
