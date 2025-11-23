@@ -41,6 +41,7 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
         cwd = get_current_dir_name(cwd_path)
 
         dont_include_files_under_dir_list = ['opae', 'VX_risc_v_agent']
+        
         if cwd in dont_include_files_under_dir_list:
             return
 
@@ -51,19 +52,26 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
         if cwd == 'tb':
             sort_by_match(dir_entries, "tests")
             sort_by_match(dir_entries, "seqs")
+            sort_by_match(dir_entries, "scoreboards")
             sort_by_match(dir_entries, "agents")
             sort_by_match(dir_entries, "memory_model")
             sort_by_match(dir_entries, "interfaces")
             sort_by_match(dir_entries, "common")
+            sort_by_match(dir_entries, "packages")
+        elif cwd == 'packages':
+            sort_by_match(file_entries, "gpr_pkg") 
+            sort_by_match(file_entries, "common_pkg")      
         elif cwd == 'seqs':
             sort_by_match(dir_entries, "base_seqs", inc_order=False)
         elif cwd == 'tests':
             sort_by_match(dir_entries, "base_tests",inc_order=False)
 
-        sort_by_match(file_entries, "_pkg")
-        sort_by_match(file_entries, ".vh")
-        sort_by_match(file_entries, ".svh")
-        
+        if cwd != 'packages':
+            sort_by_match(file_entries, "_pkg")
+            sort_by_match(file_entries, ".vh")
+            sort_by_match(file_entries, ".svh")
+
+         
         entries.extend(file_entries)
         entries.extend(dir_entries)
 
@@ -91,9 +99,13 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
             skip_list = []
             skip_list.append(entry[0] == ".") #hidden files
             skip_list.append(format not in supported_formats) #unsupported_format
-            skip_list.append((cwd == 'common') and ("pkg" not in entry) and not directory) #common_pkg_files
+            skip_list.append((cwd == 'common') and (not directory) and ('environment' not in entry)) #common_pkg_files
             skip_list.append(cwd == 'seq_items')
             skip_list.append(cwd == 'base_seqs')
+            skip_list.append(cwd == 'scoreboards')
+            skip_list.append(cwd == 'interface_connections')
+            skip_list.append(cwd == 'transaction_items')
+            skip_list.append('_agent' in cwd)
             
             if True in skip_list:
                 continue          
@@ -136,9 +148,9 @@ def sort_by_match(file_entries, match_string=".vh", inc_order=True):
         if match_string in entry:
             file_entries.pop(idx)
 
-            if not inc_order and not inserted_new_line:
-                file_entries.insert(insert_idx_dict[inc_order], "")
-                inserted_new_line = True
+            #if not inc_order and not inserted_new_line:
+            #    file_entries.insert(insert_idx_dict[inc_order], "")
+            #    inserted_new_line = True
 
             file_entries.insert(insert_idx_dict[inc_order],entry)
         

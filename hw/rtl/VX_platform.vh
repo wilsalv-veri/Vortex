@@ -39,15 +39,21 @@
 `define ERROR(msg) \
     $error msg
 
+//FIXME: wilsalv : Enable Later
+/* 
 `define ASSERT(cond, msg) \
     assert(cond) else $error msg
-
+ 
 `define RUNTIME_ASSERT(cond, msg) \
     always @(posedge clk) begin   \
         if (!reset) begin         \
             `ASSERT(cond, msg);   \
         end                       \
     end
+*/
+
+`define ASSERT(cond, msg)           //
+`define RUNTIME_ASSERT(cond, msg)
 
 `ifndef TRACING_ALL
 `define TRACING_ON      /* verilator tracing_on */

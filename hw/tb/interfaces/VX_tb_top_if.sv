@@ -1,4 +1,3 @@
-
 interface VX_tb_top_if import VX_gpu_pkg::*; ();
     //Clk
     logic clk;
@@ -16,6 +15,8 @@ interface VX_tb_top_if import VX_gpu_pkg::*; ();
     logic load_mem;
     logic start_mem_loader;
     logic mem_loader_done;
+
+    modport uvm_env (input clk, input core_reset);
 
 endinterface
 

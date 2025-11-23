@@ -1,4 +1,4 @@
-class VX_risc_v_Ftype_seq_item extends VX_risc_v_inst_seq_item;
+class VX_risc_v_Ftype_seq_item extends VX_risc_v_instr_seq_item;
 
     rand risc_v_seq_fm_t       fm;
     rand risc_v_seq_pred_t     pred;
@@ -21,28 +21,30 @@ class VX_risc_v_Ftype_seq_item extends VX_risc_v_inst_seq_item;
         super.new(name);
     endfunction
 
-    function void set_instruction_fields(risc_v_seq_fm_t fm, risc_v_seq_succ_t succ,
+    function void set_instruction_fields(string name, risc_v_seq_fm_t fm, risc_v_seq_succ_t succ,
                                             risc_v_seq_pred_t pred, risc_v_seq_reg_num_t rd,
                                             risc_v_seq_reg_num_t rs1, risc_v_seq_funct3_t funct3
                                             );
 
-        this.fm       = fm;
-        this.succ     = succ;
-        this.pred     = pred;
-        this.rs1      = rs1;
-        this.funct3   = funct3;
-        this.rd       = rd;
-        this.opcode   = INST_FENCE;
-        this.raw_data = {this.fm,this.succ,this.pred,this.rs1,this.funct3,this.rd,this.opcode};
+        this.instr_name  = name;
+        this.instr_type  = F_TYPE;
+        this.fm          = fm;
+        this.succ        = succ;
+        this.pred        = pred;
+        this.rs1         = rs1;
+        this.funct3      = funct3;
+        this.rd          = rd;
+        this.opcode      = INST_FENCE;
+        this.raw_data    = {this.fm,this.succ,this.pred,this.rs1,this.funct3,this.rd,this.opcode};
     endfunction
     
-    static function VX_risc_v_Ftype_seq_item create_instruction_with_fields(risc_v_seq_fm_t fm, risc_v_seq_succ_t succ,
+    static function VX_risc_v_Ftype_seq_item create_instruction_with_fields(string name, risc_v_seq_fm_t fm, risc_v_seq_succ_t succ,
                                             risc_v_seq_pred_t pred, risc_v_seq_reg_num_t rd,
                                             risc_v_seq_reg_num_t rs1, risc_v_seq_funct3_t funct3
                                             );
 
         VX_risc_v_Ftype_seq_item item = VX_risc_v_Ftype_seq_item::type_id::create("VX_risc_v_Ftype_seq_item");
-        item.set_instruction_fields(fm,succ,pred,rd,rs1,funct3);
+        item.set_instruction_fields(name,fm,succ,pred,rd,rs1,funct3);
         return item;
     endfunction 
 endclass

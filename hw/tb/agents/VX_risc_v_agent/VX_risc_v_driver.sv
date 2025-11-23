@@ -9,8 +9,12 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     localparam REST_OF_CACHELINE_LSB     = 0;
 
     VX_risc_v_seq_item risc_v_seq_item;
-    
+    VX_risc_v_instr_seq_item instr_item;
+
     uvm_blocking_get_port #(int) receive_seq_num_insts;
+
+
+    uvm_analysis_port #(VX_risc_v_instr_seq_item) instr_analysis_port;
 
     //For instruction type creation
     risc_v_cacheline_data_t data_word;
@@ -36,7 +40,8 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
 
         risc_v_seq_item       = VX_risc_v_seq_item::type_id::create("riscv_driver_item");
         receive_seq_num_insts = new("UVM_GET_SEQ_NUM_INSTS", this);
-        
+        instr_analysis_port   = new("VX_RISC_V_DRIVER_ANALYSIS_PORT", this);
+
         if (!uvm_config_db #(virtual VX_risc_v_inst_if)::get(this, "", "riscv_inst_ifc", riscv_inst_ifc))
             `VX_error("VX_RISC_V_DRIVER", "Failed to get access to VX_risc_v_inst_if")
 
@@ -105,6 +110,11 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
         shift_amount                    <= get_shift_amount();
         cacheline                       <= {data_word, cacheline[REST_OF_CACHELINE_MSB:REST_OF_CACHELINE_LSB]} >> get_shift_amount();
         instr_received                  <= 1'b0;
+        
+        if (data_type == INST) begin
+            $cast(instr_item,risc_v_seq_item);
+            instr_analysis_port.write(instr_item);
+        end
         seq_item_port.item_done();
     endtask
 

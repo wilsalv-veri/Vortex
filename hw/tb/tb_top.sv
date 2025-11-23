@@ -3,9 +3,11 @@ import VX_tb_top_pkg::*;
 import VX_gpu_pkg::*;
 
 `include "uvm_macros.svh"
-`include "VX_types.vh"
+//`include "VX_types.vh"
+import VX_tb_common_pkg::*;
+import VX_sched_pkg::*;
 
-module VX_tb_top ;
+module VX_tb_top;
    
     //Interfaces
     VX_tb_top_if             tb_top_if();
@@ -13,6 +15,10 @@ module VX_tb_top ;
     virtual VX_tb_top_if     tb_top_if_v;
     virtual VX_tb_top_dcr_if tb_top_dcr_if_v;
     
+    //Simulation Interfaces
+    VX_sched_tb_if           sched_tb_if();
+    VX_gpr_tb_if             gpr_tb_if();
+
     VX_uvm_test_if           uvm_test_ifc();
     VX_mem_load_if           mem_load_ifc();
     VX_risc_v_inst_if        riscv_inst_ifc();
@@ -94,7 +100,6 @@ module VX_tb_top ;
         .TAG_WIDTH (L1_MEM_ARB_TAG_WIDTH)
     ) l1_mem_load_bus_if();
 
-   
     `ASSIGN_VX_MEM_BUS_IF_EX (l1_mem_bus_if[0], icache_mem_bus_if[0], L1_MEM_TAG_WIDTH, ICACHE_MEM_TAG_WIDTH, UUID_WIDTH);
     `ASSIGN_VX_MEM_BUS_IF_EX (l1_mem_bus_if[1], dcache_mem_bus_if[0], L1_MEM_TAG_WIDTH, DCACHE_MEM_TAG_WIDTH, UUID_WIDTH);
 
@@ -234,10 +239,14 @@ module VX_tb_top ;
 
 
     initial begin
+        uvm_config_db #(virtual VX_tb_top_if                        )::set(null, "*", "tb_top_if", tb_top_if);
         uvm_config_db #(virtual VX_uvm_test_if                      )::set(null, "*", "uvm_test_ifc", uvm_test_ifc);
         uvm_config_db #(virtual VX_mem_load_if                      )::set(null, "*", "mem_load_ifc", mem_load_ifc);
         uvm_config_db #(virtual VX_risc_v_inst_if                   )::set(null, "*", "riscv_inst_ifc", riscv_inst_ifc);   
-                        
+       
+        uvm_config_db #(virtual VX_sched_tb_if                      )::set(null, "*", "sched_tb_if", sched_tb_if);
+        uvm_config_db #(virtual VX_gpr_tb_if                        )::set(null, "*", "gpr_tb_if", gpr_tb_if);
+
         //Core Interfaces          
         uvm_config_db #(virtual VX_schedule_if                      )::set(null, "*", "schedule_if", core.schedule_if);
         uvm_config_db #(virtual VX_fetch_if                         )::set(null, "*", "fetch_if", core.fetch_if);
@@ -250,6 +259,9 @@ module VX_tb_top ;
         uvm_config_db #(virtual VX_warp_ctl_if                      )::set(null, "*", "warp_ctl_if", core.warp_ctl_if);
        
     end
+
+    `include "VX_sched_tb_if_connections.sv"
+    `include "VX_gpr_tb_if_connections.sv"
 
     genvar idx;
     generate 

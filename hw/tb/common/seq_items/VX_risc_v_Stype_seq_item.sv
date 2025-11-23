@@ -1,4 +1,4 @@
-class VX_risc_v_Stype_seq_item extends VX_risc_v_inst_seq_item;
+class VX_risc_v_Stype_seq_item extends VX_risc_v_instr_seq_item;
 
     rand risc_v_seq_s_type_imm1_t     imm1;
     rand risc_v_seq_reg_num_t         rs2; 
@@ -19,10 +19,11 @@ class VX_risc_v_Stype_seq_item extends VX_risc_v_inst_seq_item;
         super.new(name);
     endfunction
 
-    function void set_instruction_fields(risc_v_seq_imm_t imm, risc_v_seq_reg_num_t rs2,
+    function void set_instruction_fields(string name, risc_v_seq_imm_t imm, risc_v_seq_reg_num_t rs2,
                                         risc_v_seq_reg_num_t rs1, risc_v_seq_funct3_t funct3,
-                                        risc_v_seq_opcode_t opcode
-                                        );
+                                        risc_v_seq_opcode_t opcode);
+        this.instr_name  = name;
+        this.instr_type  = S_TYPE;                                
         this.imm1        = imm[11:5];
         this.rs2         = rs2;
         this.rs1         = rs1;
@@ -32,12 +33,12 @@ class VX_risc_v_Stype_seq_item extends VX_risc_v_inst_seq_item;
         this.raw_data    = {this.imm1,this.rs2,this.rs1,this.imm0,this.funct3,this.opcode};
     endfunction
 
-    static function VX_risc_v_Stype_seq_item create_instruction_with_fields(risc_v_seq_imm_t imm, risc_v_seq_reg_num_t rs2,
+    static function VX_risc_v_Stype_seq_item create_instruction_with_fields(string name,risc_v_seq_imm_t imm, risc_v_seq_reg_num_t rs2,
                                         risc_v_seq_reg_num_t rs1, risc_v_seq_funct3_t funct3, risc_v_seq_opcode_t opcode
                                         );
 
         VX_risc_v_Stype_seq_item item = VX_risc_v_Stype_seq_item::type_id::create("VX_risc_v_Stype_seq_item");
-        item.set_instruction_fields(imm,rs2,rs1,funct3,opcode);
+        item.set_instruction_fields(name,imm,rs2,rs1,funct3,opcode);
         return item;
     endfunction
 

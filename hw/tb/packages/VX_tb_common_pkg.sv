@@ -6,6 +6,10 @@ package VX_tb_common_pkg;
     import uvm_pkg::*;
     import VX_gpu_pkg::*;
 
+    virtual VX_tb_top_if        tb_top_if;
+    virtual VX_gpr_tb_if        gpr_tb_if;
+   
+    //Core Interfaces
     virtual VX_schedule_if      schedule_if;
     virtual VX_fetch_if         fetch_if;
     virtual VX_decode_if        decode_if;
@@ -36,18 +40,21 @@ package VX_tb_common_pkg;
     `include "VX_risc_v_Vtype_seq_item.sv"
      
     `include "VX_tb_define.svh"
-    
+    `include "VX_risc_v_instr_queue.sv"
+
     `include "VX_risc_v_sequencer.sv"
     `include "VX_risc_v_driver.sv"
     `include "VX_risc_v_monitor.sv"
     `include "VX_risc_v_agent.sv"
-    `include "VX_tb_environment.sv"
-
+   
     `include "VX_risc_v_base_seq.sv"
     `include "VX_risc_v_base_instr_seq.sv"
     `include "VX_risc_v_base_data_seq.sv"
 
-    
+    task VX_wait_n_clks(int n);
+        repeat(n) @(posedge tb_top_if.clk);
+    endtask
+
 endpackage
 
 `endif // VX_TB_COMMON_PKG_VH

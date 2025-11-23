@@ -123,6 +123,8 @@ module VX_decode import VX_gpu_pkg::*; #(
         endcase
     end
 
+     
+
     reg [INST_BR_BITS-1:0] s_type;
     always @(*) begin
         case (u_12)
@@ -338,7 +340,15 @@ module VX_decode import VX_gpu_pkg::*; #(
                     alu_args.is_w = 0;
                     alu_args.use_imm = 1;
                     alu_args.use_PC  = 1;
-                    alu_args.imm = `XLEN'd4;
+                    
+                    // ecall/ebreak/uret/sret/mret
+                    //NOTE: wilsalv :These instructions do nothing (NOP)
+                    //Changing code to do something
+                    case(s_type)
+                        INST_BR_EBREAK: alu_args.imm = `XLEN'd0;
+                        default:        alu_args.imm = `XLEN'd4;
+                    endcase
+
                     op_args.alu = alu_args;
                     is_wstall = 1;
                     `USED_IREG (rd);

@@ -1,6 +1,6 @@
 interface VX_risc_v_inst_if import VX_tb_common_pkg::*;();
     
-    risc_v_seq_inst_type_t       inst_type;
+    risc_v_seq_instr_type_t      instr_type;
     risc_v_seq_opcode_t          opcode;
     risc_v_seq_reg_num_t         rs1;
     risc_v_seq_reg_num_t         rs2;
@@ -18,7 +18,7 @@ interface VX_risc_v_inst_if import VX_tb_common_pkg::*;();
     risc_v_seq_j_type_imm0_t     j_type_imm0;
 
     modport slave(
-        input  inst_type,
+        input  instr_type,
         input  opcode,
         input  rs1,
         input  rs2,
@@ -36,7 +36,7 @@ interface VX_risc_v_inst_if import VX_tb_common_pkg::*;();
     );
 
     modport master(
-        output  inst_type,
+        output  instr_type,
         output  opcode,
         output  rs1,
         output  rs2,

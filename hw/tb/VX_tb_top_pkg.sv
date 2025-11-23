@@ -23,7 +23,7 @@ package VX_tb_top_pkg;
     localparam RESET_TAG                    = {L1_MEM_ARB_TAG_WIDTH{1'b0}};
     localparam RESET_DATA                   = {16{32'hdeadbeef}};
     
-    localparam CODE_CS_BASE_ADDR            = `MEM_ADDR_WIDTH'h1000;
+    localparam CODE_CS_BASE_ADDR            = `USER_BASE_ADDR;
     localparam DATA_CS_BASE_ADDR            = CODE_CS_BASE_ADDR << 1; //*2
     
     localparam MEM_LOAD_BOOT_ADDR           = CODE_CS_BASE_ADDR >> `CLOG2(`L1_LINE_SIZE);
@@ -117,10 +117,6 @@ package VX_tb_top_pkg;
             VX_toggle_mem_load_reset(tb_top_if);
             VX_toggle_mem_reset(tb_top_if);
         join
-    endtask
-
-    task VX_wait_n_clks(logic clk, int n);
-        repeat(n) @(posedge clk);
     endtask
 
 endpackage

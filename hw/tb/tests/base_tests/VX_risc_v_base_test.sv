@@ -1,3 +1,5 @@
+import VX_tb_common_pkg::*;
+
 class VX_risc_v_base_test extends uvm_test;
 
     `uvm_component_utils(VX_risc_v_base_test)
@@ -28,7 +30,6 @@ class VX_risc_v_base_test extends uvm_test;
         wait_for_core_idle(phase);
     endtask
 
-    
     task wait_for_seq_completion(uvm_phase phase);
         phase.raise_objection(this);
             `VX_info("VX_RISC_V_BASE_TEST", "SEQUENCE STARTING")
@@ -39,7 +40,7 @@ class VX_risc_v_base_test extends uvm_test;
 
     task wait_for_core_idle(uvm_phase phase);
         phase.raise_objection(this);
-            wait(uvm_test_ifc.core_busy === 1'bx);
+            wait(!uvm_test_ifc.core_busy);
             `VX_info("VX_RISC_V_BASE_TEST", "END_OF TEST")
         phase.drop_objection(this);
     endtask 

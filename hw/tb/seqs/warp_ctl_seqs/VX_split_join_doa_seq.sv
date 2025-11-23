@@ -10,7 +10,7 @@ class VX_split_join_doa_seq extends VX_risc_v_base_instr_seq;
         super.new(name);
     endfunction
      
-    virtual function add_instructions();
+    virtual function void add_instructions();
         instr_queue.push_back(`ADDI(`RS1(2),`IMM_HEX(f),`RD(2)));
         instr_queue.push_back(`TMC(`RS1(2))); 
         instr_queue.push_back(`SPLIT(`RS1(2),`RS2(0),`RD(3)));

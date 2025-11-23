@@ -1,8 +1,16 @@
+import VX_tb_common_pkg::*;
+import VX_sched_pkg::*;
+import VX_gpr_pkg::*;
+
 class VX_tb_environment extends uvm_env;
 
     `uvm_component_utils(VX_tb_environment)
 
     VX_risc_v_agent      risc_v_agent;
+    VX_sched_agent       sched_agent;
+    VX_gpr_agent         gpr_agent;
+
+    VX_warp_ctl_scbd     warp_ctl_scbd;
     //VX_risc_v_scbd     risc_v_scbd;
      
     function new(string name="VX_tb_environment", uvm_component parent=null);
@@ -12,14 +20,23 @@ class VX_tb_environment extends uvm_env;
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
-        risc_v_agent = VX_risc_v_agent::type_id::create("VX_risc_v_agent", this);
+        risc_v_agent  = VX_risc_v_agent::type_id::create("VX_risc_v_agent", this);
+        sched_agent   = VX_sched_agent::type_id::create("VX_sched_agent", this);
+        gpr_agent     = VX_gpr_agent::type_id::create("VX_gpr_agent", this);
+
+        warp_ctl_scbd = VX_warp_ctl_scbd::type_id::create("VX_warp_ctl_scbd", this);
         //risc_v_scbd  = VX_risc_v_scbd::type_id::create("VX_risc_v_scbd", this);
     endfunction
 
-    /*
+    
     virtual function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
-        risc_v_agent.risc_v_monitor.send_riscv_inst.connect(risc_v_scbd.receive_riscv_inst);
+        risc_v_agent.risc_v_driver.instr_analysis_port.connect(warp_ctl_scbd.receive_riscv_instr);
+        sched_agent.sched_monitor.sched_info_analysis_port.connect(warp_ctl_scbd.receive_sched_info);
+        
+        for(int bank_num=0; bank_num  < `NUM_GPR_BANKS; bank_num++) begin
+            gpr_agent.gpr_monitor.gpr_info_analysis_port[bank_num].connect(warp_ctl_scbd.gpr_tb_fifo.analysis_export);
+        end
     endfunction
-    */
+    
 endclass

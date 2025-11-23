@@ -11,6 +11,7 @@ $UVM_HOME/src/uvm_pkg.sv
 +define+GBAR_ENABLE
 +define+LMEM_ENABLED
 +define+SV_DPI
++define+SIMULATION
 
 //Reference other filelists
 -f $VORTEX/hw/verif/filelists/rtl_filelist.f
