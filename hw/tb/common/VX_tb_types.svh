@@ -61,7 +61,7 @@
     `define VF_UNARY_WIDTH  6    
     `define VF_VM_WIDTH     1
     `define VF_NCVT_WIDTH   `REG_NUM_WIDTH    
-    `define VF_OPFVV_WIDTH  `FUNCT3_WIDTH   
+    `define VF_OPFVV_WIDTH  `FUNCT3_WIDTH  
     
     //Sequence Use
     typedef bit [`INSTR_ADDRESS_WIDTH -1:0]  risc_v_seq_instr_address_t;

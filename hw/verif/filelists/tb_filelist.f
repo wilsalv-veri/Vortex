@@ -73,6 +73,7 @@ $VORTEX/hw/tb/memory_model/memory_bfm.sv
 
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_split_join_doa_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_doa_seq.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_rtg_seq.sv
 
 
 //Include Files under $VORTEX/hw/tb/tests
@@ -87,6 +88,7 @@ $VORTEX/hw/tb/tests/base_tests/VX_risc_v_base_instr_seq_test.sv
 //Include Files under $VORTEX/hw/tb/tests/warp_ctl_tests
 +incdir+$VORTEX/hw/tb/tests/warp_ctl_tests
 
+$VORTEX/hw/tb/tests/warp_ctl_tests/VX_tmc_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_tmc_doa_test.sv
 
 $VORTEX/hw/tb/tb_top.sv

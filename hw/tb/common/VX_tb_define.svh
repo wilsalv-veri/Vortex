@@ -28,12 +28,12 @@
 `define IMM_BIN(x)     risc_v_seq_imm_t'(x)
 `define IMM_DEC(x)     `IMM_WIDTH'd``x
 
-`define RS1(x) `REG_HEX(x)
-`define RS2(x) `REG_HEX(x)
-`define RS3(x) `REG_HEX(x)
-`define RD(x)  `REG_HEX(x)
-`define FUNCT3_BIN(x) `FUNCT3_WIDTH'b``x
-`define FUNCT7_BIN(x) `FUNCT3_WIDTH'b``x
+`define RS1(x) risc_v_seq_reg_num_t'(x) 
+`define RS2(x) risc_v_seq_reg_num_t'(x) 
+`define RS3(x) risc_v_seq_reg_num_t'(x) 
+`define RD(x)  risc_v_seq_reg_num_t'(x) 
+`define FUNCT3_BIN(x) risc_v_seq_funct3_t'(x)
+`define FUNCT7_BIN(x) risc_v_seq_funct7_t'(x)
 
 //U_type Instructions
 `define LUI(imm,rd)      VX_risc_v_Utype_seq_item::create_instruction_with_fields("LUI",   imm, rd, INST_LUI)

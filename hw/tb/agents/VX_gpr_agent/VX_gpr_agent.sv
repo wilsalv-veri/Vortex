@@ -13,5 +13,4 @@ class VX_gpr_agent extends uvm_agent;
         gpr_monitor = VX_gpr_monitor::type_id::create("VX_gpr_monitor",this);
     endfunction
 
-
 endclass

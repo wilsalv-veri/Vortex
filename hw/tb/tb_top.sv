@@ -237,7 +237,6 @@ module VX_tb_top;
         .busy           (uvm_test_ifc.core_busy)
     );
 
-
     initial begin
         uvm_config_db #(virtual VX_tb_top_if                        )::set(null, "*", "tb_top_if", tb_top_if);
         uvm_config_db #(virtual VX_uvm_test_if                      )::set(null, "*", "uvm_test_ifc", uvm_test_ifc);
