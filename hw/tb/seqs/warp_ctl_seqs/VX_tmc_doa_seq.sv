@@ -18,8 +18,11 @@ class VX_tmc_doa_seq extends VX_risc_v_base_instr_seq;
     endfunction
  
     virtual function void add_instructions();  
-        instr_queue.push_back(`ADDI(`RS1(1),`IMM_BIN(thread_mask),`RD(1)));
-        instr_queue.push_back(`TMC(`RS1(1))); 
+        //thread_mask
+        instr_queue.push_back(`ADDI(`RS1(2),`IMM_BIN(thread_mask),`RD(2)));
+        instr_queue.push_back(`TMC(`RS1(2))); 
+        instr_queue.push_back(`ADDI(`RS1(2),`IMM_HEX(2),`RD(3)));
+        instr_queue.push_back(`TMC(`RS1(3))); 
     endfunction
 
 endclass

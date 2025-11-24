@@ -38,6 +38,8 @@
     `define GPR_PER_OPC_WARPS    PER_ISSUE_WARPS / `NUM_OPCS         
     `define GPR_BANK_SIZE       (NUM_REGS * SIMD_COUNT * `GPR_PER_OPC_WARPS) / `NUM_GPR_BANKS
                         
+    `define SFU_LANE_BITS `CLOG2(`NUM_SFU_LANES)
+    
 
     `define IMM_11 11
     `define IMM_12 12
@@ -101,6 +103,19 @@
     typedef bit [`NUM_GPR_BANKS - 1 : 0]     VX_gpr_bank_num_t;
     typedef bit [0:`GPR_BANK_SIZE - 1]       VX_gpr_bank_set_t;
     
+    typedef bit [`GPR_DATA_WIDTH - 1:0]                       VX_gpr_t;
+    typedef VX_gpr_t [`NUM_THREADS - 1:0]                     VX_gpr_seq_data_entry_t;
+    typedef VX_gpr_seq_data_entry_t [0: `GPR_BANK_SIZE - 1]   VX_gpr_seq_bank_t;
+    typedef VX_gpr_seq_bank_t [`NUM_GPR_BANKS - 1:0]          VX_gpr_seq_block_t;
+
+    typedef bit [`NUM_THREADS - 1 :0]          VX_tmask_t;
+    typedef  VX_tmask_t [`NUM_WARPS - 1: 0]    VX_core_tmasks_t;//Default initial TMASK is 1
+    typedef bit [`UP(`SFU_LANE_BITS)-1:0]      VX_tid_t;
+
+    typedef bit [`NUM_WARPS-1:0]               VX_warp_mask_t;
+    typedef bit [NW_WIDTH-1:0]                 VX_wid_t;
+    
+
     typedef struct packed{
         risc_v_seq_fence_pi_t                   pi;
         risc_v_seq_fence_po_t                   po;
