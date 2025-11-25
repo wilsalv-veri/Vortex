@@ -103,7 +103,11 @@
     typedef bit [`NUM_GPR_BANKS - 1 : 0]     VX_gpr_bank_num_t;
     typedef bit [0:`GPR_BANK_SIZE - 1]       VX_gpr_bank_set_t;
     
-    typedef bit [`GPR_DATA_WIDTH - 1:0]                       VX_gpr_t;
+    typedef bit [`SIMD_WIDTH - 1:0]          VX_seq_gpr_byteen;
+    typedef VX_seq_gpr_byteen [XLENB - 1:0]  VX_seq_gpr_entry_byteen;
+
+    typedef bit [7:0]                                         VX_gpr_byte_t;
+    typedef VX_gpr_byte_t [XLENB - 1:0]                       VX_gpr_t;
     typedef VX_gpr_t [`NUM_THREADS - 1:0]                     VX_gpr_seq_data_entry_t;
     typedef VX_gpr_seq_data_entry_t [0: `GPR_BANK_SIZE - 1]   VX_gpr_seq_bank_t;
     typedef VX_gpr_seq_bank_t [`NUM_GPR_BANKS - 1:0]          VX_gpr_seq_block_t;
@@ -163,6 +167,8 @@
     typedef logic [`SR_WIDTH - 1:0]           risc_v_fence_sr_t;
     typedef logic [`SW_WIDTH - 1:0]           risc_v_fence_sw_t;
 
+    typedef logic [`SIMD_WIDTH - 1:0]                           VX_gpr_byteen;
+    typedef VX_gpr_byteen [XLENB - 1:0]                         VX_gpr_entry_byteen;
     typedef logic [`GPR_DATA_WIDTH - 1:0] [`NUM_THREADS - 1:0]  VX_gpr_data_entry_t;
     typedef VX_gpr_data_entry_t [0: `GPR_BANK_SIZE - 1]         VX_gpr_bank_t;
     typedef VX_gpr_bank_t [`NUM_GPR_BANKS - 1:0]                VX_gpr_block_t;

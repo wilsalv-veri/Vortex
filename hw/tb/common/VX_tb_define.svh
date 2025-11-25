@@ -152,6 +152,3 @@
 `define VEC(vs2,vm,vd)       VX_risc_v_Vtype_seq_item::create_instruction_with_fields("VEC",vd, vm, vs2)
 
 `endif // VX_TB_DEFINE_VH
-
-
-
