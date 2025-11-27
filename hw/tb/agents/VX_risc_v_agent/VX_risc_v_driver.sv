@@ -11,8 +11,8 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     VX_risc_v_seq_item risc_v_seq_item;
     VX_risc_v_instr_seq_item instr_item;
 
-    uvm_blocking_get_port #(int) receive_seq_num_insts;
-
+    uvm_blocking_get_port   #(int) receive_seq_num_insts;
+    uvm_blocking_put_imp    #(int, VX_risc_v_driver) receive_seq_lib_seq_num;
 
     uvm_analysis_port #(VX_risc_v_instr_seq_item) instr_analysis_port;
 
@@ -28,6 +28,8 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
 
     int   word_count        = 0;
     int   words_to_send     = 0;
+    int   seq_lib_seq_count = 0;
+    int   seq_lib_seqs      = 0;
     int   shift_amount      = 0;
     logic instr_received    = 1'b0;
 
@@ -38,9 +40,10 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
-        risc_v_seq_item       = VX_risc_v_seq_item::type_id::create("riscv_driver_item");
-        receive_seq_num_insts = new("UVM_GET_SEQ_NUM_INSTS", this);
-        instr_analysis_port   = new("VX_RISC_V_DRIVER_ANALYSIS_PORT", this);
+        risc_v_seq_item         = VX_risc_v_seq_item::type_id::create("riscv_driver_item");
+        receive_seq_num_insts   = new("UVM_GET_SEQ_NUM_INSTS", this);
+        receive_seq_lib_seq_num = new("UVM_GET_SEQ_LIB_SEQ_NUM", this); 
+        instr_analysis_port     = new("VX_RISC_V_DRIVER_ANALYSIS_PORT", this);
 
         if (!uvm_config_db #(virtual VX_risc_v_inst_if)::get(this, "", "riscv_inst_ifc", riscv_inst_ifc))
             `VX_error("VX_RISC_V_DRIVER", "Failed to get access to VX_risc_v_inst_if")
@@ -86,7 +89,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
             case(driver_state)
                 GET_INSTR             : next_state  = instr_received ? PROCESS_INSTR : GET_INSTR;
                 PROCESS_INSTR      : begin
-                    if ((word_count && ((word_count % INST_PER_CACHE_LINE) == 0))  || word_count == words_to_send) 
+                    if ((word_count && ((word_count % INST_PER_CACHE_LINE) == 0))  || should_send_cacheline()) 
                                         next_state  = SEND_INSTR;
                     else
                                         next_state =  GET_INSTR;
@@ -104,6 +107,8 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
         data_word                       <= risc_v_seq_item.raw_data;
         word_count                      <= word_count + 1;
         instr_received                  <= 1'b1;
+
+        `VX_info("VX_RISC_V_DRIVER", $sformatf("Word_Count: %0d",word_count))
     endtask
 
     task process_instr();
@@ -129,7 +134,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     endtask
 
     function int get_shift_amount();
-        return (word_count  == words_to_send) ? 
+        return should_send_cacheline() ? 
                         (INST_PER_CACHE_LINE - (word_count % INST_PER_CACHE_LINE))*PC_BITS : PC_BITS;
         
     endfunction
@@ -140,16 +145,23 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
         
         forever begin
             receive_seq_num_insts.get(num_words);
-            `VX_info("VX_RISC_V_DRIVER", $sformatf("Number of Words To Send: %0d", num_words))
+            seq_lib_seq_count++;
+
+            words_to_send += num_words;
+            
+            `VX_info("VX_RISC_V_DRIVER", $sformatf("Number of Words To Send: %0d Current Word Count: %0d", num_words, words_to_send))
         
-            if (word_count == words_to_send)begin
-                word_count    = 0;
-                words_to_send = num_words;
-            end
-            else 
-                words_to_send += num_words;
         end
         
     endtask
+
+    virtual task put(int num_of_seqs);
+        seq_lib_seqs = num_of_seqs;
+        `VX_info("VX_RISC_V_DRIVER", $sformatf("Number of Sequences in Seq Lib: %0d", seq_lib_seqs))
+    endtask
+
+    virtual function bit should_send_cacheline();
+        return (word_count == words_to_send) && (seq_lib_seq_count == seq_lib_seqs) ? 1'b1 : 1'b0;
+    endfunction
 
 endclass

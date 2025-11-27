@@ -126,6 +126,7 @@ module VX_schedule import VX_gpu_pkg::*; #(
         // wspawn handling
         if (wspawn.valid && is_single_warp) begin
             active_warps_n |= wspawn.wmask;
+            
             for (integer i = 0; i < `NUM_WARPS; ++i) begin
                 if (wspawn.wmask[i]) begin
                     thread_masks_n[i][0] = 1;
@@ -134,6 +135,8 @@ module VX_schedule import VX_gpu_pkg::*; #(
             end
             stalled_warps_n[wspawn_wid] = 0; // unlock warp
         end
+
+    
 
         // TMC handling
         if (warp_ctl_if.valid && warp_ctl_if.tmc.valid) begin

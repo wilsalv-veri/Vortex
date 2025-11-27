@@ -28,6 +28,8 @@ class VX_risc_v_agent extends uvm_agent;
         
         vx_risc_v_seqr.seq_num_inst_port.connect(seq_num_inst_fifo.put_export);
         risc_v_driver.receive_seq_num_insts.connect(seq_num_inst_fifo.get_peek_export);
+        
+        vx_risc_v_seqr.seq_lib_num_seqs_port.connect(risc_v_driver.receive_seq_lib_seq_num);
     endfunction
     
 endclass

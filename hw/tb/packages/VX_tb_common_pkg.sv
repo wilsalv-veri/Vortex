@@ -5,6 +5,7 @@ package VX_tb_common_pkg;
 
     import uvm_pkg::*;
     import VX_gpu_pkg::*;
+    import VX_tb_top_pkg::*;
 
     virtual VX_tb_top_if        tb_top_if;
     virtual VX_gpr_tb_if        gpr_tb_if;
@@ -50,7 +51,8 @@ package VX_tb_common_pkg;
     `include "VX_risc_v_base_seq.sv"
     `include "VX_risc_v_base_instr_seq.sv"
     `include "VX_risc_v_base_data_seq.sv"
-
+    `include "VX_risc_v_base_seq_lib.sv"
+    
     task VX_wait_n_clks(int n);
         repeat(n) @(posedge tb_top_if.clk);
     endtask

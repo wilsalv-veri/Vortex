@@ -36,6 +36,12 @@ class VX_risc_v_Itype_seq_item extends VX_risc_v_instr_seq_item;
         this.raw_data    = {this.imm,this.rs1,this.funct3,this.rd,this.opcode};
     endfunction
 
+     function void set_imm_field(risc_v_seq_imm_t imm);
+        this.imm = imm[11:0];
+        this.raw_data    = {this.imm,this.rs1,this.funct3,this.rd,this.opcode};
+    endfunction
+
+
     static function VX_risc_v_Itype_seq_item create_instruction_with_fields(string name, risc_v_seq_imm_t imm, risc_v_seq_reg_num_t rd, 
                                       risc_v_seq_reg_num_t rs1,  risc_v_seq_funct3_t funct3,
                                       risc_v_seq_opcode_t opcode

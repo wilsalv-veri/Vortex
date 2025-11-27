@@ -10,11 +10,17 @@ class VX_risc_v_base_instr_seq extends VX_risc_v_base_seq;
     endfunction
 
     task body(); 
-        add_instructions();
-        //instr_queue.push_back(`EBREAK);  //END OF SEQUENCE INSTRUCTION
-        instr_queue.push_back(`TMC(`RS1(0)));  //END OF SEQUENCE INSTRUCTION
+        if (!p_sequencer.curr_pc)
+            p_sequencer.curr_pc = CODE_CS_BASE_ADDR;
+        else 
+            instr_queue.current_address = p_sequencer.curr_pc;
 
-        num_of_words = instr_queue.size(); 
+        add_instructions();
+        instr_queue.push_back(`TMC(`RS1(0)));  //END OF SEQUENCE INSTRUCTION
+        post_add_instructions();
+
+        num_of_words = instr_queue.size();
+        p_sequencer.curr_pc +=  (instr_queue.size() * XLENB);
         super.body();
         send_instructions(); 
     endtask
@@ -22,6 +28,11 @@ class VX_risc_v_base_instr_seq extends VX_risc_v_base_seq;
     virtual function void add_instructions();
         //Do Nothing. Implement in derived classes
     endfunction
+
+    virtual function void post_add_instructions();
+        //Do Nothing. Implement in derived classes
+    endfunction
+
 
     virtual task send_instructions();
         VX_risc_v_instr_seq_item instr_item;

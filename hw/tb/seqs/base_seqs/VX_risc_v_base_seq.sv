@@ -6,7 +6,7 @@ class VX_risc_v_base_seq extends uvm_sequence #(VX_risc_v_seq_item);
     
     int num_of_words;
     VX_risc_v_seq_item risc_v_seq_item;
-    
+
     function new(string name="VX_risc_v_base_seq");
         super.new(name);   
     endfunction

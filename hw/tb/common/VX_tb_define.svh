@@ -15,7 +15,7 @@
 //Need GPR to real access mapping
 //gpr_blocks[block_num][reg_num][thread_num]//access to GPR
 `define REG_NUM_TO_BANK(reg_num)      (reg_num % `NUM_GPR_BANKS)   
-`define REG_NUM_TO_SET(reg_num)   (reg_num / `NUM_GPR_BANKS)
+`define REG_NUM_TO_SET(wid, reg_num)  wid*(NUM_REGS/`NUM_GPR_BANKS) + (reg_num / `NUM_GPR_BANKS) 
 
 `define VX_info(ID, message)    `uvm_info(ID, message, UVM_NONE)
 `define VX_warning(ID, message) `uvm_warning(ID, message)

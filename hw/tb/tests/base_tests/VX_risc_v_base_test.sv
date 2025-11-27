@@ -33,7 +33,7 @@ class VX_risc_v_base_test extends uvm_test;
     task wait_for_seq_completion(uvm_phase phase);
         phase.raise_objection(this);
             `VX_info("VX_RISC_V_BASE_TEST", "SEQUENCE STARTING")
-            risc_v_base_seq.start(vx_tb_environment.risc_v_agent.vx_risc_v_seqr);
+            start_sequence();
             uvm_test_ifc.mem_load_seq_done = 1'b1;
         phase.drop_objection(this);
     endtask
@@ -44,5 +44,9 @@ class VX_risc_v_base_test extends uvm_test;
             `VX_info("VX_RISC_V_BASE_TEST", "END_OF TEST")
         phase.drop_objection(this);
     endtask 
+
+    virtual task start_sequence();
+         risc_v_base_seq.start(vx_tb_environment.risc_v_agent.vx_risc_v_seqr);
+    endtask
 
 endclass

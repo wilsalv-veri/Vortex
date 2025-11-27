@@ -28,23 +28,39 @@ class VX_sched_monitor extends uvm_monitor;
     virtual task run_phase(uvm_phase phase);
         fork 
             get_warp_ctl_info();
+            get_wspawn_info();
         join_none
     endtask
 
     virtual task get_warp_ctl_info();
-
-        forever @ (sched_tb_if.mon_cb)begin
+        forever @ (sched_tb_if.wctl_cb)begin
             //Capture the info from IFC
-            if (!sched_tb_if.mon_cb.reset && sched_tb_if.mon_cb.warp_ctl_valid)begin
-                sched_info.active_warps  = sched_tb_if.mon_cb.active_warps;
-                sched_info.stalled_warps = sched_tb_if.mon_cb.stalled_warps;
-                sched_info.thread_masks  = sched_tb_if.mon_cb.thread_masks;
-                sched_info.warp_pcs      = sched_tb_if.mon_cb.warp_pcs;
-                sched_info.result_pc     = sched_tb_if.mon_cb.result_pc;
-                sched_info.wid           = sched_tb_if.mon_cb.wid;
-                sched_info.last_tid      = sched_tb_if.mon_cb.last_tid;
+            
+            if (!sched_tb_if.wctl_cb.reset && sched_tb_if.wctl_cb.warp_ctl_valid)begin
+            
+                sched_info.active_warps  = sched_tb_if.wctl_cb.active_warps;
+                sched_info.stalled_warps = sched_tb_if.wctl_cb.stalled_warps;
+                sched_info.thread_masks  = sched_tb_if.wctl_cb.thread_masks;
+                sched_info.warp_pcs      = sched_tb_if.wctl_cb.warp_pcs;
+                sched_info.result_pc     = sched_tb_if.wctl_cb.result_pc;
+                sched_info.wid           = sched_tb_if.wctl_cb.wid;
+                sched_info.last_tid      = sched_tb_if.wctl_cb.last_tid;
+                sched_info.wspawn_valid  = 1'b0;
                 sched_info.sched_info_valid = 1'b1;
                 //Send Info to scoreboard
+                sched_info_analysis_port.write(sched_info);
+            end
+        end
+    endtask
+
+    virtual task get_wspawn_info();
+        
+        forever @ (sched_tb_if.wspawn_cb)begin
+
+            if(sched_tb_if.wspawn_cb.wspawn_valid)begin
+                sched_info.active_warps  = sched_tb_if.wspawn_cb.active_warps;
+                sched_info.wspawn_valid  = 1'b1;
+                sched_info.sched_info_valid = 1'b1;
                 sched_info_analysis_port.write(sched_info);
             end
         end

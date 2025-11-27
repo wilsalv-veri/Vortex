@@ -13,8 +13,12 @@ class VX_risc_v_base_data_seq extends VX_risc_v_base_seq;
     endfunction
 
     task body(); 
+        if(!p_sequencer.curr_pc)
+            p_sequencer.curr_pc = MEM_LOAD_DATA_BASE_ADDR;
+
         add_data();
         num_of_words = data_word_queue.size();
+        p_sequencer.curr_pc += (data_word_queue.size() * XLENB);
         super.body();
         
         send_data();  
@@ -26,6 +30,7 @@ class VX_risc_v_base_data_seq extends VX_risc_v_base_seq;
         risc_v_seq_item.raw_data  = 32'hcafebabe;
         data_word_queue.push_back(risc_v_seq_item);
      */
+
     task add_data();
         //Do Nothing: To be implemented in derived classes
     endtask
