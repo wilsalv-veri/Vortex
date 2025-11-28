@@ -29,6 +29,7 @@ $VORTEX/hw/tb/interfaces/VX_gpr_tb_if.sv
 $VORTEX/hw/tb/interfaces/VX_risc_v_inst_if.sv
 $VORTEX/hw/tb/interfaces/VX_mem_load_if.sv
 $VORTEX/hw/tb/interfaces/VX_tb_top_if.sv
+$VORTEX/hw/tb/interfaces/VX_execute_tb_if.sv
 $VORTEX/hw/tb/interfaces/VX_sched_tb_if.sv
 //Include Files under $VORTEX/hw/tb/interfaces/interface_connections
 +incdir+$VORTEX/hw/tb/interfaces/interface_connections
@@ -52,6 +53,10 @@ $VORTEX/hw/tb/memory_model/memory_bfm.sv
 +incdir+$VORTEX/hw/tb/agents/VX_sched_agent
 
 
+//Include Files under $VORTEX/hw/tb/agents/VX_execute_agent
++incdir+$VORTEX/hw/tb/agents/VX_execute_agent
+
+
 //Include Files under $VORTEX/hw/tb/agents/VX_gpr_agent
 +incdir+$VORTEX/hw/tb/agents/VX_gpr_agent
 
@@ -71,13 +76,16 @@ $VORTEX/hw/tb/memory_model/memory_bfm.sv
 //Include Files under $VORTEX/hw/tb/seqs/warp_ctl_seqs
 +incdir+$VORTEX/hw/tb/seqs/warp_ctl_seqs
 
-$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_split_join_doa_seq.sv
-$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_pred_doa_seq.sv
-$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_doa_seq.sv
-$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_rtg_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_doa_seq.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_doa_seq.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_pred_doa_seq.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_split_join_doa_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_pred_rtg_seq.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_rtg_seq.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_rtg_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_doa_seq_lib.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_seq_lib.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_twice_seq_lib.sv
 
 
 //Include Files under $VORTEX/hw/tb/tests
@@ -94,8 +102,10 @@ $VORTEX/hw/tb/tests/base_tests/VX_risc_v_base_seq_lib_test.sv
 +incdir+$VORTEX/hw/tb/tests/warp_ctl_tests
 
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_wspawn_doa_test.sv
+$VORTEX/hw/tb/tests/warp_ctl_tests/VX_wspawn_twice_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_pred_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_tmc_test.sv
+$VORTEX/hw/tb/tests/warp_ctl_tests/VX_wspawn_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_tmc_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_pred_test.sv
 

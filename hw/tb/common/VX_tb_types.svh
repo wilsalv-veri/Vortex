@@ -172,7 +172,6 @@
     
     typedef logic [7:0]                                         VX_gpr_byte_t;
     typedef VX_gpr_byte_t [XLENB - 1:0]                         VX_gpr_t;
-    
     typedef logic [`GPR_DATA_WIDTH - 1:0] [`NUM_THREADS - 1:0]  VX_gpr_data_entry_t;
     typedef VX_gpr_data_entry_t [0: `GPR_BANK_SIZE - 1]         VX_gpr_bank_t;
     typedef VX_gpr_bank_t [`NUM_GPR_BANKS - 1:0]                VX_gpr_block_t;

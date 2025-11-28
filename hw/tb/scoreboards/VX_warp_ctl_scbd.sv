@@ -127,7 +127,7 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                             end
                         end
                         "WSPAWN":begin
-                            if (sched_info.wspawn_valid) begin
+                            if (sched_info.wspawn_valid && sched_info.curr_single_warp) begin
                                 exp_num_of_warps = `NUM_WARPS'(gpr_block[rs1_bank_num][rs1_set_num][last_tid]);
                                 exp_next_pc      = gpr_block[rs2_bank_num][rs2_set_num][last_tid];
                                 exp_warp_mask    = get_warp_mask(exp_num_of_warps);
@@ -187,15 +187,11 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     endfunction
 
     virtual function VX_warp_mask_t get_warp_mask(int number_of_warps);
-        VX_warp_mask_t warp_mask = `NUM_WARPS'(0); 
+        VX_warp_mask_t warp_mask = `NUM_WARPS'(1); 
        
-        for(int idx=0; idx < number_of_warps;idx++)begin
-            if (!idx)
-                warp_mask = `NUM_WARPS'(1);
-            else
-                warp_mask = (warp_mask << 1) | `NUM_WARPS'(1);
-        end
-
+        for(int idx=1; idx < number_of_warps;idx++)  
+            warp_mask = (warp_mask << 1) | `NUM_WARPS'(1);
+        
         return warp_mask; 
     endfunction
 

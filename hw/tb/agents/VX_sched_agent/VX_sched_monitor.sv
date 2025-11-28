@@ -59,6 +59,7 @@ class VX_sched_monitor extends uvm_monitor;
 
             if(sched_tb_if.wspawn_cb.wspawn_valid)begin
                 sched_info.active_warps  = sched_tb_if.wspawn_cb.active_warps;
+                sched_info.curr_single_warp = sched_tb_if.wspawn_cb.curr_single_warp;
                 sched_info.wspawn_valid  = 1'b1;
                 sched_info.sched_info_valid = 1'b1;
                 sched_info_analysis_port.write(sched_info);

@@ -124,18 +124,25 @@ module VX_schedule import VX_gpu_pkg::*; #(
         end
 
         // wspawn handling
-        if (wspawn.valid && is_single_warp) begin
-            active_warps_n |= wspawn.wmask;
+        //NOTE: wilsalv
+        //By having is_single_warp at the top condition, you risk
+        //keeping the warp locked and having a deadlock. Changed implementation
+        //such that warp_pcs are still updated based on is_single_warp but the
+        //warp lock should be released. Hence instr should be no harm if it its "invalid"  
             
-            for (integer i = 0; i < `NUM_WARPS; ++i) begin
-                if (wspawn.wmask[i]) begin
-                    thread_masks_n[i][0] = 1;
-                    warp_pcs_n[i] = wspawn.pc;
+        if (wspawn.valid ) begin
+            if (is_single_warp) begin
+                active_warps_n |= wspawn.wmask;
+                
+                for (integer i = 0; i < `NUM_WARPS; ++i) begin
+                    if (wspawn.wmask[i]) begin
+                        thread_masks_n[i][0] = 1;
+                        warp_pcs_n[i] = wspawn.pc;
+                    end
                 end
             end
             stalled_warps_n[wspawn_wid] = 0; // unlock warp
         end
-
     
 
         // TMC handling
@@ -252,9 +259,11 @@ module VX_schedule import VX_gpu_pkg::*; #(
                 wspawn.pc    <= warp_ctl_if.wspawn.pc;
                 wspawn_wid   <= warp_ctl_if.wid;
             end
-            if (wspawn.valid && is_single_warp) begin
+            //NOTE: wilsalv
+            //Removed is_single_warp condition. Valid should only stay high for one clock regardless 
+            if (wspawn.valid)
                 wspawn.valid <= 0;
-            end
+            
 
             // global barrier scheduling
         `ifdef GBAR_ENABLE
