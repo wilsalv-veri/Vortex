@@ -24,7 +24,6 @@ class VX_risc_v_base_seq_lib_test extends VX_risc_v_base_test;
         set_selection_mode(UVM_SEQ_LIB_USER);
         risc_v_base_seq_lib.min_random_count = 1;
         risc_v_base_seq_lib.max_random_count = 1000;
-        //risc_v_base_seq_lib.init_sequence_library();
         `VX_info(message_id, "Initialized Sequence Library")
     endfunction
 

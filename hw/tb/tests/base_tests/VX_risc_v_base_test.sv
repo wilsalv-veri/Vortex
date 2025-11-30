@@ -33,7 +33,11 @@ class VX_risc_v_base_test extends uvm_test;
     task wait_for_seq_completion(uvm_phase phase);
         phase.raise_objection(this);
             `VX_info("VX_RISC_V_BASE_TEST", "SEQUENCE STARTING")
+            uvm_test_ifc.mem_load_seq_done = 1'b0;
             start_sequence();
+            wait(vx_tb_environment.risc_v_agent.risc_v_driver.all_words_received());
+            wait(vx_tb_environment.risc_v_agent.risc_v_driver.mem_load_ifc.load_valid);
+            
             uvm_test_ifc.mem_load_seq_done = 1'b1;
         phase.drop_objection(this);
     endtask

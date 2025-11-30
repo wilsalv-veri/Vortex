@@ -41,7 +41,6 @@ class VX_sched_monitor extends uvm_monitor;
                 sched_info.active_warps  = sched_tb_if.wctl_cb.active_warps;
                 sched_info.stalled_warps = sched_tb_if.wctl_cb.stalled_warps;
                 sched_info.thread_masks  = sched_tb_if.wctl_cb.thread_masks;
-                sched_info.warp_pcs      = sched_tb_if.wctl_cb.warp_pcs;
                 sched_info.result_pc     = sched_tb_if.wctl_cb.result_pc;
                 sched_info.wid           = sched_tb_if.wctl_cb.wid;
                 sched_info.last_tid      = sched_tb_if.wctl_cb.last_tid;
@@ -59,6 +58,7 @@ class VX_sched_monitor extends uvm_monitor;
 
             if(sched_tb_if.wspawn_cb.wspawn_valid)begin
                 sched_info.active_warps  = sched_tb_if.wspawn_cb.active_warps;
+                sched_info.warp_pcs      = sched_tb_if.wspawn_cb.warp_pcs;
                 sched_info.curr_single_warp = sched_tb_if.wspawn_cb.curr_single_warp;
                 sched_info.wspawn_valid  = 1'b1;
                 sched_info.sched_info_valid = 1'b1;

@@ -42,6 +42,7 @@ package VX_tb_common_pkg;
      
     `include "VX_tb_define.svh"
     `include "VX_risc_v_instr_queue.sv"
+    `include "VX_seq_result_txn_item.sv"
 
     `include "VX_risc_v_sequencer.sv"
     `include "VX_risc_v_driver.sv"

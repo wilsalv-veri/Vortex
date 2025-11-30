@@ -20,7 +20,6 @@ interface VX_sched_tb_if import VX_tb_common_pkg::*;();
         input active_warps; 
         input stalled_warps;  
         input thread_masks;
-        input warp_pcs;
         input result_pc;
         input wid;
         input last_tid;
@@ -28,8 +27,9 @@ interface VX_sched_tb_if import VX_tb_common_pkg::*;();
 
     clocking wspawn_cb @(posedge clk);
         input wspawn_valid;
-        input curr_single_warp;
+        input curr_single_warp;  
         input active_warps; 
+        input warp_pcs;
     endclocking
     
 endinterface 

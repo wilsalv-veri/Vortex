@@ -5,12 +5,15 @@ class VX_risc_v_base_seq_lib extends uvm_sequence_library #(VX_risc_v_seq_item);
 
     `uvm_declare_p_sequencer(VX_risc_v_sequencer)
     
+    int num_of_sequences;
     protected int curr_seq_idx;
 
     function new(string name="VX_risc_v_base_seq_lib");
         super.new(name);
         curr_seq_idx = 0;
         sequence_count = 0;
+        num_of_sequences = 2;
+        sequence_count = num_of_sequences;
         add_vx_sequences();
         init_sequence_library();
     endfunction

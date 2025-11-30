@@ -15,6 +15,7 @@ class VX_risc_v_base_instr_seq extends VX_risc_v_base_seq;
         else 
             instr_queue.current_address = p_sequencer.curr_pc;
 
+        pre_add_instructions();
         add_instructions();
         instr_queue.push_back(`TMC(`RS1(0)));  //END OF SEQUENCE INSTRUCTION
         post_add_instructions();
@@ -25,6 +26,10 @@ class VX_risc_v_base_instr_seq extends VX_risc_v_base_seq;
         send_instructions(); 
     endtask
 
+    virtual function void pre_add_instructions();
+        //Do Nothing. Implement in derived classes
+    endfunction
+
     virtual function void add_instructions();
         //Do Nothing. Implement in derived classes
     endfunction
@@ -32,7 +37,6 @@ class VX_risc_v_base_instr_seq extends VX_risc_v_base_seq;
     virtual function void post_add_instructions();
         //Do Nothing. Implement in derived classes
     endfunction
-
 
     virtual task send_instructions();
         VX_risc_v_instr_seq_item instr_item;

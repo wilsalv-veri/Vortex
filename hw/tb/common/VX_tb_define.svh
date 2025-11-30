@@ -145,7 +145,7 @@
 `define WSPAWN(rs1,rs2)      VX_risc_v_Rtype_seq_item::create_instruction_with_fields("WSPAWN",`FUNCT7_WIDTH'b0000000, `REG_NUM_WIDTH'b000000, rs2, rs1, `FUNCT3_WIDTH'b001, INST_EXT1)
 `define SPLIT(rs1,rs2,rd)    VX_risc_v_Rtype_seq_item::create_instruction_with_fields("SPLIT", `FUNCT7_WIDTH'b0000000, rd, rs2, rs1, `FUNCT3_WIDTH'b010, INST_EXT1)
 `define JOIN(rs1)            VX_risc_v_Rtype_seq_item::create_instruction_with_fields("JOIN",  `FUNCT7_WIDTH'b0000000, `REG_NUM_WIDTH'b00000, `REG_NUM_WIDTH'b000000,rs1, `FUNCT3_WIDTH'b011, INST_EXT1)
-`define BAR(rs1,rs2)         VX_risc_v_Rtype_seq_item::create_instruction_with_fields("BAR",   `FUNCT7_WIDTH'b0000000, rd, rs2, rs1, `FUNCT3_WIDTH'b100, INST_EXT1)
+`define BAR(rs1,rs2)         VX_risc_v_Rtype_seq_item::create_instruction_with_fields("BAR",   `FUNCT7_WIDTH'b0000000, `REG_NUM_WIDTH'b000000, rs2, rs1, `FUNCT3_WIDTH'b100, INST_EXT1)
 `define PRED(rs1,rs2,rd)     VX_risc_v_Rtype_seq_item::create_instruction_with_fields("PRED",  `FUNCT7_WIDTH'b0000000, rd, rs2, rs1,`FUNCT3_WIDTH'b101, INST_EXT1)
 `define VOTE(rs1,rs2,rd)     VX_risc_v_Rtype_seq_item::create_instruction_with_fields("VOTE",  `FUNCT7_WIDTH'b0000001, rd, rs2, rs1, `FUNCT3_WIDTH'b100, INST_EXT1)
 

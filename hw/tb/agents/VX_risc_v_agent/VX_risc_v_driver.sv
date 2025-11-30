@@ -12,7 +12,9 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     VX_risc_v_instr_seq_item instr_item;
 
     uvm_blocking_get_port   #(int) receive_seq_num_insts;
-    uvm_blocking_put_imp    #(int, VX_risc_v_driver) receive_seq_lib_seq_num;
+
+    `uvm_blocking_put_imp_decl(_seq_lib_seq_num)
+    uvm_blocking_put_imp_seq_lib_seq_num  #(int, VX_risc_v_driver) receive_seq_lib_seq_num;
 
     uvm_analysis_port #(VX_risc_v_instr_seq_item) instr_analysis_port;
 
@@ -29,7 +31,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     int   word_count        = 0;
     int   words_to_send     = 0;
     int   seq_lib_seq_count = 0;
-    int   seq_lib_seqs      = 0;
+    int   seq_lib_seqs      = 1;
     int   shift_amount      = 0;
     logic instr_received    = 1'b0;
 
@@ -89,7 +91,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
             case(driver_state)
                 GET_INSTR             : next_state  = instr_received ? PROCESS_INSTR : GET_INSTR;
                 PROCESS_INSTR      : begin
-                    if ((word_count && ((word_count % INST_PER_CACHE_LINE) == 0))  || should_send_cacheline()) 
+                    if (word_count &&  should_send_cacheline())  //((word_count % INST_PER_CACHE_LINE) == 0))
                                         next_state  = SEND_INSTR;
                     else
                                         next_state =  GET_INSTR;
@@ -105,17 +107,17 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
             
         data_type                       <= risc_v_seq_item.data_type;
         data_word                       <= risc_v_seq_item.raw_data;
-        word_count                      <= word_count + 1;
         instr_received                  <= 1'b1;
-
-        `VX_info("VX_RISC_V_DRIVER", $sformatf("Word_Count: %0d",word_count))
     endtask
 
     task process_instr();
+        word_count                      <= word_count + 1;
         shift_amount                    <= get_shift_amount();
         cacheline                       <= {data_word, cacheline[REST_OF_CACHELINE_MSB:REST_OF_CACHELINE_LSB]} >> get_shift_amount();
         instr_received                  <= 1'b0;
-        
+        `VX_info("VX_RISC_V_DRIVER", $sformatf("Word_Count: %0d Words_to_Send: %0d Seq_Lib_Seq_Count: %0d Seq_Lib_Seq: %0d ",word_count, words_to_send, seq_lib_seq_count, seq_lib_seqs))
+        `VX_info("VX_RISC_V_DRIVER", $sformatf("Shift Amount: %0d",get_shift_amount()))
+       
         if (data_type == INST) begin
             $cast(instr_item,risc_v_seq_item);
             instr_analysis_port.write(instr_item);
@@ -127,6 +129,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
         `VX_info("VX_RISC_V_DRIVER", "Waiting For Load Ready")
         wait(mem_load_ifc.load_ready);
         `VX_info("VX_RISC_V_DRIVER", "Sending Cacheline")
+        `VX_info("VX_RISC_V_DRIVER", $sformatf("Cacheline: 0x%0h",cacheline))
             
         mem_load_ifc.cacheline                   <= cacheline;
         mem_load_ifc.load_valid                  <= 1'b1;
@@ -134,9 +137,11 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
     endtask
 
     function int get_shift_amount();
+        `VX_info("VX_RISC_V_DRIVER", $sformatf("Should Send Cacheline: %0d Word_Count:%0d", should_send_cacheline, word_count))
+               
         return should_send_cacheline() ? 
-                        (INST_PER_CACHE_LINE - (word_count % INST_PER_CACHE_LINE))*PC_BITS : PC_BITS;
-        
+                        (INST_PER_CACHE_LINE - (word_count % INST_PER_CACHE_LINE) - 1)*PC_BITS : PC_BITS;
+                 
     endfunction
 
     task get_seq_num_insts();
@@ -155,13 +160,20 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
         
     endtask
 
-    virtual task put(int num_of_seqs);
+    virtual task put_seq_lib_seq_num(int num_of_seqs);
         seq_lib_seqs = num_of_seqs;
         `VX_info("VX_RISC_V_DRIVER", $sformatf("Number of Sequences in Seq Lib: %0d", seq_lib_seqs))
     endtask
-
+    
     virtual function bit should_send_cacheline();
-        return (word_count == words_to_send) && (seq_lib_seq_count == seq_lib_seqs) ? 1'b1 : 1'b0;
+        return (all_words_received() || cacheline_filled()) ? 1'b1 : 1'b0;
     endfunction
 
+    virtual function bit all_words_received();
+        return ((word_count == (words_to_send - 1)) && (seq_lib_seq_count == seq_lib_seqs));
+    endfunction
+
+    virtual function bit cacheline_filled();
+        return (word_count % INST_PER_CACHE_LINE) == (INST_PER_CACHE_LINE - 1);
+    endfunction
 endclass

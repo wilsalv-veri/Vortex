@@ -8,22 +8,19 @@ class VX_wspawn_doa_seq extends VX_risc_v_base_instr_seq;
     risc_v_seq_instr_address_t new_pc;
     rand risc_v_seq_reg_num_t warp_nums_reg;
     rand risc_v_seq_reg_num_t warp_pc_reg;
-    rand int num_of_active_warps;
+    rand VX_warp_num_t num_of_active_warps;
 
     function new(string name="VX_wspawn_doa_seq");
         super.new(name);
-        
-        
     endfunction
 
     constraint wspawn_seq_c {
         warp_nums_reg == 1;
         warp_pc_reg   == 2;
-        num_of_active_warps == 2;
+        num_of_active_warps == 3;
     }
 
     virtual function void add_instructions();
-
         `VX_info(message_id, $sformatf("WARP_NUMS_REG: %0d WARP_PC_REG:%0d NUM_ACTIVE_WARPS: %0d", warp_nums_reg,warp_pc_reg,num_of_active_warps ))
         instr_queue.push_back(`ADDI(`RS1(warp_nums_reg),`IMM_BIN(num_of_active_warps),`RD(warp_nums_reg)));
         instr_queue.push_back(`LUI(`IMM_BIN(CODE_CS_BASE_ADDR),`RD(warp_pc_reg))); 
@@ -33,6 +30,8 @@ class VX_wspawn_doa_seq extends VX_risc_v_base_instr_seq;
 
     virtual function void post_add_instructions();
         set_warp_pc_offset();
+        p_sequencer.seq_result_item.num_warps_spawned = num_of_active_warps;
+        `VX_info(message_id, $sformatf("Number of SPAWNED Warps : %0d", num_of_active_warps))
     endfunction
 
     virtual function void set_warp_pc_offset();

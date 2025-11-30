@@ -100,8 +100,8 @@
     typedef bit [`VF_NCVT_WIDTH - 1:0]       risc_v_vfncvt_seq_t;
     typedef bit [`VF_OPFVV_WIDTH - 1:0]      risc_v_opfvv_seq_t;
     
-    typedef bit [`NUM_GPR_BANKS - 1 : 0]     VX_gpr_bank_num_t;
-    typedef bit [0:`GPR_BANK_SIZE - 1]       VX_gpr_bank_set_t;
+    typedef bit [`NUM_GPR_BANKS - 1 : 0]     VX_seq_gpr_bank_num_t;
+    typedef bit [0:`GPR_BANK_SIZE - 1]       VX_seq_gpr_bank_set_t;
     
     typedef bit [`SIMD_WIDTH - 1:0]          VX_seq_gpr_byteen;
     typedef VX_seq_gpr_byteen [XLENB - 1:0]  VX_seq_gpr_entry_byteen;
@@ -117,9 +117,10 @@
     typedef bit [`UP(`SFU_LANE_BITS)-1:0]      VX_tid_t;
 
     typedef bit [`NUM_WARPS-1:0]               VX_warp_mask_t;
+    typedef bit [`CLOG2(`NUM_WARPS) - 1:0]     VX_warp_num_t; 
     typedef bit [NW_WIDTH-1:0]                 VX_wid_t;
     
-
+   
     typedef struct packed{
         risc_v_seq_fence_pi_t                   pi;
         risc_v_seq_fence_po_t                   po;
@@ -167,6 +168,10 @@
     typedef logic [`SR_WIDTH - 1:0]           risc_v_fence_sr_t;
     typedef logic [`SW_WIDTH - 1:0]           risc_v_fence_sw_t;
 
+
+    typedef logic [`NUM_GPR_BANKS - 1 : 0]     VX_gpr_bank_num_t;
+    typedef logic [0:`GPR_BANK_SIZE - 1]       VX_gpr_bank_set_t;
+    
     typedef logic [`SIMD_WIDTH - 1:0]                           VX_gpr_byteen;
     typedef VX_gpr_byteen [XLENB - 1:0]                         VX_gpr_entry_byteen;
     
