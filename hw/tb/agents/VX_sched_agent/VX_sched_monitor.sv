@@ -29,13 +29,13 @@ class VX_sched_monitor extends uvm_monitor;
         fork 
             get_warp_ctl_info();
             get_wspawn_info();
+            get_join_info();
         join_none
     endtask
 
     virtual task get_warp_ctl_info();
         forever @ (sched_tb_if.wctl_cb)begin
             //Capture the info from IFC
-            
             if (!sched_tb_if.wctl_cb.reset && sched_tb_if.wctl_cb.warp_ctl_valid)begin
             
                 sched_info.active_warps  = sched_tb_if.wctl_cb.active_warps;
@@ -45,6 +45,7 @@ class VX_sched_monitor extends uvm_monitor;
                 sched_info.wid           = sched_tb_if.wctl_cb.wid;
                 sched_info.last_tid      = sched_tb_if.wctl_cb.last_tid;
                 sched_info.wspawn_valid  = 1'b0;
+                sched_info.join_valid    = 1'b0;
                 sched_info.sched_info_valid = 1'b1;
                 //Send Info to scoreboard
                 sched_info_analysis_port.write(sched_info);
@@ -53,7 +54,6 @@ class VX_sched_monitor extends uvm_monitor;
     endtask
 
     virtual task get_wspawn_info();
-        
         forever @ (sched_tb_if.wspawn_cb)begin
 
             if(sched_tb_if.wspawn_cb.wspawn_valid)begin
@@ -62,6 +62,18 @@ class VX_sched_monitor extends uvm_monitor;
                 sched_info.curr_single_warp = sched_tb_if.wspawn_cb.curr_single_warp;
                 sched_info.wspawn_valid  = 1'b1;
                 sched_info.sched_info_valid = 1'b1;
+                sched_info_analysis_port.write(sched_info);
+            end
+        end
+    endtask
+
+    virtual task get_join_info();
+        forever  @ (sched_tb_if.join_cb)begin
+            if (sched_tb_if.join_cb.join_valid) begin
+                sched_info.thread_masks  = sched_tb_if.join_cb.thread_masks;
+                sched_info.result_pc     = sched_tb_if.join_cb.result_pc;
+                sched_info.ipdom_wr_ptrs = sched_tb_if.join_cb.ipdom_wr_ptrs;
+                sched_info.join_valid    = 1'b1;
                 sched_info_analysis_port.write(sched_info);
             end
         end

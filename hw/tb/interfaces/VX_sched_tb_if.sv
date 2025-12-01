@@ -4,6 +4,8 @@ interface VX_sched_tb_if import VX_tb_common_pkg::*;();
     logic                                    reset;
     logic                                    warp_ctl_valid;
     logic                                    wspawn_valid;
+    logic                                    join_valid;
+    VX_ipdom_wr_ptrs_t                       ipdom_wr_ptrs;
     logic                                    curr_single_warp;
     logic [`NUM_WARPS-1:0]                   active_warps; // updated when a warp is activated or disabled
     logic [`NUM_WARPS-1:0]                   stalled_warps;  // set when branch/gpgpu instructions are issued
@@ -30,6 +32,13 @@ interface VX_sched_tb_if import VX_tb_common_pkg::*;();
         input curr_single_warp;  
         input active_warps; 
         input warp_pcs;
+    endclocking
+
+    clocking join_cb @ (posedge clk);
+        input join_valid;
+        input ipdom_wr_ptrs;
+        input thread_masks;
+        input result_pc;
     endclocking
     
 endinterface 

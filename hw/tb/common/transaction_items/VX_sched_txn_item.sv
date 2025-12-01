@@ -2,6 +2,8 @@ class VX_sched_tb_txn_item extends uvm_transaction;
 
     bit                                    sched_info_valid;
     bit                                    wspawn_valid;
+    bit                                    join_valid;
+    VX_ipdom_wr_ptrs_t                     ipdom_wr_ptrs;
     bit                                    curr_single_warp;
     bit [`NUM_WARPS-1:0]                   active_warps; // updated when a warp is activated or disabled
     bit [`NUM_WARPS-1:0]                   stalled_warps;  // set when branch/gpgpu instructions are issued

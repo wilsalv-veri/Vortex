@@ -11,6 +11,7 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     uvm_tlm_analysis_fifo #(VX_gpr_tb_txn_item) gpr_tb_fifo;
 
     VX_risc_v_instr_seq_item   instr_array[integer]; 
+    
     VX_gpr_tb_txn_item         gpr_info;
 
     VX_gpr_seq_block_t         gpr_block;
@@ -20,6 +21,11 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     VX_tmask_t                 expected_tmask;
     VX_tid_t                   last_tid [`NUM_WARPS - 1:0]; //Initial last_tid = 0
     
+    bit                        is_else;
+    bit                        join_is_else[$];
+    VX_tb_ipdom_stack_entry_t  tb_ipdom_stack[$];
+    VX_tb_ipdom_stack_entry_t  ipdom_stack_entry;
+
     int                        exp_num_of_warps;
     VX_warp_mask_t             exp_warp_mask;
     VX_warp_num_t              num_warps;
@@ -136,7 +142,6 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                                 end
                             end
                         end
-
                         "BAR": begin
                             for(int wid_idx=0; wid_idx < `NUM_WARPS; wid_idx++)begin
                                 if (wid_idx == wid)
@@ -146,6 +151,33 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                                     `VX_error(message_id, $sformatf("BARRIER NOT SUSTAINED WID: 0x%0h PC: 0x%0h VIOLATING WARP: 0x%0h VIOLATING PC: 0x%0h", 
                                 wid, sched_info.warp_pcs[wid], wid_idx, sched_info.warp_pcs[wid_idx]))
                             end
+                        end
+                        "SPLIT": begin
+                            expected_tmask = `NUM_THREADS'(0);
+                            for(int tid_idx=0; tid_idx < `NUM_THREADS; tid_idx++)begin
+                                if (curr_tmask[wid][tid_idx])
+                                    expected_tmask[tid_idx] = gpr_block[rs1_bank_num][rs1_set_num][tid_idx][0];
+                            end
+
+                            expected_tmask = $countones(expected_tmask) >= $countones(~expected_tmask & curr_tmask[wid]) ? expected_tmask :  ~expected_tmask & curr_tmask[wid];
+                            if (expected_tmask != next_tmask[wid])
+                                `VX_error(message_id, $sformatf("SPLIT Instruction set incorrect next tmask Exp_TMASK: %0d'b%0b Act_TMASK: %0d'b%0b", `NUM_THREADS,expected_tmask, `NUM_THREADS, next_tmask[wid]))
+                            
+                            ipdom_stack_push_entry();
+                        end
+                        "JOIN": begin
+                            if (sched_info.join_valid)begin
+                                ipdom_stack_entry = tb_ipdom_stack.pop_back();
+                                expected_tmask = ipdom_stack_entry.join_is_else ? ipdom_stack_entry.join_tmask : ipdom_stack_entry.non_dvg_tmask;
+                                
+                                if (expected_tmask != next_tmask[wid])
+                                    `VX_error(message_id, $sformatf("JOIN Instruction set incorrect next tmask WID: %0d Exp_TMASK: %0d'b%0b Act_TMASK: %0d'b%0b IS_ELSE: %0d", wid, `NUM_THREADS,expected_tmask, `NUM_THREADS, next_tmask[wid], ipdom_stack_entry.join_is_else))
+                                       
+                                if (ipdom_stack_entry.join_is_else) begin
+                                    ipdom_stack_entry.join_is_else = 0;
+                                    tb_ipdom_stack.push_back(ipdom_stack_entry);
+                                end
+                            end  
                         end
                     endcase    
                     
@@ -197,6 +229,13 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
             warp_mask = (warp_mask << 1) | `NUM_WARPS'(1);
         
         return warp_mask; 
+    endfunction
+
+    virtual function void ipdom_stack_push_entry();
+        ipdom_stack_entry.join_tmask = ~expected_tmask & curr_tmask[wid];
+        ipdom_stack_entry.non_dvg_tmask = curr_tmask[wid];
+        ipdom_stack_entry.join_is_else = 1;
+        tb_ipdom_stack.push_back(ipdom_stack_entry);
     endfunction
 
 endclass

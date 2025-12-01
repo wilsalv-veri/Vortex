@@ -163,9 +163,27 @@ module VX_schedule import VX_gpu_pkg::*; #(
         // join handling
         if (join_valid) begin
             if (join_is_dvg) begin
-                if (join_is_else) begin
-                    warp_pcs_n[join_wid] = join_pc;
-                end
+
+                //note: wilsalv
+                //JOIN_PC is set to (SPLIT_PC + 4) from wctl_unit
+                //This makes it such that join reruns same instructions
+                //as then_mask but now with else_mask, making the
+                //thread divergence essentially non-existant. 
+                //To FIX this, we can remove the PC manipulation aspect of 
+                //join and instead insert 2 joins in the instructions stream
+                //making it look as the following
+                // eg) SPLIT (set active tmask to pred mask)
+                //      then_mask instrA
+                //      then_mask instrB
+                //     JOIN (set active tmask to else mask)
+                //      else_mask instrC
+                //      else_mask instrD
+                //     JOIN  (restore active tmask value before split)
+                
+                //FIXME: wilsalv - Removed due to comment above
+                //if (join_is_else) begin
+                //    warp_pcs_n[join_wid] = join_pc;
+                //end
                 thread_masks_n[join_wid] = join_tmask;
             end
             stalled_warps_n[join_wid] = 0; // unlock warp

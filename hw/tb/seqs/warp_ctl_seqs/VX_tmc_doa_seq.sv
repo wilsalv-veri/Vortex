@@ -1,5 +1,3 @@
-import VX_tb_common_pkg::*;
-   
 class VX_tmc_doa_seq extends VX_risc_v_base_instr_seq;
 
     `uvm_object_utils(VX_tmc_doa_seq)

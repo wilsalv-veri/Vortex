@@ -137,7 +137,18 @@
        
     }risc_v_seq_succ_t;
 
-    typedef bit [`SEQ_RAW_DATA_WIDTH - 1:0]   risc_v_seq_data_t;
+    typedef struct packed {
+
+        VX_tmask_t    join_tmask;
+        VX_tmask_t    non_dvg_tmask;
+        bit           join_is_else;
+
+    } VX_tb_ipdom_stack_entry_t;
+
+    typedef bit [DV_STACK_SIZEW-1:0]           VX_ipdom_wr_ptr_t;
+    typedef VX_ipdom_wr_ptr_t [`NUM_WARPS-1:0] VX_ipdom_wr_ptrs_t; 
+    
+    typedef bit [`SEQ_RAW_DATA_WIDTH - 1:0]    risc_v_seq_data_t;
     
     //Top Level Use  
     typedef logic [`CACHE_LINE_WIDTH - 1: 0]  risc_v_cacheline_t;
