@@ -164,7 +164,8 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                             if (expected_tmask != next_tmask[wid])
                                 `VX_error(message_id, $sformatf("SPLIT Instruction set incorrect next tmask Exp_TMASK: %0d'b%0b Act_TMASK: %0d'b%0b", `NUM_THREADS,expected_tmask, `NUM_THREADS, next_tmask[wid]))
                             
-                            ipdom_stack_push_entry();
+                            if (expected_tmask != curr_tmask[wid])
+                                ipdom_stack_push_entry();
                         end
                         "JOIN": begin
 
@@ -187,7 +188,7 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
 
                             end
                             else if (next_tmask[wid] != curr_tmask[wid])
-                                `VX_error(message_id, $sformatf("JOIN Instruction With Incorrect Stack Ptr Changed T-MASK"))  
+                                `VX_error(message_id, $sformatf("JOIN Instruction With Incorrect Stack Ptr Changed T-MASK RD_PTR: %0d STACK_SIZE: %0d", stack_rd_ptr,tb_ipdom_stack.size() ))  
                         
                         end
                     endcase    

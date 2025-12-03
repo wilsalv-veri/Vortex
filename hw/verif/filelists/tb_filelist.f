@@ -91,6 +91,8 @@ $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_doa_seq_lib.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_seq_lib.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_bar_seq_lib.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_twice_seq_lib.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_full_ipdom_stack_seq.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_write_to_full_ipdom_stack_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_non_dvg_join_seq.sv
 
 
@@ -112,11 +114,13 @@ $VORTEX/hw/tb/tests/warp_ctl_tests/VX_wspawn_twice_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_non_dvg_join_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_pred_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_split_join_test.sv
+$VORTEX/hw/tb/tests/warp_ctl_tests/VX_write_to_full_ipdom_stack_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_tmc_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_bar_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_wspawn_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_tmc_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_pred_test.sv
+$VORTEX/hw/tb/tests/warp_ctl_tests/VX_full_ipdom_stack_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_split_join_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_bar_doa_test.sv
 
