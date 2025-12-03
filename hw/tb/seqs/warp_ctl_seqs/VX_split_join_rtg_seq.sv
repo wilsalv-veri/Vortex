@@ -6,6 +6,7 @@ class VX_split_join_rtg_seq extends VX_split_join_doa_seq;
 
     function new(string name="VX_split_join_rtg_seq");
         super.new(name);
+        ipdom_top_stack_reg = 0;
 
         if (!this.randomize())
             `VX_error(message_id, "Failed to randomize VX_split_join_rtg_seq")
@@ -28,8 +29,8 @@ class VX_split_join_rtg_seq extends VX_split_join_doa_seq;
         then_val_reg        inside {[2:31]};
         else_val_reg        inside {[2:31]};
         all_val_reg         inside {[2:31]};
-  
-    }
 
+        ipdom_top_stack_reg == ipdom_stack_ptr_reg;
+    }
 
 endclass

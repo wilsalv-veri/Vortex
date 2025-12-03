@@ -35,6 +35,7 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     VX_seq_gpr_bank_set_t          rs1_set_num, rs2_set_num, rd_set_num;
     risc_v_seq_instr_address_t pc;
     risc_v_seq_instr_address_t exp_next_pc;
+    risc_v_seq_instr_address_t stack_rd_ptr;
     
     
     string message_id = "VX_WARP_CTL_SCBD";
@@ -156,7 +157,7 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                             expected_tmask = `NUM_THREADS'(0);
                             for(int tid_idx=0; tid_idx < `NUM_THREADS; tid_idx++)begin
                                 if (curr_tmask[wid][tid_idx])
-                                    expected_tmask[tid_idx] = gpr_block[rs1_bank_num][rs1_set_num][tid_idx][0];
+                                    expected_tmask[tid_idx] = gpr_block[rs1_bank_num][rs1_set_num][tid_idx][0] ^ r_item.rs2[0];
                             end
 
                             expected_tmask = $countones(expected_tmask) >= $countones(~expected_tmask & curr_tmask[wid]) ? expected_tmask :  ~expected_tmask & curr_tmask[wid];
@@ -166,18 +167,28 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                             ipdom_stack_push_entry();
                         end
                         "JOIN": begin
-                            if (sched_info.join_valid)begin
-                                ipdom_stack_entry = tb_ipdom_stack.pop_back();
-                                expected_tmask = ipdom_stack_entry.join_is_else ? ipdom_stack_entry.join_tmask : ipdom_stack_entry.non_dvg_tmask;
-                                
-                                if (expected_tmask != next_tmask[wid])
-                                    `VX_error(message_id, $sformatf("JOIN Instruction set incorrect next tmask WID: %0d Exp_TMASK: %0d'b%0b Act_TMASK: %0d'b%0b IS_ELSE: %0d", wid, `NUM_THREADS,expected_tmask, `NUM_THREADS, next_tmask[wid], ipdom_stack_entry.join_is_else))
-                                       
-                                if (ipdom_stack_entry.join_is_else) begin
-                                    ipdom_stack_entry.join_is_else = 0;
-                                    tb_ipdom_stack.push_back(ipdom_stack_entry);
+
+                            stack_rd_ptr = gpr_block[rs1_bank_num][rs1_set_num][last_tid[wid]];
+                            
+                            if (stack_rd_ptr == (tb_ipdom_stack.size() - 1))begin
+                                `VX_info(message_id, $sformatf("RS1 Stack Ptr: 0x%0h Stack Size: 0x%0h", stack_rd_ptr, tb_ipdom_stack.size()))
+                                if (sched_info.join_valid) begin
+                                    ipdom_stack_entry = tb_ipdom_stack.pop_back();
+                                    expected_tmask = ipdom_stack_entry.join_is_else ? ipdom_stack_entry.join_tmask : ipdom_stack_entry.non_dvg_tmask;
+
+                                    if (expected_tmask != next_tmask[wid])
+                                        `VX_error(message_id, $sformatf("JOIN Instruction set incorrect next tmask WID: %0d Exp_TMASK: %0d'b%0b Act_TMASK: %0d'b%0b IS_ELSE: %0d", wid, `NUM_THREADS,expected_tmask, `NUM_THREADS, next_tmask[wid], ipdom_stack_entry.join_is_else))
+
+                                    if (ipdom_stack_entry.join_is_else) begin
+                                        ipdom_stack_entry.join_is_else = 0;
+                                        tb_ipdom_stack.push_back(ipdom_stack_entry);
+                                    end
                                 end
-                            end  
+
+                            end
+                            else if (next_tmask[wid] != curr_tmask[wid])
+                                `VX_error(message_id, $sformatf("JOIN Instruction With Incorrect Stack Ptr Changed T-MASK"))  
+                        
                         end
                     endcase    
                     
