@@ -77,6 +77,7 @@ $VORTEX/hw/tb/memory_model/memory_bfm.sv
 +incdir+$VORTEX/hw/tb/seqs/warp_ctl_seqs
 
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_doa_seq.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_branch_doa_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_doa_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_pred_doa_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_split_join_doa_seq.sv
@@ -113,6 +114,7 @@ $VORTEX/hw/tb/tests/base_tests/VX_risc_v_base_seq_lib_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_wspawn_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_read_from_empty_ipdom_stack_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_wspawn_twice_test.sv
+$VORTEX/hw/tb/tests/warp_ctl_tests/VX_branch_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_non_dvg_join_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_pred_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_split_join_test.sv

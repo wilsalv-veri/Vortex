@@ -37,18 +37,12 @@ class VX_risc_v_Rtype_seq_item extends VX_risc_v_instr_seq_item;
         this.raw_data    = {this.funct7,this.rs2,this.rs1,this.funct3,this.rd,this.opcode};
     endfunction
 
-    function void set_instruction_with_data(string name, risc_v_seq_data_t raw_data);
-           
-         //800b        
-        //RS1  FUNCT3      RD     OPCODE
-        //1      000      00000  0001011
-       
+    function void set_instruction_with_data(string name, risc_v_seq_data_t raw_data);   
         this.instr_name  = name;
         this.instr_type  = R_TYPE;
         this.raw_data    = raw_data;
         {>>{this.funct7,this.rs2,this.rs1,this.funct3,this.rd,this.opcode}} = raw_data;
     endfunction
-
 
     static function VX_risc_v_Rtype_seq_item create_instruction_with_fields(string name,
                                     risc_v_seq_funct7_t funct7,  risc_v_seq_reg_num_t rd, 

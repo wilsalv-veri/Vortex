@@ -13,3 +13,10 @@ assign sched_tb_if.stalled_warps  =  `VX_SCHED.stalled_warps_n;
 assign sched_tb_if.thread_masks   =  `VX_SCHED.thread_masks_n;
 assign sched_tb_if.warp_pcs       =  `VX_SCHED.warp_pcs_n;
 
+//Branch
+assign sched_tb_if.br_valid       = `VX_SCHED.branch_valid;
+assign sched_tb_if.br_wid         = `VX_SCHED.branch_wid;
+assign sched_tb_if.br_pc          = `VX_EXECUTE.alu_unit.per_block_result_if[0].data.PC;
+assign sched_tb_if.br_taken       = `VX_SCHED.branch_taken;
+assign sched_tb_if.br_target      = `VX_SCHED.branch_dest;
+

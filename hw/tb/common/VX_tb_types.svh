@@ -151,6 +151,8 @@
     typedef bit [`SEQ_RAW_DATA_WIDTH - 1:0]    risc_v_seq_data_t;
     
     //Top Level Use  
+    typedef logic [`INSTR_ADDRESS_WIDTH -1:0]  risc_v_instr_address_t;
+    
     typedef logic [`CACHE_LINE_WIDTH - 1: 0]  risc_v_cacheline_t;
     typedef logic [`SEQ_RAW_DATA_WIDTH - 1:0] risc_v_cacheline_data_t; 
 

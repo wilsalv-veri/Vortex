@@ -21,6 +21,9 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     VX_tmask_t                 expected_tmask;
     VX_tid_t                   last_tid [`NUM_WARPS - 1:0]; //Initial last_tid = 0
     
+    bit                             br_taken;
+    VX_wid_t [`NUM_ALU_BLOCKS-1:0]  br_wid;
+
     bit                        is_else;
     bit                        join_is_else[$];
     VX_tb_ipdom_stack_entry_t  tb_ipdom_stack[$];
@@ -31,13 +34,14 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     VX_warp_num_t              num_warps;
     VX_wid_t                   wid;
 
-    VX_seq_gpr_bank_num_t          rs1_bank_num, rs2_bank_num, rd_bank_num;
-    VX_seq_gpr_bank_set_t          rs1_set_num, rs2_set_num, rd_set_num;
+    VX_seq_gpr_bank_num_t      rs1_bank_num, rs2_bank_num, rd_bank_num;
+    VX_seq_gpr_bank_set_t      rs1_set_num, rs2_set_num, rd_set_num;
+    VX_seq_gpr_t               br_src1, br_src2;
     risc_v_seq_instr_address_t pc;
     risc_v_seq_instr_address_t exp_next_pc;
     risc_v_seq_instr_address_t stack_rd_ptr;
-    
-    
+    risc_v_seq_instr_address_t [`NUM_ALU_BLOCKS-1:0] br_target;
+
     string message_id = "VX_WARP_CTL_SCBD";
     
     function new(string name="VX_warp_ctl_scbd", uvm_component parent=null);
@@ -91,8 +95,8 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
 
     virtual function void check_instruction(VX_sched_tb_txn_item sched_info);
        
-        pc  = sched_info.result_pc;
-        wid = sched_info.wid;
+        pc    = sched_info.br_valid  ? sched_info.br_pc : sched_info.result_pc;
+        wid   = sched_info.wid;
         num_warps = $countones(sched_info.active_warps);
 
         if (instr_array.exists(pc)) begin
@@ -100,7 +104,7 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
             case (instr_array[pc].instr_type)
                 R_TYPE: begin
                     VX_risc_v_Rtype_seq_item r_item = VX_risc_v_Rtype_seq_item::create_instruction_with_data("R_TYPE_INST",instr_array[pc].raw_data);
-                    set_gpr_lookup_fields(r_item);
+                    set_r_item_gpr_lookup_set_nums(r_item);
                     next_tmask[wid]  = `NUM_THREADS'(sched_info.thread_masks[wid]);
                             
                     case(instr_array[pc].instr_name)
@@ -197,6 +201,31 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                     curr_tmask = next_tmask;
        
                 end
+                B_TYPE: begin
+                    VX_risc_v_Btype_seq_item b_item = VX_risc_v_Btype_seq_item::create_instruction_with_data("B_TYPE_INST",instr_array[pc].raw_data);
+                    set_b_item_gpr_lookup_set_nums(b_item);
+                    
+                    for(int alu_num=0; alu_num < `NUM_ALU_BLOCKS; alu_num++)begin
+                        
+                        br_wid = sched_info.br_wid[alu_num];
+                        br_src1 = gpr_block[rs1_bank_num][rs1_set_num][last_tid[br_wid]];
+                        br_src2 = gpr_block[rs1_bank_num][rs1_set_num][last_tid[br_wid]];
+                        br_target = pc + get_br_offset(b_item);
+                   
+                        case(instr_array[pc].instr_name)
+                            "BEQ":br_taken = br_src1 == br_src2;     
+                        endcase
+
+                        if (sched_info.br_valid[alu_num])begin
+                            if (br_taken != sched_info.br_taken[alu_num])
+                                `VX_error(message_id, $sformatf("BR instruction had incorrect outcome ALU_NUM: %0d Exp Taken: %0d Act Taken: %0d", alu_num, br_taken, sched_info.br_taken))
+                            else if (br_taken && (br_target[alu_num] != sched_info.br_target[alu_num]))
+                                `VX_error(message_id, $sformatf("BR instruction taken with incorrect branch target PC: 0x%0h ALU_NUM: %0d Exp Target: 0x%0h Act Target: 0x%0h", pc, alu_num, br_target[alu_num], sched_info.br_target[alu_num]))
+                            else if (br_taken && (br_target[alu_num] != sched_info.warp_pcs[br_wid]))
+                                `VX_error(message_id, $sformatf("BR instruction taken but did not update WARP WID: 0x%0h PC TARGET: 0x%0h ACT_PC: 0x%0h", br_wid, br_target[alu_num], sched_info.warp_pcs[br_wid]))
+                        end
+                    end
+                end
                 default:
                     `VX_error("VX_WARP_CTL_SCBD", $sformatf("Found instruction with the incorrect type: %s", instr_array[pc].instr_type.name() ))
             endcase
@@ -217,21 +246,36 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
         end
     endfunction
 
-    virtual function void  set_gpr_lookup_fields( VX_risc_v_Rtype_seq_item r_item);
-        set_gpr_lookup_bank_nums(r_item);
-        set_gpr_lookup_set_nums(r_item);
+    virtual function void  set_r_item_gpr_lookup_fields( VX_risc_v_Rtype_seq_item r_item);
+        set_r_item_gpr_lookup_bank_nums(r_item);
+        set_r_item_gpr_lookup_set_nums(r_item);
     endfunction   
-    
-    virtual function void set_gpr_lookup_bank_nums(VX_risc_v_Rtype_seq_item r_item);
+   
+    virtual function void  set_b_item_gpr_lookup_fields( VX_risc_v_Btype_seq_item b_item);
+        set_b_item_gpr_lookup_bank_nums(b_item);
+        set_b_item_gpr_lookup_set_nums(b_item);
+    endfunction   
+   
+    virtual function void set_r_item_gpr_lookup_bank_nums(VX_risc_v_Rtype_seq_item r_item);
         rs1_bank_num = `REG_NUM_TO_BANK(r_item.rs1);
         rs2_bank_num = `REG_NUM_TO_BANK(r_item.rs2);
         rd_bank_num  = `REG_NUM_TO_BANK(r_item.rd);
     endfunction
 
-    virtual function void set_gpr_lookup_set_nums(VX_risc_v_Rtype_seq_item r_item);
+     virtual function void set_b_item_gpr_lookup_bank_nums(VX_risc_v_Btype_seq_item b_item);
+        rs1_bank_num = `REG_NUM_TO_BANK(b_item.rs1);
+        rs2_bank_num = `REG_NUM_TO_BANK(b_item.rs2);
+    endfunction
+
+    virtual function void set_r_item_gpr_lookup_set_nums(VX_risc_v_Rtype_seq_item r_item);
       rs1_set_num  = `REG_NUM_TO_SET(wid,r_item.rs1);
       rs2_set_num  = `REG_NUM_TO_SET(wid,r_item.rs2);
       rd_set_num   = `REG_NUM_TO_SET(wid,r_item.rd);
+    endfunction
+
+    virtual function void set_b_item_gpr_lookup_set_nums(VX_risc_v_Btype_seq_item b_item);
+      rs1_set_num  = `REG_NUM_TO_SET(wid,b_item.rs1);
+      rs2_set_num  = `REG_NUM_TO_SET(wid,b_item.rs2);
     endfunction
 
     virtual function VX_warp_mask_t get_warp_mask(int number_of_warps);
@@ -248,6 +292,10 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
         ipdom_stack_entry.non_dvg_tmask = curr_tmask[wid];
         ipdom_stack_entry.join_is_else = 1;
         tb_ipdom_stack.push_back(ipdom_stack_entry);
+    endfunction
+
+    virtual function  risc_v_seq_instr_address_t get_br_offset(VX_risc_v_Btype_seq_item b_item);
+        return risc_v_seq_instr_address_t'({b_item.imm_12,b_item.imm_11,b_item.imm1,b_item.imm0,1'b0});
     endfunction
 
 endclass
