@@ -82,6 +82,7 @@ $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_doa_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_pred_doa_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_split_join_doa_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_bar_doa_seq.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_branch_rtg_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_pred_rtg_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_rtg_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_bar_rtg_seq.sv
@@ -126,6 +127,7 @@ $VORTEX/hw/tb/tests/warp_ctl_tests/VX_tmc_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_pred_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_full_ipdom_stack_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_split_join_doa_test.sv
+$VORTEX/hw/tb/tests/warp_ctl_tests/VX_branch_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_bar_doa_test.sv
 
 $VORTEX/hw/tb/tb_top.sv

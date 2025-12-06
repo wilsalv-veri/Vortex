@@ -104,7 +104,7 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
             case (instr_array[pc].instr_type)
                 R_TYPE: begin
                     VX_risc_v_Rtype_seq_item r_item = VX_risc_v_Rtype_seq_item::create_instruction_with_data("R_TYPE_INST",instr_array[pc].raw_data);
-                    set_r_item_gpr_lookup_set_nums(r_item);
+                    set_r_item_gpr_lookup_fields(r_item);
                     next_tmask[wid]  = `NUM_THREADS'(sched_info.thread_masks[wid]);
                             
                     case(instr_array[pc].instr_name)
@@ -203,22 +203,28 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                 end
                 B_TYPE: begin
                     VX_risc_v_Btype_seq_item b_item = VX_risc_v_Btype_seq_item::create_instruction_with_data("B_TYPE_INST",instr_array[pc].raw_data);
-                    set_b_item_gpr_lookup_set_nums(b_item);
+                    set_b_item_gpr_lookup_fields(b_item);
                     
                     for(int alu_num=0; alu_num < `NUM_ALU_BLOCKS; alu_num++)begin
                         
                         br_wid = sched_info.br_wid[alu_num];
                         br_src1 = gpr_block[rs1_bank_num][rs1_set_num][last_tid[br_wid]];
-                        br_src2 = gpr_block[rs1_bank_num][rs1_set_num][last_tid[br_wid]];
+                        br_src2 = gpr_block[rs2_bank_num][rs2_set_num][last_tid[br_wid]];
                         br_target = pc + get_br_offset(b_item);
                    
                         case(instr_array[pc].instr_name)
-                            "BEQ":br_taken = br_src1 == br_src2;     
+                            "BEQ":  br_taken = br_src1 == br_src2;  
+                            "BNE":  br_taken = br_src1 != br_src2;
+                            "BLT":  br_taken = int'(br_src1)  < int'(br_src2);
+                            "BGE":  br_taken = int'(br_src1)  > int'(br_src2);
+                            "BLTU": br_taken = br_src1  < br_src2;
+                            "BGEU": br_taken = br_src1  > br_src2;     
                         endcase
 
+                        `VX_info(message_id, $sformatf("RS1 B_ITEM_RS1: %0d REG_NUM:%0d BANK_NUM:%0d BANK_SET:%0d VAL: 0x%0h RS2_VAL: 0x%0h",b_item.rs1,(rs1_bank_num*4) + rs1_set_num,rs1_bank_num,rs1_set_num,  br_src1, br_src2))
                         if (sched_info.br_valid[alu_num])begin
                             if (br_taken != sched_info.br_taken[alu_num])
-                                `VX_error(message_id, $sformatf("BR instruction had incorrect outcome ALU_NUM: %0d Exp Taken: %0d Act Taken: %0d", alu_num, br_taken, sched_info.br_taken))
+                                `VX_error(message_id, $sformatf("BR instruction had incorrect outcome ALU_NUM: %0d Exp Taken: %0d Act Taken: %0d INSTR_NAME: %0s RS1: 0x%0h RS2 : 0x%0h", alu_num, br_taken, sched_info.br_taken, instr_array[pc].instr_name, br_src1, br_src2))
                             else if (br_taken && (br_target[alu_num] != sched_info.br_target[alu_num]))
                                 `VX_error(message_id, $sformatf("BR instruction taken with incorrect branch target PC: 0x%0h ALU_NUM: %0d Exp Target: 0x%0h Act Target: 0x%0h", pc, alu_num, br_target[alu_num], sched_info.br_target[alu_num]))
                             else if (br_taken && (br_target[alu_num] != sched_info.warp_pcs[br_wid]))
@@ -226,8 +232,8 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                         end
                     end
                 end
-                default:
-                    `VX_error("VX_WARP_CTL_SCBD", $sformatf("Found instruction with the incorrect type: %s", instr_array[pc].instr_type.name() ))
+                //default:
+                //    `VX_error("VX_WARP_CTL_SCBD", $sformatf("Found instruction with the incorrect type: %s", instr_array[pc].instr_type.name() ))
             endcase
                     end
         else

@@ -78,6 +78,7 @@
     typedef bit [`S_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_s_type_imm1_t;
     typedef bit [`S_TYPE_IMM0_WIDTH - 1:0]   risc_v_seq_s_type_imm0_t;
     
+    typedef bit [`IMM_12 - 1:0]              risc_v_seq_imm12_t;
     typedef bit [`B_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_b_type_imm1_t;
     typedef bit [`B_TYPE_IMM0_WIDTH - 1:0]   risc_v_seq_b_type_imm0_t;
     
@@ -149,7 +150,9 @@
     typedef VX_ipdom_wr_ptr_t [`NUM_WARPS-1:0] VX_ipdom_wr_ptrs_t; 
     
     typedef bit [`SEQ_RAW_DATA_WIDTH - 1:0]    risc_v_seq_data_t;
-    
+    typedef enum { BEQ, BNE, BLTU, BGEU, BLT, BGE } br_instr_type_t; 
+
+    //********************************************************** */
     //Top Level Use  
     typedef logic [`INSTR_ADDRESS_WIDTH -1:0]  risc_v_instr_address_t;
     

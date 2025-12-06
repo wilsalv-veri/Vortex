@@ -223,7 +223,7 @@ package VX_gpu_pkg;
     localparam INST_BR_BEQ =     4'b0000;
     localparam INST_BR_BNE =     4'b0010;
     localparam INST_BR_BLTU =    4'b0100;
-    localparam INST_BR_BGEU =    4'b0110;
+    localparam INST_BR_BGEU =    4'b0110; 
     localparam INST_BR_BLT =     4'b0101;
     localparam INST_BR_BGE =     4'b0111;
     localparam INST_BR_JAL =     4'b1000;

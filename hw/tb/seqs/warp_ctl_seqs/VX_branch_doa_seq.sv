@@ -4,17 +4,17 @@ class VX_branch_doa_seq extends VX_risc_v_base_instr_seq;
 
     rand risc_v_seq_reg_num_t br_cmp_src1;
     rand risc_v_seq_reg_num_t br_cmp_src2;
-    rand risc_v_seq_imm_t     br_cmp_val1;
-    rand risc_v_seq_imm_t     br_cmp_val2;
+    rand risc_v_seq_imm12_t   br_cmp_val1;
+    rand risc_v_seq_imm12_t   br_cmp_val2;
     rand risc_v_seq_imm_t     branch_target;
     string message_id = "VX_BRANCH_DOA_SEQ";
-
+         
     function new(string name="VX_branch_doa_seq");
         super.new(name);
         br_cmp_src1 = 1;
         br_cmp_src2 = 2;
         br_cmp_val1 = 1;
-        br_cmp_val2 = br_cmp_val1;
+        br_cmp_val2 = br_cmp_val1; 
     endfunction
 
     virtual function void add_instructions();
@@ -25,21 +25,21 @@ class VX_branch_doa_seq extends VX_risc_v_base_instr_seq;
     endfunction
 
     virtual function void post_add_instructions();
-        set_branch_target();
+        set_branch_target("BEQ"); 
     endfunction
 
-    virtual function void set_branch_target();
-        int branch_instr_idx = get_branch_instruction_idx("BEQ");
+    virtual function void set_branch_target(string instr_name);
+        int branch_instr_idx = get_branch_instruction_idx(instr_name);
         branch_target = risc_v_seq_instr_address_t'(4) * (instr_queue.size() - branch_instr_idx - 1);
         `VX_info(message_id, $sformatf("BRANCH TARGET: 0x%0h", branch_target))
-        set_branch_target_imm(branch_target);
+        set_branch_target_imm(instr_name, branch_target);
     endfunction
 
-    virtual function void set_branch_target_imm(risc_v_seq_imm_t imm);
+    virtual function void set_branch_target_imm(string instr_name, risc_v_seq_imm_t imm);
         VX_risc_v_Btype_seq_item b_seq_item = VX_risc_v_Btype_seq_item::type_id::create("VX_risc_v_Btype_seq_item");
         VX_risc_v_instr_seq_item instr_seq_item;
 
-        int branch_instr_idx = get_branch_instruction_idx("BEQ");
+        int branch_instr_idx = get_branch_instruction_idx(instr_name);
         instr_seq_item = instr_queue.get(branch_instr_idx);
         if ($cast(b_seq_item, instr_seq_item))begin
             b_seq_item.set_imm_field(imm); 

@@ -47,7 +47,7 @@
 `define BLT(rs1,rs2,imm)  VX_risc_v_Btype_seq_item::create_instruction_with_fields("BLT",  imm, rs2, rs1, `FUNCT3_WIDTH'b100)
 `define BGE(rs1,rs2,imm)  VX_risc_v_Btype_seq_item::create_instruction_with_fields("BGE",  imm, rs2, rs1, `FUNCT3_WIDTH'b101)
 `define BLTU(rs1,rs2,imm) VX_risc_v_Btype_seq_item::create_instruction_with_fields("BLTU", imm, rs2, rs1, `FUNCT3_WIDTH'b110)
-`define BGEU(rs1,rs2,imm) VX_risc_v_Btype_seq_item::create_instruction_with_fields("BGEU", imm, rs2, rs1, `FUNCT3_WIDTH'b110)
+`define BGEU(rs1,rs2,imm) VX_risc_v_Btype_seq_item::create_instruction_with_fields("BGEU", imm, rs2, rs1, `FUNCT3_WIDTH'b111)
 
 //L_TYPE (Load) Instructions
 `define LB(rs1,imm,rd)  VX_risc_v_Itype_seq_item::create_instruction_with_fields("LB",  imm, rd, rs1, `FUNCT3_WIDTH'b000,INST_L)
