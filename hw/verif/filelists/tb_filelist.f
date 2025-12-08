@@ -130,5 +130,14 @@ $VORTEX/hw/tb/tests/warp_ctl_tests/VX_split_join_doa_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_branch_test.sv
 $VORTEX/hw/tb/tests/warp_ctl_tests/VX_bar_doa_test.sv
 
+
+//Include Files under $VORTEX/hw/tb/coverage
++incdir+$VORTEX/hw/tb/coverage
+
+
+//Include Files under $VORTEX/hw/tb/assertions
++incdir+$VORTEX/hw/tb/assertions
+
+$VORTEX/hw/tb/assertions/VX_sched_assert.sv
 $VORTEX/hw/tb/tb_top.sv
 

@@ -237,6 +237,9 @@ module VX_tb_top;
         .busy           (uvm_test_ifc.core_busy)
     );
 
+    
+    bind core.schedule VX_sched_assert sched_sva(.*);
+
     initial begin
         uvm_config_db #(virtual VX_tb_top_if                        )::set(null, "*", "tb_top_if", tb_top_if);
         uvm_config_db #(virtual VX_uvm_test_if                      )::set(null, "*", "uvm_test_ifc", uvm_test_ifc);
@@ -261,6 +264,7 @@ module VX_tb_top;
 
     `include "VX_sched_tb_if_connections.sv"
     `include "VX_gpr_tb_if_connections.sv"
+
 
     genvar idx;
     generate 

@@ -22,6 +22,9 @@
 `define VX_error(ID, message)   `uvm_error(ID, message)
 `define VX_fatal(ID, message)   `uvm_fatal(ID, message)
 
+`define VX_sva_info(message)    $info(message)
+`define VX_sva_error(message)   $error(message)
+
 `define REG_HEX(x) `REG_NUM_WIDTH'h``x
 `define REG_DEC(x) `REG_NUM_WIDTH'd``x
 `define IMM_HEX(x)     `IMM_WIDTH'h``x
