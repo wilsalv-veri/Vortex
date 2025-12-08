@@ -6,7 +6,7 @@ class VX_sched_monitor extends uvm_monitor;
 
     VX_sched_tb_txn_item                      sched_info;
     virtual VX_sched_tb_if                    sched_tb_if;
-
+  
     function new(string name="VX_sched_monitor", uvm_component parent=null);
         super.new(name, parent);
     endfunction
@@ -27,6 +27,7 @@ class VX_sched_monitor extends uvm_monitor;
 
     virtual task run_phase(uvm_phase phase);
         fork 
+            //Scoreboard
             get_warp_ctl_info();
             get_wspawn_info();
             get_join_info();
@@ -49,6 +50,7 @@ class VX_sched_monitor extends uvm_monitor;
                 sched_info.join_valid    = 1'b0;
                 sched_info.br_valid      = 1'b0;
                 sched_info.sched_info_valid = 1'b1;
+
                 //Send Info to scoreboard
                 sched_info_analysis_port.write(sched_info);
             end
@@ -64,8 +66,6 @@ class VX_sched_monitor extends uvm_monitor;
                 sched_info.wspawn_valid  = 1'b1;
                 sched_info.join_valid    = 1'b0;
                 sched_info.br_valid      = 1'b0;
-                
-
                 sched_info.sched_info_valid = 1'b1;
                 sched_info_analysis_port.write(sched_info);
             end

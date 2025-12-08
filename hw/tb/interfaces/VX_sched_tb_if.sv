@@ -22,6 +22,13 @@ interface VX_sched_tb_if import VX_tb_common_pkg::*;();
     risc_v_instr_address_t  [`NUM_ALU_BLOCKS-1:0]   br_target;
     risc_v_instr_address_t                          br_pc;
 
+    //Cov-Only
+    logic                                           sched_busy;
+    logic                                           tmc_valid;
+    logic                                           bar_valid;
+    logic                                           split_valid;
+    logic                                           ipdom_push;
+    logic                                           ipdom_pop;
 
     clocking wctl_cb @(posedge clk);
         input reset;

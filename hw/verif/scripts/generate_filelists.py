@@ -68,22 +68,16 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
             sort_by_match(file_entries, "doa_seq_lib")
             sort_by_match(file_entries, "rtg_seq.sv")
             sort_by_match(file_entries, "doa_seq.sv")
-           
-            #sort_by_match(file_entries, "seq_lib", inc_order=False)
-       
         elif cwd == 'tests':
             sort_by_match(dir_entries, "base_tests",inc_order=False)
-
         if cwd != 'packages':
             sort_by_match(file_entries, "_pkg")
             sort_by_match(file_entries, ".vh")
             sort_by_match(file_entries, ".svh")
-
          
         entries.extend(file_entries)
         entries.extend(dir_entries)
 
-     
         for entry in entries:
             
             abs_path = os.path.join(cwd_path, entry)

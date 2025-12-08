@@ -237,8 +237,39 @@ module VX_tb_top;
         .busy           (uvm_test_ifc.core_busy)
     );
 
-    
+    //SVA
     bind core.schedule VX_sched_assert sched_sva(.*);
+
+    //COV
+    bind core.schedule VX_sched_cov sched_cov(  .clk            (clk),
+                                                .reset          (reset),
+                                                .sched_busy     (busy),
+                                                .wid            (schedule_wid),
+
+                                                .warp_ctl_valid (warp_ctl_if.valid),
+                                                .tmc_valid      (warp_ctl_if.tmc.valid),
+                                                .wspawn_valid   (warp_ctl_if.wspawn.valid),
+                                                .bar_valid      (warp_ctl_if.barrier.valid),
+                                                .split_valid    (warp_ctl_if.split.valid),
+                                                
+                                                .join_valid     (join_valid),
+                                                .join_is_dvg    (join_is_dvg),
+                                                .join_is_else   (join_is_else),
+   
+                                                .ipdom_push     (split_join.g_enable.ipdom_push),  
+                                                .ipdom_pop      (split_join.g_enable.ipdom_pop),
+                                                .ipdom_wr_ptrs  (split_join.g_enable.ipdom_wr_ptr),
+
+                                                .thread_masks   (thread_masks),
+                                                .active_warps   (active_warps),
+                                                .stalled_warps  (stalled_warps),
+
+                                                .br_valid       (branch_valid),
+                                                .br_taken       (branch_taken),
+                                                .br_wid         (branch_wid)
+                                                );
+
+
 
     initial begin
         uvm_config_db #(virtual VX_tb_top_if                        )::set(null, "*", "tb_top_if", tb_top_if);

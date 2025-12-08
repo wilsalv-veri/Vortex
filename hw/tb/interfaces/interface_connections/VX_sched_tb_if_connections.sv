@@ -20,3 +20,11 @@ assign sched_tb_if.br_pc          = `VX_EXECUTE.alu_unit.per_block_result_if[0].
 assign sched_tb_if.br_taken       = `VX_SCHED.branch_taken;
 assign sched_tb_if.br_target      = `VX_SCHED.branch_dest;
 
+
+//Cov-Only
+assign sched_tb_if.sched_busy     = `VX_SCHED.busy;
+assign sched_tb_if.tmc_valid      = `VX_CORE.warp_ctl_if.tmc.valid;
+assign sched_tb_if.bar_valid      = `VX_CORE.warp_ctl_if.barrier.valid;
+assign sched_tb_if.split_valid    = `VX_CORE.warp_ctl_if.split.valid;
+assign sched_tb_if.ipdom_push     = `VX_SCHED.split_join.g_enable.ipdom_push;
+assign sched_tb_if.ipdom_pop      = `VX_SCHED.split_join.g_enable.ipdom_pop;
