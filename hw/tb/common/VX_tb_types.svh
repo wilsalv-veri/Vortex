@@ -152,6 +152,8 @@
     typedef bit [`SEQ_RAW_DATA_WIDTH - 1:0]    risc_v_seq_data_t;
     typedef enum { BEQ, BNE, BLTU, BGEU, BLT, BGE } br_instr_type_t; 
 
+    typedef enum {RAW, WAW, WAR} data_hazard_type_t;
+    
     //********************************************************** */
     //Top Level Use  
     typedef logic [`INSTR_ADDRESS_WIDTH -1:0]  risc_v_instr_address_t;

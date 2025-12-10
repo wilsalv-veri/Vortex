@@ -69,10 +69,6 @@ $VORTEX/hw/tb/memory_model/memory_bfm.sv
 //Include Files under $VORTEX/hw/tb/seqs
 +incdir+$VORTEX/hw/tb/seqs
 
-//Include Files under $VORTEX/hw/tb/seqs/base_seqs
-+incdir+$VORTEX/hw/tb/seqs/base_seqs
-
-
 //Include Files under $VORTEX/hw/tb/seqs/warp_ctl_seqs
 +incdir+$VORTEX/hw/tb/seqs/warp_ctl_seqs
 
@@ -98,6 +94,16 @@ $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_full_ipdom_stack_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_write_to_full_ipdom_stack_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_non_dvg_join_seq.sv
 
+//Include Files under $VORTEX/hw/tb/seqs/base_seqs
++incdir+$VORTEX/hw/tb/seqs/base_seqs
+
+
+//Include Files under $VORTEX/hw/tb/seqs/data_hazard_seqs
++incdir+$VORTEX/hw/tb/seqs/data_hazard_seqs
+
+$VORTEX/hw/tb/seqs/data_hazard_seqs/VX_data_hazard_base_seq.sv
+$VORTEX/hw/tb/seqs/data_hazard_seqs/VX_data_hazard_rtg_seq.sv
+
 
 //Include Files under $VORTEX/hw/tb/tests
 +incdir+$VORTEX/hw/tb/tests
@@ -108,6 +114,12 @@ $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_non_dvg_join_seq.sv
 $VORTEX/hw/tb/tests/base_tests/VX_risc_v_base_test.sv
 $VORTEX/hw/tb/tests/base_tests/VX_risc_v_base_instr_seq_test.sv
 $VORTEX/hw/tb/tests/base_tests/VX_risc_v_base_seq_lib_test.sv
+
+//Include Files under $VORTEX/hw/tb/tests/data_hazard_tests
++incdir+$VORTEX/hw/tb/tests/data_hazard_tests
+
+$VORTEX/hw/tb/tests/data_hazard_tests/VX_data_hazard_rtg_test.sv
+$VORTEX/hw/tb/tests/data_hazard_tests/VX_data_hazard_base_test.sv
 
 //Include Files under $VORTEX/hw/tb/tests/warp_ctl_tests
 +incdir+$VORTEX/hw/tb/tests/warp_ctl_tests
