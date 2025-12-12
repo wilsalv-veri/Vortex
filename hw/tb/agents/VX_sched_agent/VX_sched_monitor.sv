@@ -6,7 +6,8 @@ class VX_sched_monitor extends uvm_monitor;
 
     VX_sched_tb_txn_item                      sched_info;
     virtual VX_sched_tb_if                    sched_tb_if;
-  
+    virtual VX_warp_ctl_if                    warp_ctl_if;
+    
     function new(string name="VX_sched_monitor", uvm_component parent=null);
         super.new(name, parent);
     endfunction

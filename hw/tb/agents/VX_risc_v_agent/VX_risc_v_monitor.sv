@@ -9,6 +9,7 @@ class VX_risc_v_monitor extends uvm_monitor;
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
+        /* 
         if(! uvm_config_db #(virtual VX_fetch_if) ::get(this, "", "fetch_if", fetch_if))
             `VX_error("VX_RISC_V_MONITOR", "Failed to get access to fetch_if")
         
@@ -22,6 +23,7 @@ class VX_risc_v_monitor extends uvm_monitor;
             if(! uvm_config_db #(virtual VX_writeback_if) ::get(this, "", $sformatf("writeback_if[%0d]", idx), writeback_if[idx]))
                 `VX_error("VX_RISC_V_MONITOR", "Failed to get access to writeback_if")
         end
+        */
     endfunction
 
     virtual task run_phase(uvm_phase phase);

@@ -24,6 +24,8 @@ class VX_data_hazard_rtg_seq extends VX_data_hazard_base_seq;
         hazard_reg3 inside {[1:RV_REGS]};
         hazard_reg1 != hazard_reg3;
        
+        data_hazard_type dist {RAW:=20, WAW:=40, WAR:=40};
+
         if (data_hazard_type == RAW) {
             hazard_reg2 == hazard_reg1;
             hazard_reg4 == hazard_reg3;

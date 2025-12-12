@@ -290,20 +290,27 @@ module VX_tb_top;
         uvm_config_db #(virtual VX_commit_sched_if                  )::set(null, "*", "commit_sched_if", core.commit_sched_if);
         uvm_config_db #(virtual VX_commit_csr_if                    )::set(null, "*", "commit_csr_if", core.commit_csr_if);
         uvm_config_db #(virtual VX_warp_ctl_if                      )::set(null, "*", "warp_ctl_if", core.warp_ctl_if);
-       
     end
 
     `include "VX_sched_tb_if_connections.sv"
     `include "VX_gpr_tb_if_connections.sv"
 
-
-    genvar idx;
+    genvar idx, jdx;
     generate 
         //initial begin
             for( idx=0; idx < `ISSUE_WIDTH; idx++) begin
+                
+                for(jdx=0; jdx < PER_ISSUE_WARPS; jdx++)begin
+                    initial begin
+                        uvm_config_db #(virtual VX_ibuffer_if               )::set(null, "*", $sformatf("ibuffer_if[%0d][%0d]", idx,jdx), core.issue.g_slices[idx].issue_slice.ibuffer_if[jdx]);
+                    end
+                end
+                
                 initial begin
                     uvm_config_db #(virtual VX_issue_sched_if               )::set(null, "*", $sformatf("issue_sched_if[%0d]", idx), core.issue_sched_if[idx]);
-                    uvm_config_db #(virtual VX_writeback_if                 )::set(null, "*", $sformatf("writeback_if[%0d]", idx  ), core.writeback_if[idx]);
+                    uvm_config_db #(virtual VX_scoreboard_if                )::set(null, "*", $sformatf("scoreboard_if[%0d]",  idx), core.issue.g_slices[idx].issue_slice.scoreboard_if);
+                    uvm_config_db #(virtual VX_writeback_if                 )::set(null, "*", $sformatf("writeback_if[%0d]",   idx), core.writeback_if[idx]);
+                    
                 end
             end
 

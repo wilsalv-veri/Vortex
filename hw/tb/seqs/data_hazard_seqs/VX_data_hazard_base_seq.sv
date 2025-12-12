@@ -28,6 +28,9 @@ class VX_data_hazard_base_seq extends VX_risc_v_base_instr_seq;
     endfunction
 
     virtual function void add_instructions();
+        `VX_info(message_id, $sformatf("Hazard_Reg1: %0d Hazard_Reg2: %0d Hazard_Reg3: %0d Hazard_Reg4: %0d", 
+        hazard_reg1, hazard_reg2,hazard_reg3,hazard_reg4))
+        
         instr_queue.push_back(`ADDI(`RS1(hazard_reg1),`IMM_HEX(a),`RD(hazard_reg2)));
         instr_queue.push_back(`ADDI(`RS1(hazard_reg3),`IMM_HEX(b),`RD(hazard_reg4)));
         instr_queue.push_back(`ADD(`RS1(src1_reg),`RS2(src2_reg), `RD(dst_reg)));

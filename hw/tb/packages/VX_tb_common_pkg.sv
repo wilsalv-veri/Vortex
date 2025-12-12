@@ -20,11 +20,9 @@ package VX_tb_common_pkg;
     virtual VX_commit_sched_if  commit_sched_if;
     virtual VX_commit_csr_if    commit_csr_if;
     virtual VX_branch_ctl_if    branch_ctl_if[`NUM_ALU_BLOCKS];
-    virtual VX_warp_ctl_if      warp_ctl_if;
     virtual VX_dispatch_if      dispatch_if[NUM_EX_UNITS * `ISSUE_WIDTH];
     virtual VX_commit_if        commit_if[NUM_EX_UNITS * `ISSUE_WIDTH];
-    virtual VX_writeback_if     writeback_if[`ISSUE_WIDTH];
-   
+    
     localparam INST_PER_CACHE_LINE = L2_MEM_DATA_WIDTH / PC_BITS; 
 
     `include "VX_tb_types.svh"

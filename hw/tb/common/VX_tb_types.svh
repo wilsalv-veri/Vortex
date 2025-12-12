@@ -67,12 +67,24 @@
     typedef bit [`INSTR_ADDRESS_WIDTH -1:0]  risc_v_seq_instr_address_t;
     
     typedef bit [`OPCODE_WIDTH - 1:0 ]       risc_v_seq_opcode_t;
-    typedef bit [`REG_NUM_WIDTH - 1:0]       risc_v_seq_reg_num_t;
+    typedef bit [`REG_NUM_WIDTH -1:0 ]       risc_v_seq_reg_num_t;
     typedef bit [`FUNCT2_WIDTH - 1:0 ]       risc_v_seq_funct2_t;
     typedef bit [`FUNCT3_WIDTH - 1:0 ]       risc_v_seq_funct3_t;
     typedef bit [`FUNCT7_WIDTH - 1:0 ]       risc_v_seq_funct7_t;
     typedef bit [`IMM_WIDTH - 1:0    ]       risc_v_seq_imm_t;
     typedef bit [`FM_WIDTH - 1:0     ]       risc_v_seq_fm_t;
+
+    typedef struct packed {
+        bit [REG_TYPE_BITS-1:0] reg_type;
+        risc_v_seq_reg_num_t    reg_num;
+    } VX_pipeline_reg_num_t;
+
+    typedef struct packed {
+        bit use_rs3;
+        bit use_rs2;
+        bit use_rs1;
+    } VX_pipeline_used_rs_t;
+
 
     typedef bit [`I_TYPE_IMM_WIDTH - 1:0]    risc_v_seq_i_type_imm_t;
     typedef bit [`S_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_s_type_imm1_t;
@@ -112,6 +124,9 @@
     typedef VX_seq_gpr_t [`NUM_THREADS - 1:0]                 VX_gpr_seq_data_entry_t;
     typedef VX_gpr_seq_data_entry_t [0: `GPR_BANK_SIZE - 1]   VX_gpr_seq_bank_t;
     typedef VX_gpr_seq_bank_t [`NUM_GPR_BANKS - 1:0]          VX_gpr_seq_block_t;
+
+    typedef bit [NUM_REGS-1:0]                                VX_seq_gpr_reg_mask;
+    typedef bit  [`ISSUE_WIDTH-1:0]                           VX_pipeline_issue_slice_num_t;
 
     typedef bit [`NUM_THREADS - 1 :0]          VX_tmask_t;
     typedef  VX_tmask_t [`NUM_WARPS - 1: 0]    VX_core_tmasks_t;//Default initial TMASK is 1
