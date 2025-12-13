@@ -82,14 +82,7 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     endfunction
 
     virtual function void write_gpr_info(VX_gpr_tb_txn_item gpr_info);
-         
-        for(int tid=0; tid < `NUM_THREADS; tid++)begin
-            for(int gpr_byte=0; gpr_byte < `SIMD_WIDTH; gpr_byte++)begin
-                if(gpr_info.byteen[tid][gpr_byte])
-                    gpr_block[gpr_info.bank_num][gpr_info.bank_set][tid][gpr_byte] = gpr_info.gpr_data_entry[tid][gpr_byte];
-            end
-        end
-
+        write_gpr_entry(gpr_info, gpr_block);
         `VX_info(message_id, $sformatf("GPR Info Received BYTEEN: 0x%0h BANK_NUM: %0d SET: %0d DATA_ENTRY: 0x%0x", gpr_info.byteen,  gpr_info.bank_num, gpr_info.bank_set, gpr_info.gpr_data_entry))
     endfunction
 

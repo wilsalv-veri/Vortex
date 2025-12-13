@@ -1,8 +1,8 @@
-class VX_scoreboard_scbd extends uvm_scoreboard;
+class VX_data_hazard_scbd extends uvm_scoreboard;
 
-    `uvm_component_utils(VX_scoreboard_scbd);
+    `uvm_component_utils(VX_data_hazard_scbd);
 
-    string message_id = "VX_SCOREBOARD_SCBD";
+    string message_id = "VX_data_hazard_SCBD";
 
     VX_scoreboard_tb_txn_item scoreboard_info;
     VX_writeback_tb_txn_item  writeback_info;
@@ -11,7 +11,7 @@ class VX_scoreboard_scbd extends uvm_scoreboard;
     uvm_tlm_analysis_fifo #(VX_scoreboard_tb_txn_item) scoreboard_info_fifo;
     uvm_tlm_analysis_fifo #(VX_writeback_tb_txn_item)  writeback_info_fifo;
 
-    function new(string name="VX_scoreboard_scbd", uvm_component parent=null);
+    function new(string name="VX_data_hazard_scbd", uvm_component parent=null);
         super.new(name, parent);
     endfunction
 

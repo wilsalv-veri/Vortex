@@ -19,7 +19,7 @@ class VX_data_hazard_base_seq extends VX_risc_v_base_instr_seq;
         
         hazard_reg1 = 2;
         hazard_reg2 = hazard_reg1;
-        hazard_reg3 = 1;
+        hazard_reg3 = hazard_reg1 + `NUM_GPR_BANKS; //Create bank conflict
         hazard_reg4 = hazard_reg3;
 
         src1_reg    = hazard_reg4;

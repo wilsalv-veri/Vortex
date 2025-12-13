@@ -297,35 +297,35 @@ module VX_tb_top;
 
     genvar idx, jdx;
     generate 
-        //initial begin
-            for( idx=0; idx < `ISSUE_WIDTH; idx++) begin
-                
-                for(jdx=0; jdx < PER_ISSUE_WARPS; jdx++)begin
-                    initial begin
-                        uvm_config_db #(virtual VX_ibuffer_if               )::set(null, "*", $sformatf("ibuffer_if[%0d][%0d]", idx,jdx), core.issue.g_slices[idx].issue_slice.ibuffer_if[jdx]);
-                    end
-                end
-                
+        
+        for( idx=0; idx < `ISSUE_WIDTH; idx++) begin
+            
+            for(jdx=0; jdx < PER_ISSUE_WARPS; jdx++)begin
                 initial begin
-                    uvm_config_db #(virtual VX_issue_sched_if               )::set(null, "*", $sformatf("issue_sched_if[%0d]", idx), core.issue_sched_if[idx]);
-                    uvm_config_db #(virtual VX_scoreboard_if                )::set(null, "*", $sformatf("scoreboard_if[%0d]",  idx), core.issue.g_slices[idx].issue_slice.scoreboard_if);
-                    uvm_config_db #(virtual VX_writeback_if                 )::set(null, "*", $sformatf("writeback_if[%0d]",   idx), core.writeback_if[idx]);
-                    
+                    uvm_config_db #(virtual VX_ibuffer_if               )::set(null, "*", $sformatf("ibuffer_if[%0d][%0d]", idx,jdx), core.issue.g_slices[idx].issue_slice.ibuffer_if[jdx]);
                 end
             end
+            
+            initial begin
+                uvm_config_db #(virtual VX_issue_sched_if               )::set(null, "*", $sformatf("issue_sched_if[%0d]", idx), core.issue_sched_if[idx]);
+                uvm_config_db #(virtual VX_scoreboard_if                )::set(null, "*", $sformatf("scoreboard_if[%0d]",  idx), core.issue.g_slices[idx].issue_slice.scoreboard_if);
+                uvm_config_db #(virtual VX_writeback_if                 )::set(null, "*", $sformatf("writeback_if[%0d]",   idx), core.writeback_if[idx]);
+                uvm_config_db #(virtual VX_operands_if                  )::set(null, "*", $sformatf("operands_if[%0d]", idx),    core.issue.g_slices[idx].issue_slice.operands_if);
+            end
+        end
 
-            for(idx=0; idx < `NUM_ALU_BLOCKS; idx++)begin
-                initial begin
-                    uvm_config_db #(virtual VX_branch_ctl_if                )::set(null, "*", "branch_ctl_if", core.branch_ctl_if[idx]);
-                end
+        for(idx=0; idx < `NUM_ALU_BLOCKS; idx++)begin
+            initial begin
+                uvm_config_db #(virtual VX_branch_ctl_if                )::set(null, "*", "branch_ctl_if", core.branch_ctl_if[idx]);
             end
-            for(idx=0; idx < NUM_EX_UNITS * `ISSUE_WIDTH; idx++)begin
-                initial begin
-                    uvm_config_db #(virtual VX_dispatch_if                  )::set(null, "*", $sformatf("dispatch_if[%0d]",idx) , core.dispatch_if[idx]);
-                    uvm_config_db #(virtual VX_commit_if                    )::set(null, "*", $sformatf("commit_if[%0d]",idx), core.commit_if[idx]);
-                end
+        end
+        for(idx=0; idx < NUM_EX_UNITS * `ISSUE_WIDTH; idx++)begin
+            initial begin
+                uvm_config_db #(virtual VX_dispatch_if                  )::set(null, "*", $sformatf("dispatch_if[%0d]",idx) , core.dispatch_if[idx]);
+                uvm_config_db #(virtual VX_commit_if                    )::set(null, "*", $sformatf("commit_if[%0d]",idx), core.commit_if[idx]);
             end
-        //end
+        end
+        
     endgenerate
 
     //Run Test 

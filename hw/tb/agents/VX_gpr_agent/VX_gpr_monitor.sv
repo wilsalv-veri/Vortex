@@ -37,15 +37,15 @@ class VX_gpr_monitor extends uvm_monitor;
     virtual task  get_gpr_info(int bank_num);
         `VX_info("VX_GPR_MONITOR", $sformatf("Starting GET_GPR_INFO For BANK:%0d", bank_num))
            
-        forever @ (gpr_tb_if.bank_set[bank_num]) begin
+        forever @ (gpr_tb_if.wr_bank_set[bank_num]) begin
             
             if (gpr_tb_if.write_en[bank_num]) begin
                 gpr_info[bank_num].bank_num           =  VX_seq_gpr_bank_num_t'(bank_num);
-                gpr_info[bank_num].bank_set           =  gpr_tb_if.bank_set[bank_num];
-                gpr_info[bank_num].byteen             =  gpr_tb_if.byteen[bank_num];
-                gpr_info[bank_num].gpr_data_entry     =  gpr_tb_if.gpr_data_entry[bank_num];
+                gpr_info[bank_num].bank_set           =  gpr_tb_if.wr_bank_set[bank_num];
+                gpr_info[bank_num].byteen             =  gpr_tb_if.wr_byteen[bank_num];
+                gpr_info[bank_num].gpr_data_entry     =  gpr_tb_if.wr_gpr_data_entry[bank_num];
                 gpr_info_analysis_port[bank_num].write(gpr_info[bank_num]);
-                `VX_info("VX_GPR_MONITOR", $sformatf("Sending GPR_INFO BANK:%0d SET:%0d", bank_num, gpr_tb_if.bank_set[bank_num]))
+                `VX_info("VX_GPR_MONITOR", $sformatf("Sending GPR_INFO BANK:%0d SET:%0d", bank_num, gpr_tb_if.wr_bank_set[bank_num]))
             end
         end
     endtask

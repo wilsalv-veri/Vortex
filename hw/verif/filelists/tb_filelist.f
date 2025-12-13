@@ -8,7 +8,7 @@ $VORTEX/hw/tb/VX_tb_top_pkg.sv
 $VORTEX/hw/tb/packages/VX_tb_common_pkg.sv
 $VORTEX/hw/tb/packages/VX_gpr_pkg.sv
 $VORTEX/hw/tb/packages/VX_sched_pkg.sv
-$VORTEX/hw/tb/packages/VX_scoreboard_pkg.sv
+$VORTEX/hw/tb/packages/VX_issue_pkg.sv
 
 //Include Files under $VORTEX/hw/tb/common
 +incdir+$VORTEX/hw/tb/common
@@ -54,8 +54,8 @@ $VORTEX/hw/tb/memory_model/memory_bfm.sv
 +incdir+$VORTEX/hw/tb/agents/VX_sched_agent
 
 
-//Include Files under $VORTEX/hw/tb/agents/VX_scoreboard_agent
-+incdir+$VORTEX/hw/tb/agents/VX_scoreboard_agent
+//Include Files under $VORTEX/hw/tb/agents/VX_issue_agent
++incdir+$VORTEX/hw/tb/agents/VX_issue_agent
 
 
 //Include Files under $VORTEX/hw/tb/agents/VX_execute_agent
