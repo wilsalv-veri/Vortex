@@ -271,6 +271,31 @@ module VX_tb_top;
 
 
 
+
+    
+    //GPR Cov
+    //genvar gpr_bank_num;
+
+    for (genvar issue_id = 0; issue_id < `ISSUE_WIDTH; ++issue_id) begin : g_slices
+        
+        bind core.issue.g_slices[issue_id].issue_slice.scoreboard VX_scoreboard_cov scoreboard_cov (.*);
+        bind core.issue.g_slices[issue_id].issue_slice.operands   VX_opc_cov        opc_cov (.*);
+
+        for (genvar opc_num = 0; opc_num < `NUM_OPCS; opc_num++)begin
+            for(genvar gpr_bank_num = 0; gpr_bank_num < `NUM_BANKS; gpr_bank_num++)begin
+            
+                bind core.issue.g_slices[issue_id].issue_slice.operands.g_collectors[opc_num].opc_unit.g_gpr_rams[gpr_bank_num]   VX_gpr_cov    gpr_cov (  .clk           (clk),
+                                                                                                                                                           .gpr_read      (pipe_fire_st1),
+                                                                                                                                                           .gpr_write     (gpr_wr_enabled), 
+                                                                                                                                                           .gpr_wr_set    (gpr_wr_addr) ,
+                                                                                                                                                           .gpr_rd_set    (gpr_rd_addr), 
+                                                                                                                                                           .gpr_wr_byteen (gpr_wr_byteen)
+                                                                                                                                                        );
+            end
+        end
+    end
+    
+   
     initial begin
         uvm_config_db #(virtual VX_tb_top_if                        )::set(null, "*", "tb_top_if", tb_top_if);
         uvm_config_db #(virtual VX_uvm_test_if                      )::set(null, "*", "uvm_test_ifc", uvm_test_ifc);

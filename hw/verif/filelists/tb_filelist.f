@@ -151,6 +151,7 @@ $VORTEX/hw/tb/tests/warp_ctl_tests/VX_bar_doa_test.sv
 //Include Files under $VORTEX/hw/tb/coverage
 +incdir+$VORTEX/hw/tb/coverage
 
+$VORTEX/hw/tb/coverage/VX_issue_cov.sv
 $VORTEX/hw/tb/coverage/VX_sched_cov.sv
 
 //Include Files under $VORTEX/hw/tb/assertions

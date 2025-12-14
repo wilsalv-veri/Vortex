@@ -76,7 +76,6 @@ class VX_issue_monitor extends uvm_monitor;
             scoreboard_info.rs3        = scoreboard_if[issue_slice].data.rs3;
             scoreboard_info_analysis_port[issue_slice].write(scoreboard_info);
         end 
-   
     endtask
 
     virtual task get_writeback_info(int issue_slice);
@@ -100,7 +99,6 @@ class VX_issue_monitor extends uvm_monitor;
             operands_info.rs3_data = operands_if[issue_slice].data.rs3_data;
             operands_info_analysis_port[issue_slice].write(operands_info);
         end
-   
     endtask
 
 endclass

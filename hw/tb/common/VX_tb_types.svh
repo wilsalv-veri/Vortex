@@ -37,7 +37,7 @@
     `define GPR_DATA_ENTRY_WIDTH (`XLEN * `SIMD_WIDTH)
     `define GPR_PER_OPC_WARPS    PER_ISSUE_WARPS / `NUM_OPCS         
     `define GPR_BANK_SIZE       (NUM_REGS * SIMD_COUNT * `GPR_PER_OPC_WARPS) / `NUM_GPR_BANKS
-                        
+    `define GPR_ADDR_WIDTH      `CLOG2(GPR_BANK_SIZE)                  
     `define SFU_LANE_BITS `CLOG2(`NUM_SFU_LANES)
     
 
