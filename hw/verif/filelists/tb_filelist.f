@@ -158,5 +158,6 @@ $VORTEX/hw/tb/coverage/VX_sched_cov.sv
 +incdir+$VORTEX/hw/tb/assertions
 
 $VORTEX/hw/tb/assertions/VX_sched_assert.sv
+$VORTEX/hw/tb/assertions/VX_issue_assert.sv
 $VORTEX/hw/tb/tb_top.sv
 
