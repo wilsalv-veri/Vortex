@@ -12,6 +12,7 @@ $UVM_HOME/src/uvm_pkg.sv
 +define+LMEM_ENABLED
 +define+SV_DPI
 +define+SIMULATION
++define+EXT_M_ENABLE
 +define+
 
 //Reference other filelists

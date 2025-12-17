@@ -25,6 +25,8 @@
 `define VX_sva_info(message)    $info(message)
 `define VX_sva_error(message)   $error(message)
 
+`define VX_PE_COUNT   1 + `EXT_M_ENABLED
+
 `define REG_HEX(x) `REG_NUM_WIDTH'h``x
 `define REG_DEC(x) `REG_NUM_WIDTH'd``x
 `define IMM_HEX(x)     `IMM_WIDTH'h``x

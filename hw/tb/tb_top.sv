@@ -263,7 +263,8 @@ module VX_tb_top;
                                                 .thread_masks   (thread_masks),
                                                 .active_warps   (active_warps),
                                                 .stalled_warps  (stalled_warps),
-
+                                                .is_single_warp (is_single_warp),
+                                                
                                                 .br_valid       (branch_valid),
                                                 .br_taken       (branch_taken),
                                                 .br_wid         (branch_wid)
@@ -344,8 +345,17 @@ module VX_tb_top;
             end
         end
 
+        
         for(idx=0; idx < `NUM_ALU_BLOCKS; idx++)begin
+            
+            for(jdx=0; jdx < `VX_PE_COUNT; jdx++)begin
+                initial begin
+                    uvm_config_db #(virtual VX_result_if                )::set(null, "*", $sformatf("alu_result_if[%0d]", jdx), core.execute.alu_unit.g_blocks[idx].pe_result_if[jdx]);
+                end
+            end
+
             initial begin
+                
                 uvm_config_db #(virtual VX_branch_ctl_if                )::set(null, "*", "branch_ctl_if", core.branch_ctl_if[idx]);
             end
         end

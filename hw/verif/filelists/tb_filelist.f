@@ -8,6 +8,7 @@ $VORTEX/hw/tb/VX_tb_top_pkg.sv
 $VORTEX/hw/tb/packages/VX_tb_common_pkg.sv
 $VORTEX/hw/tb/packages/VX_gpr_pkg.sv
 $VORTEX/hw/tb/packages/VX_sched_pkg.sv
+$VORTEX/hw/tb/packages/VX_execute_pkg.sv
 $VORTEX/hw/tb/packages/VX_issue_pkg.sv
 
 //Include Files under $VORTEX/hw/tb/common
@@ -94,10 +95,18 @@ $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_doa_seq_lib.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_seq_lib.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_bar_seq_lib.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_wspawn_twice_seq_lib.sv
+$VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_tmc_no_end_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_read_from_empty_ipdom_stack_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_full_ipdom_stack_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_write_to_full_ipdom_stack_seq.sv
 $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_non_dvg_join_seq.sv
+
+//Include Files under $VORTEX/hw/tb/seqs/execute_seqs
++incdir+$VORTEX/hw/tb/seqs/execute_seqs
+
+$VORTEX/hw/tb/seqs/execute_seqs/VX_arithmetic_doa_seq.sv
+$VORTEX/hw/tb/seqs/execute_seqs/VX_arithmetic_rtg_seq.sv
+$VORTEX/hw/tb/seqs/execute_seqs/VX_arithmetic_seq_lib.sv
 
 //Include Files under $VORTEX/hw/tb/seqs/base_seqs
 +incdir+$VORTEX/hw/tb/seqs/base_seqs
@@ -125,6 +134,13 @@ $VORTEX/hw/tb/tests/base_tests/VX_risc_v_base_seq_lib_test.sv
 
 $VORTEX/hw/tb/tests/data_hazard_tests/VX_data_hazard_rtg_test.sv
 $VORTEX/hw/tb/tests/data_hazard_tests/VX_data_hazard_base_test.sv
+
+//Include Files under $VORTEX/hw/tb/tests/execute_tests
++incdir+$VORTEX/hw/tb/tests/execute_tests
+
+$VORTEX/hw/tb/tests/execute_tests/VX_arithmetic_rtg_test.sv
+$VORTEX/hw/tb/tests/execute_tests/VX_arithmetic_simd_test.sv
+$VORTEX/hw/tb/tests/execute_tests/VX_arithmetic_doa_test.sv
 
 //Include Files under $VORTEX/hw/tb/tests/warp_ctl_tests
 +incdir+$VORTEX/hw/tb/tests/warp_ctl_tests

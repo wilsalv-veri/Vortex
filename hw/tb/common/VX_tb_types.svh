@@ -39,7 +39,6 @@
     `define GPR_BANK_SIZE       (NUM_REGS * SIMD_COUNT * `GPR_PER_OPC_WARPS) / `NUM_GPR_BANKS
     `define GPR_ADDR_WIDTH      `CLOG2(GPR_BANK_SIZE)                  
     `define SFU_LANE_BITS `CLOG2(`NUM_SFU_LANES)
-    
 
     `define IMM_11 11
     `define IMM_12 12
@@ -167,8 +166,14 @@
     typedef bit [`SEQ_RAW_DATA_WIDTH - 1:0]    risc_v_seq_data_t;
     typedef enum { BEQ, BNE, BLTU, BGEU, BLT, BGE } br_instr_type_t; 
 
-    typedef enum {RAW, WAW, WAR} data_hazard_type_t;
+    typedef enum {RAW, WAW, WAR}      data_hazard_type_t;
     
+    typedef enum {ADD,  SUB,  SLL,  SLT,   SLTU,    XOR,    SRL,  SRA,
+                  OR,   AND,  MUL,  MULH,  MULHSU,  MULHU,  DIV,  DIVU,
+                  REM,  REMU} arith_instr_type_t;
+
+
+
     //********************************************************** */
     //Top Level Use  
     typedef logic [`INSTR_ADDRESS_WIDTH -1:0]  risc_v_instr_address_t;
