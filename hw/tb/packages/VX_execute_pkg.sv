@@ -41,6 +41,25 @@ package VX_execute_pkg;
         return funct3;
     endfunction
 
+    function risc_v_seq_funct3_t get_arith_imm_funct3(string arith_imm_instr_name);
+        risc_v_seq_funct3_t funct3;
+
+        case(arith_imm_instr_name)
+            "ADDI":    funct3 =  `FUNCT3_WIDTH'b000;
+            "SLTI":    funct3 =  `FUNCT3_WIDTH'b010;
+            "SLTIU":   funct3 =  `FUNCT3_WIDTH'b011;
+            "XORI":    funct3 =  `FUNCT3_WIDTH'b100;
+            "ORI":     funct3 =  `FUNCT3_WIDTH'b110;          
+            "ANDI":    funct3 =  `FUNCT3_WIDTH'b111;
+            "SLLI":    funct3 =  `FUNCT3_WIDTH'b001;
+            "SRLI":    funct3 =  `FUNCT3_WIDTH'b101;
+            "SRAI":    funct3 =  `FUNCT3_WIDTH'b101;
+        endcase
+
+        return funct3;
+    endfunction
+        
+
     function risc_v_seq_funct7_t get_arith_funct7(string arith_instr_name);
         risc_v_seq_funct7_t funct7;
 

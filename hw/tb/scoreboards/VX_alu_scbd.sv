@@ -24,7 +24,10 @@ class VX_alu_scbd extends uvm_scoreboard;
     VX_wid_t                   wid;
     VX_seq_gpr_bank_num_t      rs1_bank_num, rs2_bank_num, rd_bank_num;
     VX_seq_gpr_bank_set_t      rs1_set_num, rs2_set_num, rd_set_num;
+    risc_v_seq_imm_t           imm;
    
+
+
     function new(string name="VX_alu_scbd", uvm_component parent=null);
         super.new(name,parent);
     endfunction
@@ -68,12 +71,13 @@ class VX_alu_scbd extends uvm_scoreboard;
        
         if (instr_array.exists(pc)) begin
             
-            case (instr_array[pc].instr_type)
-                R_TYPE: begin
-                    VX_risc_v_Rtype_seq_item r_item = VX_risc_v_Rtype_seq_item::create_instruction_with_data("R_TYPE_INST",instr_array[pc].raw_data);
-                    set_r_item_gpr_lookup_fields(r_item);
-                     
-                    for(int tid=0; tid < `NUM_THREADS;  tid++)begin
+            for(int tid=0; tid < `NUM_THREADS;  tid++)begin
+                  
+                case (instr_array[pc].instr_type)
+                    R_TYPE: begin
+                        VX_risc_v_Rtype_seq_item r_item = VX_risc_v_Rtype_seq_item::create_instruction_with_data("R_TYPE_INST",instr_array[pc].raw_data);
+                        set_r_item_gpr_lookup_fields(r_item);
+                        
                         operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
                         operand2_data[tid]   = gpr_block[rs2_bank_num][rs2_set_num][tid];
                             
@@ -96,13 +100,35 @@ class VX_alu_scbd extends uvm_scoreboard;
                             "DIVU":   expected_result[tid] = operand2_data[tid] != 0 ? operand1_data[tid]  / operand2_data[tid] : -1;
                             "REM":    expected_result[tid] = $signed(operand2_data[tid]) != 0 ? $signed(operand1_data[tid]) % $signed(operand2_data[tid]) : operand1_data[tid];
                             "REMU":   expected_result[tid] = operand2_data[tid] != 0 ? operand1_data[tid] % operand2_data[tid] : operand1_data[tid];
+                        endcase     
+                    end
+                    
+                    I_TYPE: begin
+                        VX_risc_v_Itype_seq_item i_item = VX_risc_v_Itype_seq_item::create_instruction_with_data("I_TYPE_INST",instr_array[pc].raw_data);
+                        set_i_item_gpr_lookup_fields(i_item);
+                        imm = i_item.imm;
+
+                        operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
+                                
+                        case(instr_array[pc].instr_name)
+                            "ADDI":    expected_result[tid] = operand1_data[tid] + imm;
+                            "SLTI":    expected_result[tid] = operand1_data[tid] < $signed(imm);
+                            "SLTIU":   expected_result[tid] = operand1_data[tid] < imm;
+                            "XORI":    expected_result[tid] = operand1_data[tid] ^ imm;
+                            "ORI":     expected_result[tid] = operand1_data[tid] | imm;   
+                            "ANDI":    expected_result[tid] = operand1_data[tid] & imm;
+                            "SLLI":    expected_result[tid] = operand1_data[tid] << imm;
+                            "SRLI":    expected_result[tid] = operand1_data[tid] >> imm;
+                            "SRAI":    expected_result[tid] = operand1_data[tid] >>> imm;
                         endcase
 
-                        if (expected_result[tid] !== alu_info.data[tid])
-                            `VX_error(message_id, $sformatf("ALU RESULT MISMATCH INSTR: %0s Exp_Res: 0x%0h Act_Res: 0x%0h TID: %0d", instr_array[pc].instr_name, expected_result[tid], alu_info.data[tid], tid))
                     end
-                end
-            endcase
+                endcase
+
+                if (expected_result[tid] !== alu_info.data[tid])
+                    `VX_error(message_id, $sformatf("ALU RESULT MISMATCH PC: 0x%0h INSTR: %0s Exp_Res: 0x%0h Act_Res: 0x%0h TID: %0d", pc, instr_array[pc].instr_name, expected_result[tid], alu_info.data[tid], tid))
+            
+            end
         end
         
     endfunction
@@ -123,5 +149,22 @@ class VX_alu_scbd extends uvm_scoreboard;
       rs2_set_num  = `REG_NUM_TO_SET(wid,r_item.rs2);
       rd_set_num   = `REG_NUM_TO_SET(wid,r_item.rd);
     endfunction
+
+
+    virtual function void  set_i_item_gpr_lookup_fields( VX_risc_v_Itype_seq_item i_item);
+        set_i_item_gpr_lookup_bank_nums(i_item);
+        set_i_item_gpr_lookup_set_nums(i_item);
+    endfunction   
+   
+    virtual function void set_i_item_gpr_lookup_bank_nums(VX_risc_v_Itype_seq_item i_item);
+        rs1_bank_num = `REG_NUM_TO_BANK(i_item.rs1);
+        rd_bank_num  = `REG_NUM_TO_BANK(i_item.rd);
+    endfunction
+
+    virtual function void set_i_item_gpr_lookup_set_nums(VX_risc_v_Itype_seq_item i_item);
+      rs1_set_num  = `REG_NUM_TO_SET(wid,i_item.rs1);
+      rd_set_num   = `REG_NUM_TO_SET(wid,i_item.rd);
+    endfunction
+
 
 endclass

@@ -17,7 +17,7 @@ class VX_risc_v_Itype_seq_item extends VX_risc_v_instr_seq_item;
         super.new(name);
     endfunction
 
-    function void set_instruction_fields(string name, risc_v_seq_imm_t imm, risc_v_seq_reg_num_t rd, 
+    function void set_instruction_with_fields(string name, risc_v_seq_imm_t imm, risc_v_seq_reg_num_t rd, 
                                       risc_v_seq_reg_num_t rs1,  risc_v_seq_funct3_t funct3,
                                       risc_v_seq_opcode_t opcode
                                       );
@@ -33,12 +33,29 @@ class VX_risc_v_Itype_seq_item extends VX_risc_v_instr_seq_item;
         
         this.rd          = rd;
         this.opcode      = opcode;
-        this.raw_data    = {this.imm,this.rs1,this.funct3,this.rd,this.opcode};
+        set_raw_data_from_current_fields();
     endfunction
+
+    function void set_instruction_with_data(string name, risc_v_seq_data_t raw_data);   
+        this.instr_name  = name;
+        this.instr_type  = I_TYPE;
+        this.raw_data    = raw_data;
+        {>>{this.imm,this.rs1,this.funct3,this.rd,this.opcode}} = raw_data;
+    endfunction
+
 
     function void set_imm_field(risc_v_seq_imm_t imm);
         this.imm = imm[11:0];
-        this.raw_data    = {this.imm,this.rs1,this.funct3,this.rd,this.opcode};
+        set_raw_data_from_current_fields();
+    endfunction
+
+    function void set_funct3(risc_v_seq_funct3_t funct3);
+        this.funct3 = funct3;
+        set_raw_data_from_current_fields();
+    endfunction
+
+    function void set_raw_data_from_current_fields();
+        this.raw_data  = {this.imm,this.rs1,this.funct3,this.rd,this.opcode};
     endfunction
 
     static function VX_risc_v_Itype_seq_item create_instruction_with_fields(string name, risc_v_seq_imm_t imm, risc_v_seq_reg_num_t rd, 
@@ -47,8 +64,16 @@ class VX_risc_v_Itype_seq_item extends VX_risc_v_instr_seq_item;
                                       );
         
         VX_risc_v_Itype_seq_item item = VX_risc_v_Itype_seq_item::type_id::create("VX_risc_v_Itype_seq_item");
-        item.set_instruction_fields(name, imm,rd,rs1,funct3,opcode);
+        item.set_instruction_with_fields(name, imm,rd,rs1,funct3,opcode);
         return item;
     endfunction
+
+    static function VX_risc_v_Itype_seq_item create_instruction_with_data(string name, risc_v_seq_data_t raw_data);
+        
+        VX_risc_v_Itype_seq_item item = VX_risc_v_Itype_seq_item::type_id::create("VX_risc_v_Itype_seq_item");
+        item.set_instruction_with_data(name, raw_data);
+        return item;
+    endfunction
+
     
 endclass

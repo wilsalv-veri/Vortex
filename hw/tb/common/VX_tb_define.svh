@@ -77,7 +77,7 @@
 `define SRLI(rs1,shamt,rd) VX_risc_v_Itype_seq_item::create_instruction_with_fields("SRLI", {7'b0000000,shamt}, rd, rs1, `FUNCT3_WIDTH'b101, INST_I)
 `define SRAI(rs1,shamt,rd) VX_risc_v_Itype_seq_item::create_instruction_with_fields("SRAI", {7'b0100000,shamt}, rd, rs1, `FUNCT3_WIDTH'b101, INST_I)
 
-//R_TYPE (Register) Instructios 
+//R_TYPE (Register) Instructions
 `define ADD(rs1,rs2,rd)     VX_risc_v_Rtype_seq_item::create_instruction_with_fields("ADD",    `FUNCT7_WIDTH'b0000000, rd, rs2, rs1, `FUNCT3_WIDTH'b000, INST_R)
 `define SUB(rs1,rs2,rd)     VX_risc_v_Rtype_seq_item::create_instruction_with_fields("SUB",    `FUNCT7_WIDTH'b0100000, rd, rs2, rs1, `FUNCT3_WIDTH'b000, INST_R)
 `define SLL(rs1,rs2,rd)     VX_risc_v_Rtype_seq_item::create_instruction_with_fields("SLL",    `FUNCT7_WIDTH'b0000000, rd, rs2, rs1, `FUNCT3_WIDTH'b001, INST_R)

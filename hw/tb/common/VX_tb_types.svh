@@ -16,6 +16,7 @@
     `define FUNCT7_WIDTH      7
 
     `define I_TYPE_IMM_WIDTH  12
+    `define I_TYPE_SHIFT_IMM_WIDTH 5
     
     `define S_TYPE_IMM1_WIDTH `I_TYPE_IMM_WIDTH
     `define S_TYPE_IMM0_WIDTH 5
@@ -173,6 +174,8 @@
                   REM,  REMU} arith_instr_type_t;
 
 
+    typedef enum {ADDI,  SLTI,  SLTIU,  XORI,  ORI,  ANDI,
+                  SLLI,  SRLI,  SRAI} arith_instr_imm_type_t;
 
     //********************************************************** */
     //Top Level Use  
