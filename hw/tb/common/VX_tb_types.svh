@@ -177,6 +177,7 @@
     typedef enum {ADDI,  SLTI,  SLTIU,  XORI,  ORI,  ANDI,
                   SLLI,  SRLI,  SRAI} arith_instr_imm_type_t;
 
+    typedef enum {VOTE_ALL, VOTE_ANY, VOTE_UNI, VOTE_BAL} vote_instr_type_t;
     //********************************************************** */
     //Top Level Use  
     typedef logic [`INSTR_ADDRESS_WIDTH -1:0]  risc_v_instr_address_t;

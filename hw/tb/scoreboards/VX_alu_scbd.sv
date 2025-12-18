@@ -17,21 +17,24 @@ class VX_alu_scbd extends uvm_scoreboard;
     VX_gpr_seq_data_entry_t                     operand2_data;;
     VX_gpr_seq_data_entry_t                     expected_result;
    
+   
     VX_risc_v_instr_seq_item                    instr_array[integer]; 
     VX_alu_tb_txn_item                          alu_info;
      
-    risc_v_seq_instr_address_t pc;
-    VX_wid_t                   wid;
-    VX_seq_gpr_bank_num_t      rs1_bank_num, rs2_bank_num, rd_bank_num;
-    VX_seq_gpr_bank_set_t      rs1_set_num, rs2_set_num, rd_set_num;
-    risc_v_seq_imm_t           imm;
-   
+    risc_v_seq_instr_address_t                  pc;
+    VX_wid_t                                    wid;
+    VX_seq_gpr_bank_num_t                       rs1_bank_num, rs2_bank_num, rd_bank_num;
+    VX_seq_gpr_bank_set_t                       rs1_set_num, rs2_set_num, rd_set_num;
+    risc_v_seq_imm_t                            imm;
 
+    VX_tid_t                                    vote_count;
+    VX_tmask_t                                  vote_mask;
+    VX_seq_gpr_t                                vote_all_result;
+    VX_seq_gpr_t                                vote_none_result;
 
     function new(string name="VX_alu_scbd", uvm_component parent=null);
         super.new(name,parent);
     endfunction
-
     
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
@@ -71,8 +74,12 @@ class VX_alu_scbd extends uvm_scoreboard;
        
         if (instr_array.exists(pc)) begin
             
+            vote_count = 0;
+            
             for(int tid=0; tid < `NUM_THREADS;  tid++)begin
-                  
+                
+                expected_result[tid] = alu_info.data[tid];
+
                 case (instr_array[pc].instr_type)
                     R_TYPE: begin
                         VX_risc_v_Rtype_seq_item r_item = VX_risc_v_Rtype_seq_item::create_instruction_with_data("R_TYPE_INST",instr_array[pc].raw_data);
@@ -100,6 +107,24 @@ class VX_alu_scbd extends uvm_scoreboard;
                             "DIVU":   expected_result[tid] = operand2_data[tid] != 0 ? operand1_data[tid]  / operand2_data[tid] : -1;
                             "REM":    expected_result[tid] = $signed(operand2_data[tid]) != 0 ? $signed(operand1_data[tid]) % $signed(operand2_data[tid]) : operand1_data[tid];
                             "REMU":   expected_result[tid] = operand2_data[tid] != 0 ? operand1_data[tid] % operand2_data[tid] : operand1_data[tid];
+                        
+                            //Vote Instructions
+                            "VOTE_ALL":begin
+                                vote_count += operand1_data[tid][0];
+                                vote_mask[tid] = operand1_data[tid][0][0];
+                            end
+                            "VOTE_ANY":begin
+                                vote_count += operand1_data[tid][0];
+                                vote_mask[tid] = operand1_data[tid][0][0];
+                            end
+                            "VOTE_UNI":begin
+                                vote_count += operand1_data[tid][0];
+                                vote_mask[tid] = operand1_data[tid][0][0];
+                            end
+                            "VOTE_BAL": begin
+                                vote_count += operand1_data[tid][0];
+                                vote_mask[tid] = operand1_data[tid][0][0];
+                            end
                         endcase     
                     end
                     
@@ -127,8 +152,25 @@ class VX_alu_scbd extends uvm_scoreboard;
 
                 if (expected_result[tid] !== alu_info.data[tid])
                     `VX_error(message_id, $sformatf("ALU RESULT MISMATCH PC: 0x%0h INSTR: %0s Exp_Res: 0x%0h Act_Res: 0x%0h TID: %0d", pc, instr_array[pc].instr_name, expected_result[tid], alu_info.data[tid], tid))
-            
+                
             end
+
+            for(int tid=0; tid < `NUM_THREADS;  tid++)begin
+                
+                vote_all_result[tid]  = vote_count == $countones(alu_info.tmask);
+                vote_none_result[tid] = vote_count == 0;
+
+                if (alu_info.tmask[tid]) begin
+                    case(instr_array[pc].instr_name)
+                        "VOTE_ALL": expected_result[tid] = VX_gpr_seq_data_entry_t'(vote_all_result);
+                        "VOTE_ANY": expected_result[tid] = vote_count > 0;
+                        "VOTE_UNI": expected_result[tid] = vote_all_result || vote_none_result;
+                        "VOTE_BAL": expected_result[tid] = VX_gpr_seq_data_entry_t'(vote_mask);
+                    endcase
+                end
+                
+            end
+                      
         end
         
     endfunction
@@ -150,7 +192,6 @@ class VX_alu_scbd extends uvm_scoreboard;
       rd_set_num   = `REG_NUM_TO_SET(wid,r_item.rd);
     endfunction
 
-
     virtual function void  set_i_item_gpr_lookup_fields( VX_risc_v_Itype_seq_item i_item);
         set_i_item_gpr_lookup_bank_nums(i_item);
         set_i_item_gpr_lookup_set_nums(i_item);
@@ -165,6 +206,5 @@ class VX_alu_scbd extends uvm_scoreboard;
       rs1_set_num  = `REG_NUM_TO_SET(wid,i_item.rs1);
       rd_set_num   = `REG_NUM_TO_SET(wid,i_item.rd);
     endfunction
-
 
 endclass

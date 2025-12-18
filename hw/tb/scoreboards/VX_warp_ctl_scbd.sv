@@ -225,10 +225,9 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                         end
                     end
                 end
-                //default:
-                //    `VX_error("VX_WARP_CTL_SCBD", $sformatf("Found instruction with the incorrect type: %s", instr_array[pc].instr_type.name() ))
+            
             endcase
-                    end
+        end
         else
             `VX_error("VX_WARP_CTL_SCBD", $sformatf("No instruction found at address: %0h", pc))
         

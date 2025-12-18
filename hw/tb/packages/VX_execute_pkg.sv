@@ -58,7 +58,34 @@ package VX_execute_pkg;
 
         return funct3;
     endfunction
-        
+
+    function risc_v_seq_funct3_t get_vote_funct3(string vote_instr_name);
+        risc_v_seq_funct3_t funct3;
+
+        case(vote_instr_name)
+            "VOTE_ALL": funct3 = `FUNCT3_WIDTH'b000;
+            "VOTE_ANY": funct3 = `FUNCT3_WIDTH'b001;
+            "VOTE_UNI": funct3 = `FUNCT3_WIDTH'b010;
+            "VOTE_BAL": funct3 = `FUNCT3_WIDTH'b011;
+        endcase
+
+        return funct3;
+    endfunction
+
+    function risc_v_seq_funct3_t get_shift_funct3(string shift_instr_name);
+        risc_v_seq_funct3_t funct3;
+
+        case(shift_instr_name)
+            "SLL":  funct3 = `FUNCT3_WIDTH'b001;
+            "SRL":  funct3 = `FUNCT3_WIDTH'b101;
+            "SRA":  funct3 = `FUNCT3_WIDTH'b101;
+            "SLLI": funct3 = `FUNCT3_WIDTH'b001;
+            "SRLI": funct3 = `FUNCT3_WIDTH'b101;
+            "SRAI": funct3 = `FUNCT3_WIDTH'b101;
+        endcase
+
+        return funct3;
+    endfunction
 
     function risc_v_seq_funct7_t get_arith_funct7(string arith_instr_name);
         risc_v_seq_funct7_t funct7;
