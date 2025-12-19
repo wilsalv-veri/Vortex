@@ -19,9 +19,9 @@ class VX_arithmetic_rtg_seq extends VX_arithmetic_doa_seq;
 
     constraint arithmetinc_instr_operands_c {
         
-        src1_reg inside {[1:RV_REGS]};
-        src2_reg inside {[1:RV_REGS]};
-        dst_reg inside  {[1:RV_REGS]};
+        src1_reg inside {[1:RV_REGS - 1]};
+        src2_reg inside {[1:RV_REGS - 1]};
+        dst_reg inside  {[1:RV_REGS - 1]};
         
         unique {src1_reg, src2_reg, dst_reg};
     }

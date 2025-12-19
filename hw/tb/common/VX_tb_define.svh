@@ -73,9 +73,9 @@
 `define XORI(rs1,imm,rd)        VX_risc_v_Itype_seq_item::create_instruction_with_fields("XORI", imm, rd, rs1, `FUNCT3_WIDTH'b100,INST_I)
 `define ORI(rs1,imm,rd)         VX_risc_v_Itype_seq_item::create_instruction_with_fields("ORI",  imm, rd, rs1, `FUNCT3_WIDTH'b110,INST_I)
 `define ANDI(rs1,imm,rd)        VX_risc_v_Itype_seq_item::create_instruction_with_fields("ANDI", imm, rd, rs1, `FUNCT3_WIDTH'b111,INST_I)
-`define SLLI(rs1,shamt,rd)      VX_risc_v_Itype_seq_item::create_instruction_with_fields("SLLI", {7'b0000000,shamt}, rd, rs1, `FUNCT3_WIDTH'b001, INST_I)
-`define SRLI(rs1,shamt,rd)      VX_risc_v_Itype_seq_item::create_instruction_with_fields("SRLI", {7'b0000000,shamt}, rd, rs1, `FUNCT3_WIDTH'b101, INST_I)
-`define SRAI(rs1,shamt,rd)      VX_risc_v_Itype_seq_item::create_instruction_with_fields("SRAI", {7'b0100000,shamt}, rd, rs1, `FUNCT3_WIDTH'b101, INST_I)
+`define SLLI(rs1,shamt,rd)      VX_risc_v_Itype_seq_item::create_instruction_with_fields("SLLI", risc_v_seq_imm_t'({7'b0000000,shamt}), rd, rs1, `FUNCT3_WIDTH'b001, INST_I)
+`define SRLI(rs1,shamt,rd)      VX_risc_v_Itype_seq_item::create_instruction_with_fields("SRLI", risc_v_seq_imm_t'({7'b0000000,shamt}), rd, rs1, `FUNCT3_WIDTH'b101, INST_I)
+`define SRAI(rs1,shamt,rd)      VX_risc_v_Itype_seq_item::create_instruction_with_fields("SRAI", risc_v_seq_imm_t'({7'b0100000,shamt}), rd, rs1, `FUNCT3_WIDTH'b101, INST_I)
 
 //R_TYPE (Register) Instructions
 `define ADD(rs1,rs2,rd)         VX_risc_v_Rtype_seq_item::create_instruction_with_fields("ADD",    `FUNCT7_WIDTH'b0000000, rd, rs2, rs1, `FUNCT3_WIDTH'b000, INST_R)

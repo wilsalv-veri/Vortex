@@ -16,7 +16,7 @@ class VX_alu_scbd extends uvm_scoreboard;
     VX_gpr_seq_data_entry_t                     operand1_data; 
     VX_gpr_seq_data_entry_t                     operand2_data;;
     VX_gpr_seq_data_entry_t                     expected_result;
-   
+    
    
     VX_risc_v_instr_seq_item                    instr_array[integer]; 
     VX_alu_tb_txn_item                          alu_info;
@@ -31,6 +31,14 @@ class VX_alu_scbd extends uvm_scoreboard;
     VX_tmask_t                                  vote_mask;
     VX_seq_gpr_t                                vote_all_result;
     VX_seq_gpr_t                                vote_none_result;
+
+    VX_tid_t                                    shfl_bval;
+    VX_tid_t                                    shfl_cval;
+    VX_tid_t                                    shfl_mask;
+    VX_tid_t                                    shfl_minLane;
+    VX_tid_t                                    shfl_maxLane;
+    VX_tid_t                                    shfl_lane;
+    bit                                         shfl_instr;
 
     function new(string name="VX_alu_scbd", uvm_component parent=null);
         super.new(name,parent);
@@ -75,7 +83,8 @@ class VX_alu_scbd extends uvm_scoreboard;
         if (instr_array.exists(pc)) begin
             
             vote_count = 0;
-            
+            shfl_instr = 0;
+
             for(int tid=0; tid < `NUM_THREADS;  tid++)begin
                 
                 expected_result[tid] = alu_info.data[tid];
@@ -87,7 +96,14 @@ class VX_alu_scbd extends uvm_scoreboard;
                         
                         operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
                         operand2_data[tid]   = gpr_block[rs2_bank_num][rs2_set_num][tid];
-                            
+                        
+                        shfl_bval            = {operand2_data[tid][1],operand2_data[tid][0]}[BVAL_START + NUM_ALU_BITS - 1 : BVAL_START];
+                        shfl_cval            = {operand2_data[tid][1],operand2_data[tid][0]}[CVAL_START + NUM_ALU_BITS - 1 : CVAL_START];
+                        shfl_mask            = {operand2_data[tid][1],operand2_data[tid][0]}[MASK_START + NUM_ALU_BITS - 1 : MASK_START];
+                        
+                        shfl_minLane         = shfl_mask;
+                        shfl_maxLane         = shfl_mask + shfl_cval < `NUM_ALU_LANES ? shfl_mask + shfl_cval : `NUM_ALU_LANES - 1;
+
                         case(instr_array[pc].instr_name)
                             "ADD":    expected_result[tid] = operand1_data[tid] + operand2_data[tid];
                             "SUB":    expected_result[tid] = operand1_data[tid] - operand2_data[tid];
@@ -125,13 +141,41 @@ class VX_alu_scbd extends uvm_scoreboard;
                                 vote_count += operand1_data[tid][0];
                                 vote_mask[tid] = operand1_data[tid][0][0];
                             end
-                        endcase     
+
+                            //SHFL Instructions
+                            "SHFL_UP":begin
+                                shfl_instr = 1;
+                                shfl_lane  = (tid - shfl_bval);
+                            end
+                            "SHFL_DOWN":begin
+                                shfl_instr  = 1;
+                                shfl_lane   = (tid + shfl_bval);
+                             
+                            end
+                            "SHFL_IDX":begin
+                                shfl_instr  = 1;
+                                shfl_lane   = shfl_bval;
+                            end
+                            "SHFL_BFLY":begin
+                                shfl_instr  = 1;
+                                shfl_lane   = tid ^ shfl_bval;
+                            end
+                        endcase
+                        
+                        if (shfl_instr)begin
+                            shfl_instr = 0;
+                            
+                            if ((shfl_lane >= shfl_minLane) && (shfl_lane <= shfl_maxLane))
+                                expected_result[tid] = gpr_block[rs1_bank_num][rs1_set_num][shfl_lane];
+                            else
+                                expected_result[tid] = operand1_data[tid];
+                        end
                     end
                     
                     I_TYPE: begin
                         VX_risc_v_Itype_seq_item i_item = VX_risc_v_Itype_seq_item::create_instruction_with_data("I_TYPE_INST",instr_array[pc].raw_data);
                         set_i_item_gpr_lookup_fields(i_item);
-                        imm = i_item.imm;
+                        imm = `SEXT(`XLEN,i_item.imm);
 
                         operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
                                 
@@ -150,9 +194,10 @@ class VX_alu_scbd extends uvm_scoreboard;
                     end
                 endcase
 
-                if (expected_result[tid] !== alu_info.data[tid])
-                    `VX_error(message_id, $sformatf("ALU RESULT MISMATCH PC: 0x%0h INSTR: %0s Exp_Res: 0x%0h Act_Res: 0x%0h TID: %0d", pc, instr_array[pc].instr_name, expected_result[tid], alu_info.data[tid], tid))
-                
+                if (alu_info.tmask[tid]) begin
+                    if (expected_result[tid] !== alu_info.data[tid])
+                        `VX_error(message_id, $sformatf("ALU RESULT MISMATCH PC: 0x%0h INSTR: %0s Exp_Res: 0x%0h Act_Res: 0x%0h TID: %0d", pc, instr_array[pc].instr_name, expected_result[tid], alu_info.data[tid], tid))
+                end
             end
 
             for(int tid=0; tid < `NUM_THREADS;  tid++)begin

@@ -148,7 +148,6 @@ module VX_alu_int import VX_gpu_pkg::*; #(
     if (NUM_LANES > 1) begin : g_shfl
         for (genvar i = 0; i < NUM_LANES; ++i) begin : g_i
             
-            
             localparam bval_start = 0;
             localparam cval_start = 6;
             localparam mask_start = 12;
@@ -160,8 +159,13 @@ module VX_alu_int import VX_gpu_pkg::*; #(
             wire [LANE_BITS-1:0] bval = alu_in2[i][bval_end : bval_start];  
             wire [LANE_BITS-1:0] cval = alu_in2[i][cval_end : cval_start]; 
             wire [LANE_BITS-1:0] mask = alu_in2[i][mask_end : mask_start];  
-            wire [LANE_BITS-1:0] minLane = (LANE_BITS'(i) & mask);
-            wire [LANE_BITS-1:0] maxLane = minLane | (cval & ~(mask));
+            
+            //note: wilsalv Incorrrect minLane and maxLane calculation
+            //wire [LANE_BITS-1:0] minLane = (LANE_BITS'(i) & mask);
+            //wire [LANE_BITS-1:0] maxLane = minLane | (cval & ~(mask));
+
+            wire [LANE_BITS-1:0] minLane = mask;            
+            wire [LANE_BITS-1:0] maxLane = (minLane + cval) <= (NUM_LANES - 1) ? minLane + cval : NUM_LANES - 1;
 
             wire [LANE_BITS:0]   lane_up   = LANE_BITS'(i) - bval;
             wire [LANE_BITS:0]   lane_down = LANE_BITS'(i) + bval;
@@ -173,22 +177,22 @@ module VX_alu_int import VX_gpu_pkg::*; #(
                 lane = LANE_BITS'(i);
                 case (alu_op[1:0])
                     INST_SHFL_UP: begin
-                        if ($signed(lane_up) >= $signed({1'b0, minLane})) begin
+                        if (($signed(lane_up) >= $signed({1'b0, minLane})) && ($signed(lane_up) <= $signed({1'b0, maxLane}))) begin //note: wilsalv Does not Include maxLane check here
                             lane = lane_up[LANE_BITS-1:0];
                         end
                     end
                     INST_SHFL_DOWN: begin
-                        if (lane_down <= {1'b0, maxLane}) begin
+                        if ((lane_down >= {1'b0, minLane}) && (lane_down <= {1'b0, maxLane})) begin //note: wilsalv Does not Include minLane check here
                             lane = lane_down[LANE_BITS-1:0];
                         end
                     end
                     INST_SHFL_BFLY: begin
-                        if (lane_bfly <= maxLane) begin
+                        if ((lane_bfly >= minLane) && (lane_bfly <= maxLane)) begin //note: wilsalv Does not Include minLane check here
                             lane = lane_bfly;
                         end
                     end
-                    INST_SHFL_IDX: begin
-                        if (lane_idx <= maxLane) begin
+                    INST_SHFL_IDX: begin 
+                        if ((lane_idx >= minLane) && (lane_idx <= maxLane))  begin //note: wilsalv Does not Include minLane check here
                             lane = lane_idx;
                         end
                     end

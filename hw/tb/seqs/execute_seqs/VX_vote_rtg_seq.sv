@@ -20,7 +20,6 @@ class VX_vote_rtg_seq extends VX_vote_doa_seq;
         unique {first_tmask_reg, pred_val_reg, alternate_tmask_reg, vote_result_reg};
         first_tmask     inside {[1:'hf]};
         alternate_tmask inside {[1:'hf]};
-
         vote_instr_type dist {VOTE_ALL:=30, VOTE_ANY:=10, VOTE_UNI:=30, VOTE_BAL:= 30};
     }
     

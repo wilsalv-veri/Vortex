@@ -106,7 +106,9 @@ $VORTEX/hw/tb/seqs/warp_ctl_seqs/VX_non_dvg_join_seq.sv
 
 $VORTEX/hw/tb/seqs/execute_seqs/VX_arithmetic_doa_seq.sv
 $VORTEX/hw/tb/seqs/execute_seqs/VX_vote_doa_seq.sv
+$VORTEX/hw/tb/seqs/execute_seqs/VX_shfl_doa_seq.sv
 $VORTEX/hw/tb/seqs/execute_seqs/VX_arithmetic_imm_doa_seq.sv
+$VORTEX/hw/tb/seqs/execute_seqs/VX_shfl_rtg_seq.sv
 $VORTEX/hw/tb/seqs/execute_seqs/VX_vote_rtg_seq.sv
 $VORTEX/hw/tb/seqs/execute_seqs/VX_arithmetic_rtg_seq.sv
 $VORTEX/hw/tb/seqs/execute_seqs/VX_arithmetic_imm_rtg_seq.sv
@@ -150,7 +152,9 @@ $VORTEX/hw/tb/tests/execute_tests/VX_arithmetic_imm_rtg_test.sv
 $VORTEX/hw/tb/tests/execute_tests/VX_arithmetic_imm_simd_test.sv
 $VORTEX/hw/tb/tests/execute_tests/VX_vote_rtg_test.sv
 $VORTEX/hw/tb/tests/execute_tests/VX_arithmetic_simd_test.sv
+$VORTEX/hw/tb/tests/execute_tests/VX_shfl_doa_test.sv
 $VORTEX/hw/tb/tests/execute_tests/VX_arithmetic_doa_test.sv
+$VORTEX/hw/tb/tests/execute_tests/VX_shfl_rtg_test.sv
 
 //Include Files under $VORTEX/hw/tb/tests/warp_ctl_tests
 +incdir+$VORTEX/hw/tb/tests/warp_ctl_tests

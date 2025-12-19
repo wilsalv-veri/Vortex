@@ -51,6 +51,18 @@ package VX_tb_common_pkg;
     `include "VX_risc_v_base_instr_seq.sv"
     `include "VX_risc_v_base_data_seq.sv"
     `include "VX_risc_v_base_seq_lib.sv"
+
+    function VX_tmask_t get_max_possible_tmask();
+        
+        VX_tmask_t max_tmask;
+        max_tmask  = VX_tmask_t'(1);
+
+        for(int i=0; i< `NUM_THREADS; i++)begin
+            max_tmask  = (max_tmask << 1) | 1;
+        end
+        
+        return max_tmask;
+    endfunction
     
     task VX_wait_n_clks(int n);
         repeat(n) @(posedge tb_top_if.clk);

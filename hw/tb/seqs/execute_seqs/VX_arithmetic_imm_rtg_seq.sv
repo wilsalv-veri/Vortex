@@ -18,8 +18,8 @@ class VX_arithmetic_imm_rtg_seq extends VX_arithmetic_imm_doa_seq;
 
     constraint arithmetinc_imm_instr_operands_c {
         
-        src1_reg inside {[1:RV_REGS]};
-        dst_reg inside  {[1:RV_REGS]};
+        src1_reg inside {[1:RV_REGS - 1]};
+        dst_reg inside  {[1:RV_REGS - 1]};
         imm       <= 12'hFFF;
         unique {src1_reg, dst_reg};
     }

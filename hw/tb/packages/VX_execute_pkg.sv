@@ -8,6 +8,12 @@ package VX_execute_pkg;
     import VX_tb_common_pkg::*;
     import VX_gpr_pkg::*;
     
+    localparam NUM_ALU_BITS  = `CLOG2(`NUM_ALU_LANES);
+    localparam SHFL_OP_WIDTH = 6;
+    localparam BVAL_START    = 0;
+    localparam CVAL_START    = BVAL_START + SHFL_OP_WIDTH;
+    localparam MASK_START   = CVAL_START + SHFL_OP_WIDTH;
+  
     `include "VX_alu_txn_item.sv"
 
     `include "VX_execute_monitor.sv"

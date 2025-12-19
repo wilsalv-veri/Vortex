@@ -45,6 +45,8 @@
     `define IMM_12 12
     `define IMM_20 20
 
+    `define SHIFT_WIDTH 5
+
     //Fence Insts
     `define FM_WIDTH 4
     `define PI_WIDTH 1
@@ -57,7 +59,6 @@
     `define SW_WIDTH `PI_WIDTH
 
     //Vec Insts
-
     `define VF_UNARY_WIDTH  6    
     `define VF_VM_WIDTH     1
     `define VF_NCVT_WIDTH   `REG_NUM_WIDTH    
@@ -178,6 +179,11 @@
                   SLLI,  SRLI,  SRAI} arith_instr_imm_type_t;
 
     typedef enum {VOTE_ALL, VOTE_ANY, VOTE_UNI, VOTE_BAL} vote_instr_type_t;
+
+    typedef enum {SHFL_UP, SHFL_DOWN, SHFL_BFLY, SHFL_IDX} shfl_instr_type_t;
+
+    typedef bit [`SHIFT_WIDTH - 1:0]             VX_shift_imm_t;
+    
     //********************************************************** */
     //Top Level Use  
     typedef logic [`INSTR_ADDRESS_WIDTH -1:0]  risc_v_instr_address_t;
