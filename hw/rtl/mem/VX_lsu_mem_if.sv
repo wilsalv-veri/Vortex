@@ -54,21 +54,21 @@ interface VX_lsu_mem_if import VX_gpu_pkg::*; #(
     modport master (
         inout req_valid,
         inout req_data, 
-        input  req_ready,
+        input req_ready,
 
-        input  rsp_valid,
-        input  rsp_data,
+        input rsp_valid,
+        input rsp_data,
         inout rsp_ready 
     );
 
     modport slave (
-        input  req_valid,
-        input  req_data,
+        input req_valid,
+        input req_data,
         inout req_ready, 
 
         inout rsp_valid, 
         inout rsp_data, 
-        input  rsp_ready
+        input rsp_ready
     );
 
 endinterface

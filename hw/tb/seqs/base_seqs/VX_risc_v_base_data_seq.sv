@@ -13,29 +13,22 @@ class VX_risc_v_base_data_seq extends VX_risc_v_base_seq;
     endfunction
 
     task body(); 
-        if(!p_sequencer.curr_pc)
-            p_sequencer.curr_pc = MEM_LOAD_DATA_BASE_ADDR;
+        //if(!p_sequencer.curr_pc)
+        //    p_sequencer.curr_pc = MEM_LOAD_DATA_BASE_ADDR;
 
         add_data();
         num_of_words = data_word_queue.size();
-        p_sequencer.curr_pc += (data_word_queue.size() * XLENB);
+        //p_sequencer.curr_pc += (data_word_queue.size() * XLENB);
         super.body();
         
         send_data();  
     endtask
 
-    /*
-     * risc_v_seq_item           = VX_risc_v_seq_item::type_id::create($sformatf("riscv_inst_data%0d", 0));
-        risc_v_seq_item.data_type = DATA;
-        risc_v_seq_item.raw_data  = 32'hcafebabe;
-        data_word_queue.push_back(risc_v_seq_item);
-     */
-
-    task add_data();
+    virtual function void add_data();
         //Do Nothing: To be implemented in derived classes
-    endtask
+    endfunction
 
-    task send_data();
+    virtual task send_data();
         foreach(data_word_queue[idx])begin
             start_item(data_word_queue[idx]);
             `VX_info("VX_RISC_V_BASE_DATA_SEQ", "Sequencer Grant Received!")

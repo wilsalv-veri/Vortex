@@ -91,7 +91,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
             case(driver_state)
                 GET_INSTR             : next_state  = instr_received ? PROCESS_INSTR : GET_INSTR;
                 PROCESS_INSTR      : begin
-                    if (word_count &&  should_send_cacheline())  //((word_count % INST_PER_CACHE_LINE) == 0))
+                    if (word_count &&  should_send_cacheline())  
                                         next_state  = SEND_INSTR;
                     else
                                         next_state =  GET_INSTR;
@@ -120,6 +120,7 @@ class VX_risc_v_driver  extends uvm_driver #(VX_risc_v_seq_item);
        
         if (data_type == INST) begin
             $cast(instr_item,risc_v_seq_item);
+            `VX_info("VX_RISC_V_DRIVER", $sformatf("Sending Instr With PC: 0x%0h", instr_item.address))
             instr_analysis_port.write(instr_item);
         end
         seq_item_port.item_done();

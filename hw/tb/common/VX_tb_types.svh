@@ -39,7 +39,7 @@
     `define GPR_PER_OPC_WARPS    PER_ISSUE_WARPS / `NUM_OPCS         
     `define GPR_BANK_SIZE       (NUM_REGS * SIMD_COUNT * `GPR_PER_OPC_WARPS) / `NUM_GPR_BANKS
     `define GPR_ADDR_WIDTH      `CLOG2(GPR_BANK_SIZE)                  
-    `define SFU_LANE_BITS `CLOG2(`NUM_SFU_LANES)
+    `define SIMD_BITS           `CLOG2(`SIMD_WIDTH)
 
     `define IMM_11 11
     `define IMM_12 12
@@ -131,7 +131,7 @@
 
     typedef bit [`NUM_THREADS - 1 :0]          VX_tmask_t;
     typedef  VX_tmask_t [`NUM_WARPS - 1: 0]    VX_core_tmasks_t;//Default initial TMASK is 1
-    typedef bit [`UP(`SFU_LANE_BITS)-1:0]      VX_tid_t;
+    typedef bit [`UP(`SIMD_BITS)-1:0]          VX_tid_t;
 
     typedef bit [`NUM_WARPS-1:0]               VX_warp_mask_t;
     typedef bit [`CLOG2(`NUM_WARPS) - 1:0]     VX_warp_num_t; 
@@ -182,7 +182,18 @@
 
     typedef enum {SHFL_UP, SHFL_DOWN, SHFL_BFLY, SHFL_IDX} shfl_instr_type_t;
 
-    typedef bit [`SHIFT_WIDTH - 1:0]             VX_shift_imm_t;
+
+    typedef enum {LB, LH, LW, LBU, LHU} load_instr_type_t;
+    typedef enum {SB, SH, SW}           store_instr_type_t;
+
+    typedef bit [`SHIFT_WIDTH - 1:0]    VX_shift_imm_t;
+    
+    typedef bit [`INSTR_ADDRESS_WIDTH - `CLOG2(XLENB) - 1:0] VX_lsu_req_addr_t;
+    typedef  VX_lsu_req_addr_t          [`NUM_LSU_LANES-1:0] VX_lsu_req_addresses_t;
+    typedef  VX_seq_gpr_byteen          [`NUM_LSU_LANES-1:0] VX_lsu_req_byteen_t;
+    typedef  risc_v_seq_data_t          [`NUM_LSU_LANES-1:0] VX_lsu_rsp_data;
+    
+    typedef  risc_v_seq_data_t             [`SIMD_WIDTH-1:0] VX_commit_data;
     
     //********************************************************** */
     //Top Level Use  

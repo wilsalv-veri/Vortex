@@ -9,8 +9,13 @@ class Instruction_queue  #(type T = VX_risc_v_instr_seq_item) extends uvm_queue 
         current_address = `USER_BASE_ADDR;
     endfunction
 
+    constraint initial_address_c {
+        current_address == `USER_BASE_ADDR;
+    }
+
     virtual function void push_back(VX_risc_v_instr_seq_item item);
         item.address = current_address;
+        `VX_info("INSTRUCTION_QUEUE", $sformatf("Item Address: 0x%0h Current Address: 0x%0h USER_BASE: 0x%0h", item.address, current_address, `USER_BASE_ADDR))
         super.push_back(item);
         update_current_address();
     endfunction

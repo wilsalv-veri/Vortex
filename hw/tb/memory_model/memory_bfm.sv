@@ -12,6 +12,7 @@ module Memory_BFM import VX_gpu_pkg::*; import VX_tb_top_pkg::*; import VX_tb_co
     mem_operation_t    operation;
     addr_t             address;
     tag_t              tag;
+    
     risc_v_cacheline_t data;
     
     memory_state_t     state;
@@ -43,11 +44,9 @@ module Memory_BFM import VX_gpu_pkg::*; import VX_tb_top_pkg::*; import VX_tb_co
 
             end
             EXECUTE_OPERATION: begin
+                tag_mem[address]                =  tag;
                 case(operation) 
-                    WRITE: begin
-                        memory[address]         =  data;
-                        tag_mem[address]        =  tag;
-                    end
+                        WRITE: memory[address]  =  data;  
                 endcase
             end
             EXECUTE_OPERATION_READ: begin
@@ -111,13 +110,9 @@ module Memory_BFM import VX_gpu_pkg::*; import VX_tb_top_pkg::*; import VX_tb_co
             end
             EXECUTE_OPERATION: begin
                 case(operation) 
-                        READ: begin
-                            data                <=  memory.exists(address)  ? memory[address]  : RESET_DATA;
-                            tag                 <=  tag_mem.exists(address) ? tag_mem[address] : RESET_TAG; 
-                        end
+                    READ:  data                <=  memory.exists(address)  ? memory[address]  : RESET_DATA;
                 endcase
             end
-           
         endcase        
     end
 

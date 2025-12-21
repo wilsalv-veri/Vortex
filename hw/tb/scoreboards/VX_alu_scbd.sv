@@ -17,7 +17,6 @@ class VX_alu_scbd extends uvm_scoreboard;
     VX_gpr_seq_data_entry_t                     operand2_data;;
     VX_gpr_seq_data_entry_t                     expected_result;
     
-   
     VX_risc_v_instr_seq_item                    instr_array[integer]; 
     VX_alu_tb_txn_item                          alu_info;
      

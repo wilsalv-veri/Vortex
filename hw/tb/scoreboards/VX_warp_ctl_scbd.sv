@@ -260,7 +260,7 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
         rd_bank_num  = `REG_NUM_TO_BANK(r_item.rd);
     endfunction
 
-     virtual function void set_b_item_gpr_lookup_bank_nums(VX_risc_v_Btype_seq_item b_item);
+    virtual function void set_b_item_gpr_lookup_bank_nums(VX_risc_v_Btype_seq_item b_item);
         rs1_bank_num = `REG_NUM_TO_BANK(b_item.rs1);
         rs2_bank_num = `REG_NUM_TO_BANK(b_item.rs2);
     endfunction

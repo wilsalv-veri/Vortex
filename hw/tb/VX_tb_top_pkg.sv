@@ -23,12 +23,14 @@ package VX_tb_top_pkg;
     localparam RESET_TAG                    = {L1_MEM_ARB_TAG_WIDTH{1'b0}};
     localparam RESET_DATA                   = {16{32'hdeadbeef}};
     
+    localparam CL_BYTE_OFFSET_BITS             = `CLOG2(`L1_LINE_SIZE);
     localparam CODE_CS_BASE_ADDR            = `USER_BASE_ADDR;
-    localparam DATA_CS_BASE_ADDR            = CODE_CS_BASE_ADDR << 1; //*2
-    
-    localparam MEM_LOAD_BOOT_ADDR           = CODE_CS_BASE_ADDR >> `CLOG2(`L1_LINE_SIZE);
-    localparam MEM_LOAD_DATA_BASE_ADDR      = DATA_CS_BASE_ADDR >> `CLOG2(`L1_LINE_SIZE);
+    localparam DATA_CS_BASE_ADDR            = CODE_CS_BASE_ADDR + (CODE_CS_BASE_ADDR >> CL_BYTE_OFFSET_BITS); // 1/2
+    localparam INSTR_SEG_SIZE               = DATA_CS_BASE_ADDR - CODE_CS_BASE_ADDR;
 
+    localparam MEM_LOAD_BOOT_ADDR           = CODE_CS_BASE_ADDR >> CL_BYTE_OFFSET_BITS;
+    localparam MEM_LOAD_DATA_BASE_ADDR      = DATA_CS_BASE_ADDR >> CL_BYTE_OFFSET_BITS;
+    
     typedef logic [`MEM_ADDR_WIDTH - `CLOG2(`L1_LINE_SIZE) - 1:0]  addr_t;
     typedef logic [L1_MEM_ARB_TAG_WIDTH - 1:0] tag_t;
     

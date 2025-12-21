@@ -41,7 +41,7 @@ always_comb begin
                 `VX_info("VX_MEM_LOADER", "Received Cacheline from Driver")
         
                 req_valid               = 1'b1;
-                rw                      = 1'b1;
+                rw                      = WRITE;
                 addr                    = (mem_load_if.data_type == INST) ? 
                                            (MEM_LOAD_BOOT_ADDR + inst_cacheline_count) : 
                                            MEM_LOAD_DATA_BASE_ADDR + data_cacheline_count;
