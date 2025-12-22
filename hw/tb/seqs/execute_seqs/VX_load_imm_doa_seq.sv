@@ -2,6 +2,8 @@ class VX_load_imm_doa_seq extends VX_risc_v_base_instr_seq;
 
     `uvm_object_utils(VX_load_imm_doa_seq)
 
+    string message_id = "VX_LOAD_IMM_DOA_SEQ";
+
     rand load_instr_type_t       ld_instr_type;
     rand risc_v_seq_reg_num_t    src1_reg;
     rand risc_v_seq_reg_num_t    dst_reg;
@@ -24,8 +26,23 @@ class VX_load_imm_doa_seq extends VX_risc_v_base_instr_seq;
     endfunction
 
      virtual function void post_add_instructions();
-        int load_instr_idx = 0;
+        int load_instr_idx = get_load_instruction_idx();
         update_load_instr(load_instr_idx);
+    endfunction
+
+    virtual function int get_load_instruction_idx();
+        VX_risc_v_Itype_seq_item i_seq_item  = VX_risc_v_Itype_seq_item::type_id::create("VX_risc_v_Itype_seq_item");
+        VX_risc_v_instr_seq_item instr_seq_item;
+
+        for(int q_idx=0; q_idx < instr_queue.size();q_idx++)begin
+            instr_seq_item = instr_queue.get(q_idx);
+
+            if ($cast(i_seq_item, instr_seq_item))begin
+                if (i_seq_item.instr_name == "LB")
+                return q_idx;
+            end             
+        end
+    
     endfunction
 
     virtual function void update_load_instr(int load_instr_idx);

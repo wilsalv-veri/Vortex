@@ -368,8 +368,8 @@ module VX_tb_top;
         
         for(idx=0; idx < NUM_EX_UNITS*`ISSUE_WIDTH; idx++)begin
             initial begin
-                uvm_config_db #(virtual VX_dispatch_if              )::set(null, "*", $sformatf("dispatch_if[%0d]",idx) , core.dispatch_if[idx]);
-                uvm_config_db #(virtual VX_commit_if                )::set(null, "*", $sformatf("commit_if[%0d]",  idx),  core.commit_if[idx]);
+                uvm_config_db #(virtual VX_dispatch_if                  )::set(null, "*", $sformatf("dispatch_if[%0d]",idx) , core.dispatch_if[idx]);
+                uvm_config_db #(virtual VX_commit_if                    )::set(null, "*", $sformatf("commit_if[%0d]",  idx),  core.commit_if[idx]);
             end
         end
         

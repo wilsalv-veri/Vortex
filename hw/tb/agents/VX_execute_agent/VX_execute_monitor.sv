@@ -63,8 +63,8 @@ class VX_execute_monitor extends uvm_monitor;
             
             if( !uvm_config_db #(virtual VX_commit_if)::get (this, "", $sformatf("commit_if[%0d]", lsu_commit_idx),commit_if[virt_commit_if_idx]))
                 `VX_error(message_id, $sformatf("Failed to get access for commit_if[%0d]", lsu_commit_idx))
-        
-            if( !uvm_config_db #(virtual VX_dispatch_if)::get (this, "", $sformatf("dispatch_if[%0d]", lsu_commit_idx),commit_if[virt_commit_if_idx]))
+           
+            if( !uvm_config_db #(virtual VX_dispatch_if)::get (this, "", $sformatf("dispatch_if[%0d]", lsu_commit_idx),dispatch_if[virt_commit_if_idx]))
                 `VX_error(message_id, $sformatf("Failed to get access for dispatch_if[%0d]", lsu_commit_idx))
         
         end
@@ -88,10 +88,9 @@ class VX_execute_monitor extends uvm_monitor;
             end
  
             for(int idx=lsu_commit_start_idx, jdx=0; idx < lsu_commit_end_idx; idx++, jdx++)begin
-                automatic int lsu_commit_idx = idx;
-                automatic int commit_item_idx = jdx;
+                automatic int lsu_commit_idx = jdx;
                 fork
-                    get_commit_info(commit_item_idx, lsu_commit_idx);
+                    get_commit_info(lsu_commit_idx);
                 join_none
             end
                 
@@ -131,15 +130,17 @@ class VX_execute_monitor extends uvm_monitor;
   
     endtask
 
-    virtual task get_commit_info(int commit_item_idx, int lsu_commit_idx);
+    virtual task get_commit_info(int lsu_commit_idx);
+        `VX_info(message_id, $sformatf("Starting GET_COMMIT_INFO LSU_COMMIT_IDX: %0d", lsu_commit_idx))
+
         forever @(posedge commit_if[lsu_commit_idx].valid)begin  
-            commit_tb_item[commit_item_idx].pc    = commit_if[lsu_commit_idx].data.PC;
-            commit_tb_item[commit_item_idx].wid    = commit_if[lsu_commit_idx].data.wid;
-            commit_tb_item[commit_item_idx].tmask = commit_if[lsu_commit_idx].data.tmask;
-            commit_tb_item[commit_item_idx].wb    = commit_if[lsu_commit_idx].data.wb;
-            commit_tb_item[commit_item_idx].rd    = commit_if[lsu_commit_idx].data.rd;
-            commit_tb_item[commit_item_idx].data  = commit_if[lsu_commit_idx].data.data;
-            commit_analysis_port.write(commit_tb_item[commit_item_idx]);
+            commit_tb_item[lsu_commit_idx].pc    = commit_if[lsu_commit_idx].data.PC;
+            commit_tb_item[lsu_commit_idx].wid   = commit_if[lsu_commit_idx].data.wid;
+            commit_tb_item[lsu_commit_idx].tmask = commit_if[lsu_commit_idx].data.tmask;
+            commit_tb_item[lsu_commit_idx].wb    = commit_if[lsu_commit_idx].data.wb;
+            commit_tb_item[lsu_commit_idx].rd    = commit_if[lsu_commit_idx].data.rd;
+            commit_tb_item[lsu_commit_idx].data  = commit_if[lsu_commit_idx].data.data;
+            commit_analysis_port.write(commit_tb_item[lsu_commit_idx]);
         end
     endtask
 

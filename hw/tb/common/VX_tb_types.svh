@@ -47,6 +47,12 @@
 
     `define SHIFT_WIDTH 5
 
+    `define LB_WIDTH 8
+    `define LH_WIDTH 16
+    `define LW_WIDTH 32
+
+    `define WORD_OFFSET_BITS `CLOG2(`LW_WIDTH / `LB_WIDTH)
+
     //Fence Insts
     `define FM_WIDTH 4
     `define PI_WIDTH 1
@@ -86,7 +92,6 @@
         bit use_rs1;
     } VX_pipeline_used_rs_t;
 
-
     typedef bit [`I_TYPE_IMM_WIDTH - 1:0]    risc_v_seq_i_type_imm_t;
     typedef bit [`S_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_s_type_imm1_t;
     typedef bit [`S_TYPE_IMM0_WIDTH - 1:0]   risc_v_seq_s_type_imm0_t;
@@ -120,7 +125,10 @@
     typedef bit [`SIMD_WIDTH - 1:0]          VX_seq_gpr_byteen;
     typedef VX_seq_gpr_byteen [XLENB - 1:0]  VX_seq_gpr_entry_byteen;
 
-    typedef bit [7:0]                                         VX_seq_gpr_byte_t;
+    typedef bit [`LB_WIDTH -1:0]                                         VX_seq_gpr_byte_t;
+    typedef bit [`LH_WIDTH- 1:0]                                         VX_seq_gpr_half_w_t;
+    typedef bit [`LW_WIDTH- 1:0]                                         VX_seq_gpr_word_t;
+
     typedef VX_seq_gpr_byte_t [XLENB - 1:0]                   VX_seq_gpr_t;
     typedef VX_seq_gpr_t [`SIMD_WIDTH - 1:0]                  VX_gpr_seq_data_entry_t;
     typedef VX_gpr_seq_data_entry_t [0: `GPR_BANK_SIZE - 1]   VX_gpr_seq_bank_t;

@@ -5,6 +5,7 @@ package VX_execute_pkg;
 
     import uvm_pkg::*;
     import VX_gpu_pkg::*;
+    import VX_tb_top_pkg::*;
     import VX_tb_common_pkg::*;
     import VX_gpr_pkg::*;
     
