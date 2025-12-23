@@ -13,7 +13,7 @@ package VX_execute_pkg;
     localparam SHFL_OP_WIDTH = 6;
     localparam BVAL_START    = 0;
     localparam CVAL_START    = BVAL_START + SHFL_OP_WIDTH;
-    localparam MASK_START   = CVAL_START + SHFL_OP_WIDTH;
+    localparam MASK_START    = CVAL_START + SHFL_OP_WIDTH;
   
     `include "VX_alu_txn_item.sv"
     `include "VX_lsu_txn_item.sv"
@@ -23,7 +23,7 @@ package VX_execute_pkg;
     `include "VX_execute_agent.sv"
     `include "VX_alu_scbd.sv"
     `include "VX_lsu_scbd.sv"
-
+    
     function risc_v_seq_funct3_t get_arith_funct3(string arith_instr_name);
         risc_v_seq_funct3_t funct3;
 
@@ -106,6 +106,18 @@ package VX_execute_pkg;
             "LW":  funct3 = `FUNCT3_WIDTH'b010;
             "LBU": funct3 = `FUNCT3_WIDTH'b101;
             "LHU": funct3 = `FUNCT3_WIDTH'b101;
+        endcase
+
+        return funct3;
+    endfunction
+
+    function risc_v_seq_funct3_t get_store_funct3(string store_instr_name);
+        risc_v_seq_funct3_t funct3;
+
+        case(store_instr_name)
+            "SB":  funct3 = `FUNCT3_WIDTH'b000;
+            "SH":  funct3 = `FUNCT3_WIDTH'b001;
+            "SW":  funct3 = `FUNCT3_WIDTH'b010;
         endcase
 
         return funct3;

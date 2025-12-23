@@ -5,7 +5,7 @@ class VX_load_imm_rtg_seq_lib extends VX_load_imm_doa_seq_lib;
 
     function new(string name="VX_load_imm_rtg_seq_lib");
         super.new(name);
-        message_id = "VX_LOA_IMM_RTG_SEQ_LIB";
+        message_id = "VX_LOAD_IMM_RTG_SEQ_LIB";
     endfunction
 
     virtual function void add_load_sequence();

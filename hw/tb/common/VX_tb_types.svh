@@ -18,7 +18,7 @@
     `define I_TYPE_IMM_WIDTH  12
     `define I_TYPE_SHIFT_IMM_WIDTH 5
     
-    `define S_TYPE_IMM1_WIDTH `I_TYPE_IMM_WIDTH
+    `define S_TYPE_IMM1_WIDTH 7
     `define S_TYPE_IMM0_WIDTH 5
    
     `define IMM_WIDTH 32
@@ -47,11 +47,11 @@
 
     `define SHIFT_WIDTH 5
 
-    `define LB_WIDTH 8
-    `define LH_WIDTH 16
-    `define LW_WIDTH 32
+    `define B_WIDTH 8
+    `define H_WIDTH 16
+    `define W_WIDTH 32
 
-    `define WORD_OFFSET_BITS `CLOG2(`LW_WIDTH / `LB_WIDTH)
+    `define WORD_OFFSET_BITS `CLOG2(`W_WIDTH / `B_WIDTH)
 
     //Fence Insts
     `define FM_WIDTH 4
@@ -92,7 +92,7 @@
         bit use_rs1;
     } VX_pipeline_used_rs_t;
 
-    typedef bit [`I_TYPE_IMM_WIDTH - 1:0]    risc_v_seq_i_type_imm_t;
+    typedef bit [`I_TYPE_IMM_WIDTH  - 1:0]   risc_v_seq_i_type_imm_t;
     typedef bit [`S_TYPE_IMM1_WIDTH - 1:0]   risc_v_seq_s_type_imm1_t;
     typedef bit [`S_TYPE_IMM0_WIDTH - 1:0]   risc_v_seq_s_type_imm0_t;
     
@@ -125,9 +125,9 @@
     typedef bit [`SIMD_WIDTH - 1:0]          VX_seq_gpr_byteen;
     typedef VX_seq_gpr_byteen [XLENB - 1:0]  VX_seq_gpr_entry_byteen;
 
-    typedef bit [`LB_WIDTH -1:0]                                         VX_seq_gpr_byte_t;
-    typedef bit [`LH_WIDTH- 1:0]                                         VX_seq_gpr_half_w_t;
-    typedef bit [`LW_WIDTH- 1:0]                                         VX_seq_gpr_word_t;
+    typedef bit [`B_WIDTH -1:0]                                         VX_seq_gpr_byte_t;
+    typedef bit [`H_WIDTH- 1:0]                                         VX_seq_gpr_half_w_t;
+    typedef bit [`W_WIDTH- 1:0]                                         VX_seq_gpr_word_t;
 
     typedef VX_seq_gpr_byte_t [XLENB - 1:0]                   VX_seq_gpr_t;
     typedef VX_seq_gpr_t [`SIMD_WIDTH - 1:0]                  VX_gpr_seq_data_entry_t;
@@ -199,7 +199,7 @@
     typedef bit [`INSTR_ADDRESS_WIDTH - `CLOG2(XLENB) - 1:0] VX_lsu_req_addr_t;
     typedef  VX_lsu_req_addr_t          [`NUM_LSU_LANES-1:0] VX_lsu_req_addresses_t;
     typedef  VX_seq_gpr_byteen          [`NUM_LSU_LANES-1:0] VX_lsu_req_byteen_t;
-    typedef  risc_v_seq_data_t          [`NUM_LSU_LANES-1:0] VX_lsu_rsp_data;
+    typedef  risc_v_seq_data_t          [`NUM_LSU_LANES-1:0] VX_lsu_data;
     
     typedef  risc_v_seq_data_t             [`SIMD_WIDTH-1:0] VX_commit_data;
     

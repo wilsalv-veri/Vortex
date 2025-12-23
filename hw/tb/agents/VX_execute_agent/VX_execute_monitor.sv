@@ -116,9 +116,10 @@ class VX_execute_monitor extends uvm_monitor;
 
         fork 
             forever @(posedge lsu_mem_if[lsu_block].req_valid)begin
-                lsu_tb_item[lsu_block].req_mask       =  lsu_mem_if[lsu_block].req_data.mask;
-                lsu_tb_item[lsu_block].req_addresses  =  lsu_mem_if[lsu_block].req_data.addr;
-                lsu_tb_item[lsu_block].req_byteen     =  lsu_mem_if[lsu_block].req_data.byteen;
+                lsu_tb_item[lsu_block].req_mask      = lsu_mem_if[lsu_block].req_data.mask;
+                lsu_tb_item[lsu_block].req_addresses = lsu_mem_if[lsu_block].req_data.addr;
+                lsu_tb_item[lsu_block].req_byteen    = lsu_mem_if[lsu_block].req_data.byteen;
+                lsu_tb_item[lsu_block].req_data      = lsu_mem_if[lsu_block].req_data.data;
             end
 
             forever @(posedge lsu_mem_if[lsu_block].rsp_valid)begin

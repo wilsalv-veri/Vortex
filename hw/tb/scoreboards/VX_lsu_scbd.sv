@@ -23,15 +23,17 @@ class VX_lsu_scbd extends uvm_scoreboard;
     VX_gpr_tb_txn_item                                                  gpr_info;
     VX_gpr_seq_block_t                                                  gpr_block;
     VX_gpr_seq_data_entry_t                                             operand1_data; 
+    VX_gpr_seq_data_entry_t                                             operand2_data; 
     VX_gpr_seq_data_entry_t                                             expected_result;
-
-    VX_seq_gpr_bank_num_t                                               rs1_bank_num, rd_bank_num;
-    VX_seq_gpr_bank_set_t                                               rs1_set_num,  rd_set_num;
+    VX_lsu_req_byteen_t                                                 expected_byteen;
+    
+    VX_seq_gpr_bank_num_t                                               rs1_bank_num, rs2_bank_num, rd_bank_num;
+    VX_seq_gpr_bank_set_t                                               rs1_set_num, rs2_set_num, rd_set_num;
     risc_v_seq_imm_t                                                    imm;
 
-    VX_seq_gpr_byte_t                                                   gpr_load_byte;
-    VX_seq_gpr_half_w_t                                                 gpr_load_half_w;
-    VX_seq_gpr_word_t                                                   gpr_load_word;
+    VX_seq_gpr_byte_t                                                   gpr_byte;
+    VX_seq_gpr_half_w_t                                                 gpr_half_w;
+    VX_seq_gpr_word_t                                                   gpr_word;
   
     function new(string name="VX_lsu_scbd", uvm_component parent=null);
         super.new(name,parent);
@@ -90,27 +92,59 @@ class VX_lsu_scbd extends uvm_scoreboard;
 
                         operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
                      
+                        if (!commit_info.wb)
+                            `VX_error(message_id, "commit_if.wb NOT set on Load Instruction")
+                    
                         if((operand1_data[tid] + imm) != (lsu_info.req_addresses[tid] << `WORD_OFFSET_BITS))
                             `VX_error(message_id, $sformatf("Incorrect Load Target Exp: 0x%0h Act: 0x%0h", (operand1_data[tid] + imm) , (lsu_info.req_addresses[tid] << `WORD_OFFSET_BITS)))
 
                         if(i_item.rd != commit_info.rd)
                             `VX_error(message_id,  $sformatf("Committing to incorrect reg Exp: %0d Act: %0d", i_item.rd, commit_info.rd))
 
-                        gpr_load_byte = lsu_info.rsp_data[tid][`LB_WIDTH - 1: 0];
-                        gpr_load_half_w = lsu_info.rsp_data[tid][`LH_WIDTH - 1: 0];
-                        gpr_load_word = lsu_info.rsp_data[tid][`LW_WIDTH - 1: 0];
+                        gpr_byte = lsu_info.rsp_data[tid][`B_WIDTH - 1: 0];
+                        gpr_half_w = lsu_info.rsp_data[tid][`H_WIDTH - 1: 0];
+                        gpr_word = lsu_info.rsp_data[tid][`W_WIDTH - 1: 0];
 
                         case(instr_array[pc].instr_name)
-                            "LB":  expected_result[tid] = `SEXT(`XLEN, gpr_load_byte);
-                            "LH":  expected_result[tid] = `SEXT(`SEQ_RAW_DATA_WIDTH, gpr_load_half_w);
-                            "LW":  expected_result[tid] = `SEXT(`SEQ_RAW_DATA_WIDTH, gpr_load_word);
-                            "LBU": expected_result[tid] = VX_seq_gpr_t'(gpr_load_byte);
-                            "LHU": expected_result[tid] = VX_seq_gpr_t'(gpr_load_half_w);
+                            "LB":  expected_result[tid] = `SEXT(`XLEN, gpr_byte);
+                            "LH":  expected_result[tid] = `SEXT(`SEQ_RAW_DATA_WIDTH, gpr_half_w);
+                            "LW":  expected_result[tid] = `SEXT(`SEQ_RAW_DATA_WIDTH, gpr_word);
+                            "LBU": expected_result[tid] = VX_seq_gpr_t'(gpr_byte);
+                            "LHU": expected_result[tid] = VX_seq_gpr_t'(gpr_half_w);
                         endcase
 
                         if (expected_result[tid] != commit_info.data[tid])
-                            `VX_error(message_id, $sformatf("Incorrect Load Data Committed Exp: 0x%0h Act: 0x%0h", expected_result[tid], commit_info.data[tid]))
+                            `VX_error(message_id, $sformatf("Incorrect Load Data Committed TID: %0d Exp: 0x%0h Act: 0x%0h", tid, expected_result[tid], commit_info.data[tid]))
                     
+                    end
+                    S_TYPE: begin
+                        VX_risc_v_Stype_seq_item s_item = VX_risc_v_Stype_seq_item::create_instruction_with_data("S_TYPE_INST",instr_array[pc].raw_data);
+                        set_s_item_gpr_lookup_fields(s_item);
+                        imm = `SEXT(`XLEN,{s_item.imm1,s_item.imm0});
+
+                        operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
+                        operand2_data[tid]   = gpr_block[rs2_bank_num][rs2_set_num][tid];
+                     
+                        if (commit_info.wb)
+                            `VX_error(message_id, "commit_if.wb set on Store Instruction")
+                        
+                        if((operand1_data[tid] + imm) != (lsu_info.req_addresses[tid] << `WORD_OFFSET_BITS))
+                            `VX_error(message_id, $sformatf("Incorrect Store Target Exp: 0x%0h Act: 0x%0h", (operand1_data[tid] + imm) , (lsu_info.req_addresses[tid] << `WORD_OFFSET_BITS)))
+
+                        case(instr_array[pc].instr_name)
+                            "SB":  expected_byteen[tid] = `NUM_THREADS'b1;
+                            "SH":  expected_byteen[tid] = `NUM_THREADS'b11;
+                            "SW":  expected_byteen[tid] = `NUM_THREADS'b1111;
+                        endcase
+
+                        if(expected_byteen[tid] != lsu_info.req_byteen[tid]) begin
+                            `VX_error(message_id, $sformatf("Incorrect Store Byteen TID: %0d Exp: %0d'b%0b Act: %0d'b%0b",
+                            tid, `NUM_THREADS, expected_byteen[tid], `NUM_THREADS, lsu_info.req_byteen[tid]))
+                        end
+
+                        if (operand2_data[tid] != lsu_info.req_data[tid])
+                            `VX_error(message_id, $sformatf("Incorrect Store Data Sent TID: %0d Exp: 0x%0h Act: 0x%0h", tid, operand2_data[tid], lsu_info.req_data[tid]))
+                      
                     end
                     default: `VX_error(message_id, $sformatf("Found Instruction of incorrect type %0s", instr_array[pc].instr_type))
                 endcase
@@ -131,6 +165,21 @@ class VX_lsu_scbd extends uvm_scoreboard;
     virtual function void set_i_item_gpr_lookup_set_nums(VX_risc_v_Itype_seq_item i_item);
       rs1_set_num  = `REG_NUM_TO_SET(wid,i_item.rs1);
       rd_set_num   = `REG_NUM_TO_SET(wid,i_item.rd);
+    endfunction
+
+    virtual function void  set_s_item_gpr_lookup_fields( VX_risc_v_Stype_seq_item s_item);
+        set_s_item_gpr_lookup_bank_nums(s_item);
+        set_s_item_gpr_lookup_set_nums(s_item);
+    endfunction   
+   
+    virtual function void set_s_item_gpr_lookup_bank_nums(VX_risc_v_Stype_seq_item s_item);
+        rs1_bank_num = `REG_NUM_TO_BANK(s_item.rs1);
+        rs2_bank_num  = `REG_NUM_TO_BANK(s_item.rs2);
+    endfunction
+
+    virtual function void set_s_item_gpr_lookup_set_nums(VX_risc_v_Stype_seq_item s_item);
+      rs1_set_num  = `REG_NUM_TO_SET(wid,s_item.rs1);
+      rs2_set_num   = `REG_NUM_TO_SET(wid,s_item.rs2);
     endfunction
 
 endclass
