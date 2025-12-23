@@ -17,6 +17,7 @@ class VX_lsu_scbd extends uvm_scoreboard;
     uvm_analysis_imp_lsu_instr #(VX_risc_v_instr_seq_item, VX_lsu_scbd) receive_riscv_instr;
    
     risc_v_seq_instr_address_t                                          pc;
+    risc_v_seq_instr_address_t                                          fence_pc;
     VX_wid_t                                                            wid;
    
     uvm_tlm_analysis_fifo #(VX_gpr_tb_txn_item)                         gpr_tb_fifo;
@@ -73,10 +74,10 @@ class VX_lsu_scbd extends uvm_scoreboard;
 
     function void write_commit_info(VX_commit_tb_txn_item commit_info);
         this.commit_info = commit_info;
-        check_load_operation();
+        check_lsu_operation();
     endfunction
 
-    function void check_load_operation();
+    function void check_lsu_operation();
         pc  = commit_info.pc;
         wid = commit_info.wid;
 
@@ -92,6 +93,9 @@ class VX_lsu_scbd extends uvm_scoreboard;
 
                         operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
                      
+                        if(pc < fence_pc)
+                            `VX_error(message_id, $sformatf("Load Instr Violated FENCE LD_PC: 0x%0h Fence_PC: 0x%0h", pc, fence_pc))
+
                         if (!commit_info.wb)
                             `VX_error(message_id, "commit_if.wb NOT set on Load Instruction")
                     
@@ -124,7 +128,10 @@ class VX_lsu_scbd extends uvm_scoreboard;
 
                         operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
                         operand2_data[tid]   = gpr_block[rs2_bank_num][rs2_set_num][tid];
-                     
+                        
+                        if(pc < fence_pc)
+                            `VX_error(message_id, $sformatf("Store Instr Violated FENCE ST_PC: 0x%0h Fence_PC: 0x%0h", pc, fence_pc))
+
                         if (commit_info.wb)
                             `VX_error(message_id, "commit_if.wb set on Store Instruction")
                         
@@ -145,6 +152,9 @@ class VX_lsu_scbd extends uvm_scoreboard;
                         if (operand2_data[tid] != lsu_info.req_data[tid])
                             `VX_error(message_id, $sformatf("Incorrect Store Data Sent TID: %0d Exp: 0x%0h Act: 0x%0h", tid, operand2_data[tid], lsu_info.req_data[tid]))
                       
+                    end
+                    F_TYPE:begin
+                        fence_pc = pc;
                     end
                     default: `VX_error(message_id, $sformatf("Found Instruction of incorrect type %0s", instr_array[pc].instr_type))
                 endcase

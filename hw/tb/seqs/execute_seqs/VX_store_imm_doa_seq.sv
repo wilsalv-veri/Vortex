@@ -2,7 +2,7 @@ class VX_store_imm_doa_seq extends VX_risc_v_base_instr_seq;
 
     `uvm_object_utils(VX_store_imm_doa_seq)
 
-    string message_id = "VX_LOAD_IMM_DOA_SEQ";
+    string message_id = "VX_STORE_IMM_DOA_SEQ";
 
     rand store_instr_type_t      st_instr_type;
     rand risc_v_seq_reg_num_t    st_src1_reg;
