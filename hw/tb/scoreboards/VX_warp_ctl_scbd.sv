@@ -5,30 +5,30 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     `uvm_analysis_imp_decl (_warp_ctl_instr)
     uvm_analysis_imp_warp_ctl_instr #(VX_risc_v_instr_seq_item, VX_warp_ctl_scbd) receive_riscv_instr;
     
-    `uvm_analysis_imp_decl (_sched_info)
-    uvm_analysis_imp_sched_info #(VX_sched_tb_txn_item, VX_warp_ctl_scbd) receive_sched_info; 
-
-    uvm_tlm_analysis_fifo #(VX_gpr_tb_txn_item) gpr_tb_fifo;
+    uvm_tlm_analysis_fifo #(VX_sched_tb_txn_item) sched_tb_fifo;
+    uvm_tlm_analysis_fifo #(VX_gpr_tb_txn_item)   gpr_tb_fifo;
 
     VX_risc_v_instr_seq_item   instr_array[integer]; 
     
     VX_gpr_tb_txn_item         gpr_info;
+    VX_sched_tb_txn_item       sched_info;
 
-    VX_gpr_seq_block_t         gpr_block;
+    VX_gpr_seq_block_t         gpr_block[`SOCKET_SIZE];
 
-    VX_core_tmasks_t           curr_tmask;//Default initial TMASK is 1
-    VX_core_tmasks_t           next_tmask;//Default initial TMASK is 1
+    VX_core_tmasks_t           curr_tmask[`SOCKET_SIZE];//Default initial TMASK is 1
+    VX_core_tmasks_t           next_tmask[`SOCKET_SIZE];//Default initial TMASK is 1
     VX_tmask_t                 expected_tmask;
-    VX_tid_t                   last_tid [`NUM_WARPS - 1:0]; //Initial last_tid = 0
+    VX_tid_t                   last_tid [`SOCKET_SIZE][`NUM_WARPS - 1:0]; //Initial last_tid = 0
     
     bit                             br_taken;
     VX_wid_t [`NUM_ALU_BLOCKS-1:0]  br_wid;
 
     bit                        is_else;
-    bit                        join_is_else[$];
-    VX_tb_ipdom_stack_entry_t  tb_ipdom_stack[$];
+    bit                        join_is_else[`SOCKET_SIZE][$];
+    VX_tb_ipdom_stack_entry_t  tb_ipdom_stack[`SOCKET_SIZE][$];
     VX_tb_ipdom_stack_entry_t  ipdom_stack_entry;
 
+    VX_core_id_t               core_id;
     int                        exp_num_of_warps;
     VX_warp_mask_t             exp_warp_mask;
     VX_warp_num_t              num_warps;
@@ -47,8 +47,8 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     function new(string name="VX_warp_ctl_scbd", uvm_component parent=null);
         super.new(name,parent);
 
-        foreach(next_tmask[wid_idx])
-            next_tmask[wid_idx] = !wid_idx ?  `NUM_THREADS'b1 : `NUM_THREADS'b0;
+        foreach(next_tmask[core_id][wid_idx])
+            next_tmask[core_id][wid_idx] = !wid_idx ?  `NUM_THREADS'b1 : `NUM_THREADS'b0;
         
         curr_tmask    = next_tmask;
         exp_warp_mask = `NUM_WARPS'b1;
@@ -56,19 +56,26 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-        receive_riscv_instr = new("RECEIIVE_RISCV_INSTR", this);
-        receive_sched_info  = new("RECEIVE_SCHED_INFO", this);
+        receive_riscv_instr = new("RECEIVE_RISCV_INSTR", this);
         
+        sched_tb_fifo       = new("SCHED_TB_FIFO",this);
         gpr_tb_fifo         = new("GPR_TB_FIFO", this);
     endfunction
 
     virtual task run_phase (uvm_phase phase);
         super.run_phase(phase);
         
-        forever begin
-            gpr_tb_fifo.get(gpr_info);
-            write_gpr_info(gpr_info);
-        end
+        fork
+            forever begin
+                gpr_tb_fifo.get(gpr_info);
+                write_gpr_info(gpr_info);
+            end
+
+            forever begin
+                sched_tb_fifo.get(sched_info);
+                write_sched_info(sched_info);
+            end
+        join_none
     endtask
 
     virtual function void write_warp_ctl_instr(VX_risc_v_instr_seq_item instr);
@@ -77,19 +84,19 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     endfunction
 
     virtual function void write_sched_info(VX_sched_tb_txn_item sched_info);
-        `VX_info(message_id, $sformatf("Sched Info Received Address: 0x%0h", sched_info.result_pc))
+        `VX_info(message_id, $sformatf("Sched Info Received CORE_ID: %0d Address: 0x%0h", sched_info.core_id, sched_info.result_pc))
         check_instruction(sched_info);
     endfunction
 
     virtual function void write_gpr_info(VX_gpr_tb_txn_item gpr_info);
-        write_gpr_entry(gpr_info, gpr_block);
-        `VX_info(message_id, $sformatf("GPR Info Received BYTEEN: 0x%0h BANK_NUM: %0d SET: %0d DATA_ENTRY: 0x%0x", gpr_info.byteen,  gpr_info.bank_num, gpr_info.bank_set, gpr_info.gpr_data_entry))
+        write_gpr_entry(gpr_info, gpr_block[gpr_info.core_id]);
+        `VX_info(message_id, $sformatf("GPR Info Received CORE_ID: %0d BYTEEN: 0x%0h BANK_NUM: %0d SET: %0d DATA_ENTRY: 0x%0x", gpr_info.core_id, gpr_info.byteen,  gpr_info.bank_num, gpr_info.bank_set, gpr_info.gpr_data_entry))
     endfunction
 
     virtual function void check_instruction(VX_sched_tb_txn_item sched_info);
-       
-        pc    = sched_info.br_valid  ? sched_info.br_pc : sched_info.result_pc;
-        wid   = sched_info.wid;
+        core_id = sched_info.core_id;
+        pc      = sched_info.br_valid  ? sched_info.br_pc : sched_info.result_pc;
+        wid     = sched_info.wid;
         num_warps = $countones(sched_info.active_warps);
 
         if (instr_array.exists(pc)) begin
@@ -98,37 +105,37 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                 R_TYPE: begin
                     VX_risc_v_Rtype_seq_item r_item = VX_risc_v_Rtype_seq_item::create_instruction_with_data("R_TYPE_INST",instr_array[pc].raw_data);
                     set_r_item_gpr_lookup_fields(r_item);
-                    next_tmask[wid]  = `NUM_THREADS'(sched_info.thread_masks[wid]);
+                    next_tmask[core_id][wid]  = `NUM_THREADS'(sched_info.thread_masks[wid]);
                             
                     case(instr_array[pc].instr_name)
                         "TMC": begin      
-                            expected_tmask   = `NUM_THREADS'(gpr_block[rs1_bank_num][rs1_set_num][last_tid[wid]]);
+                            expected_tmask   = `NUM_THREADS'(gpr_block[core_id][rs1_bank_num][rs1_set_num][last_tid[core_id][wid]]);
                          
-                            if (expected_tmask !== next_tmask[wid])begin 
-                                `VX_error(message_id, $sformatf("TMC Instruction Thread Mask Mismatch  WID: %0h PC: %0h Instruction: 0x%0h Expected: 0x%0h Actual: 0x%0h", wid, pc, r_item.raw_data, gpr_block[rs1_bank_num][rs1_set_num][last_tid[wid]], sched_info.thread_masks[wid])) 
-                                `VX_info(message_id, $sformatf("WID: %0d RS1: %0d BANK_NUM:%0d SET_NUM:%0d GPR_VAL: 0x%0h LAST_TID: %0d", wid, r_item.rs1,rs1_bank_num, rs1_set_num, gpr_block[rs1_bank_num][rs1_set_num][last_tid[wid]], last_tid[wid]))
+                            if (expected_tmask !== next_tmask[core_id][wid])begin 
+                                `VX_error(message_id, $sformatf("TMC Instruction Thread Mask Mismatch CORE_ID: %0d WID: %0h PC: %0h Instruction: 0x%0h Expected: 0x%0h Actual: 0x%0h", core_id, wid, pc, r_item.raw_data, gpr_block[core_id][rs1_bank_num][rs1_set_num][last_tid[core_id][wid]], sched_info.thread_masks[wid])) 
+                                `VX_info(message_id, $sformatf("CORE_ID: %0d WID: %0d RS1: %0d BANK_NUM:%0d SET_NUM:%0d GPR_VAL: 0x%0h LAST_TID: %0d", core_id, wid, r_item.rs1,rs1_bank_num, rs1_set_num, gpr_block[core_id][rs1_bank_num][rs1_set_num][last_tid[core_id][wid]], last_tid[core_id][wid]))
                             end
                             else 
-                                `VX_info(message_id, $sformatf("WID: %0d RS1: %0d BANK_NUM:%0d SET_NUM:%0d GPR_VAL: 0x%0h ThreadMask: 4'b%b", wid, r_item.rs1,rs1_bank_num, rs1_set_num, gpr_block[rs1_bank_num][rs1_set_num][last_tid[wid]],sched_info.thread_masks[wid])) 
+                                `VX_info(message_id, $sformatf("CORE_ID: %0d WID: %0d RS1: %0d BANK_NUM:%0d SET_NUM:%0d GPR_VAL: 0x%0h ThreadMask: 4'b%b", core_id, wid, r_item.rs1,rs1_bank_num, rs1_set_num, gpr_block[core_id][rs1_bank_num][rs1_set_num][last_tid[core_id][wid]],sched_info.thread_masks[wid])) 
                          
                         end
                         "PRED":begin
                             expected_tmask = `NUM_THREADS'(0);
                             
                             for(int tid=0; tid < `NUM_THREADS;  tid++)    
-                                expected_tmask[tid] = ((gpr_block[rs1_bank_num][rs1_set_num][tid][0] ^ r_item.rd[0]) & curr_tmask[wid][tid]); 
+                                expected_tmask[tid] = ((gpr_block[core_id][rs1_bank_num][rs1_set_num][tid][0] ^ r_item.rd[0]) & curr_tmask[core_id][wid][tid]); 
                             
-                            expected_tmask = expected_tmask  ? expected_tmask : `NUM_THREADS'(gpr_block[rs2_bank_num][rs2_set_num][last_tid[wid]]);     
+                            expected_tmask = expected_tmask  ? expected_tmask : `NUM_THREADS'(gpr_block[core_id][rs2_bank_num][rs2_set_num][last_tid[core_id][wid]]);     
                           
-                            if (expected_tmask !== next_tmask[wid])begin 
-                                `VX_error(message_id, $sformatf("PRED Instruction Thread Mask Mismatch Expected: 0x%0h Actual: 0x%0h", expected_tmask, next_tmask[wid])) 
-                                `VX_info(message_id, $sformatf("RS1_GPR_VAL: 0x%0h RS2_GPR_VAL: 0x%0h RD_GPR_VAL: 0x%0h", gpr_block[rs1_bank_num][rs1_set_num], gpr_block[rs2_bank_num][rs2_set_num], gpr_block[rd_bank_num][rd_set_num]))
+                            if (expected_tmask !== next_tmask[core_id][wid])begin 
+                                `VX_error(message_id, $sformatf("PRED Instruction Thread Mask Mismatch Expected: 0x%0h Actual: 0x%0h", expected_tmask, next_tmask[core_id][wid])) 
+                                `VX_info(message_id, $sformatf("RS1_GPR_VAL: 0x%0h RS2_GPR_VAL: 0x%0h RD_GPR_VAL: 0x%0h", gpr_block[core_id][rs1_bank_num][rs1_set_num], gpr_block[core_id][rs2_bank_num][rs2_set_num], gpr_block[core_id][rd_bank_num][rd_set_num]))
                             end
                         end
                         "WSPAWN":begin
                             if (sched_info.wspawn_valid && sched_info.curr_single_warp) begin
-                                exp_num_of_warps = `NUM_WARPS'(gpr_block[rs1_bank_num][rs1_set_num][last_tid[wid]]);
-                                exp_next_pc      = gpr_block[rs2_bank_num][rs2_set_num][last_tid[wid]];
+                                exp_num_of_warps = `NUM_WARPS'(gpr_block[core_id][rs1_bank_num][rs1_set_num][last_tid[core_id][wid]]);
+                                exp_next_pc      = gpr_block[core_id][rs2_bank_num][rs2_set_num][last_tid[core_id][wid]];
                                 exp_warp_mask    = get_warp_mask(exp_num_of_warps);
                                 
                                 if (exp_warp_mask != sched_info.active_warps)
@@ -153,45 +160,45 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                         "SPLIT": begin
                             expected_tmask = `NUM_THREADS'(0);
                             for(int tid_idx=0; tid_idx < `NUM_THREADS; tid_idx++)begin
-                                if (curr_tmask[wid][tid_idx])
-                                    expected_tmask[tid_idx] = gpr_block[rs1_bank_num][rs1_set_num][tid_idx][0] ^ r_item.rs2[0];
+                                if (curr_tmask[core_id][wid][tid_idx])
+                                    expected_tmask[tid_idx] = gpr_block[core_id][rs1_bank_num][rs1_set_num][tid_idx][0] ^ r_item.rs2[0];
                             end
 
-                            expected_tmask = $countones(expected_tmask) >= $countones(~expected_tmask & curr_tmask[wid]) ? expected_tmask :  ~expected_tmask & curr_tmask[wid];
-                            if (expected_tmask != next_tmask[wid])
-                                `VX_error(message_id, $sformatf("SPLIT Instruction set incorrect next tmask Exp_TMASK: %0d'b%0b Act_TMASK: %0d'b%0b", `NUM_THREADS,expected_tmask, `NUM_THREADS, next_tmask[wid]))
+                            expected_tmask = $countones(expected_tmask) >= $countones(~expected_tmask & curr_tmask[core_id][wid]) ? expected_tmask :  ~expected_tmask & curr_tmask[core_id][wid];
+                            if (expected_tmask != next_tmask[core_id][wid])
+                                `VX_error(message_id, $sformatf("SPLIT Instruction set incorrect next tmask Exp_TMASK: %0d'b%0b Act_TMASK: %0d'b%0b", `NUM_THREADS,expected_tmask, `NUM_THREADS, next_tmask[core_id][wid]))
                             
-                            if (expected_tmask != curr_tmask[wid])
+                            if (expected_tmask != curr_tmask[core_id][wid])
                                 ipdom_stack_push_entry();
                         end
                         "JOIN": begin
 
-                            stack_rd_ptr = gpr_block[rs1_bank_num][rs1_set_num][last_tid[wid]];
+                            stack_rd_ptr = gpr_block[core_id][rs1_bank_num][rs1_set_num][last_tid[core_id][wid]];
                             
-                            if (stack_rd_ptr == (tb_ipdom_stack.size() - 1))begin
-                                `VX_info(message_id, $sformatf("RS1 Stack Ptr: 0x%0h Stack Size: 0x%0h", stack_rd_ptr, tb_ipdom_stack.size()))
+                            if (stack_rd_ptr == (tb_ipdom_stack[core_id].size() - 1))begin
+                                `VX_info(message_id, $sformatf("CORE_ID: %0d RS1 Stack Ptr: 0x%0h Stack Size: 0x%0h", core_id, stack_rd_ptr, tb_ipdom_stack[core_id].size()))
                                 if (sched_info.join_valid) begin
-                                    ipdom_stack_entry = tb_ipdom_stack.pop_back();
+                                    ipdom_stack_entry = tb_ipdom_stack[core_id].pop_back();
                                     expected_tmask = ipdom_stack_entry.join_is_else ? ipdom_stack_entry.join_tmask : ipdom_stack_entry.non_dvg_tmask;
 
-                                    if (expected_tmask != next_tmask[wid])
-                                        `VX_error(message_id, $sformatf("JOIN Instruction set incorrect next tmask WID: %0d Exp_TMASK: %0d'b%0b Act_TMASK: %0d'b%0b IS_ELSE: %0d", wid, `NUM_THREADS,expected_tmask, `NUM_THREADS, next_tmask[wid], ipdom_stack_entry.join_is_else))
+                                    if (expected_tmask != next_tmask[core_id][wid])
+                                        `VX_error(message_id, $sformatf("JOIN Instruction set incorrect next tmask WID: %0d Exp_TMASK: %0d'b%0b Act_TMASK: %0d'b%0b IS_ELSE: %0d", wid, `NUM_THREADS,expected_tmask, `NUM_THREADS, next_tmask[core_id][wid], ipdom_stack_entry.join_is_else))
 
                                     if (ipdom_stack_entry.join_is_else) begin
                                         ipdom_stack_entry.join_is_else = 0;
-                                        tb_ipdom_stack.push_back(ipdom_stack_entry);
+                                        tb_ipdom_stack[core_id].push_back(ipdom_stack_entry);
                                     end
                                 end
 
                             end
-                            else if (next_tmask[wid] != curr_tmask[wid])
-                                `VX_error(message_id, $sformatf("JOIN Instruction With Incorrect Stack Ptr Changed T-MASK RD_PTR: %0d STACK_SIZE: %0d", stack_rd_ptr,tb_ipdom_stack.size() ))  
+                            else if (next_tmask[core_id][wid] != curr_tmask[core_id][wid])
+                                `VX_error(message_id, $sformatf("JOIN Instruction With Incorrect Stack Ptr Changed T-MASK RD_PTR: %0d STACK_SIZE: %0d CORE_ID: %0d", stack_rd_ptr,tb_ipdom_stack[core_id].size(), core_id ))  
                         
                         end
                     endcase    
                     
-                    set_last_tid(next_tmask[wid]);
-                    curr_tmask = next_tmask;
+                    set_last_tid(next_tmask[core_id][wid]);
+                    curr_tmask[core_id] = next_tmask[core_id];
        
                 end
                 B_TYPE: begin
@@ -201,8 +208,8 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                     for(int alu_num=0; alu_num < `NUM_ALU_BLOCKS; alu_num++)begin
                         
                         br_wid = sched_info.br_wid[alu_num];
-                        br_src1 = gpr_block[rs1_bank_num][rs1_set_num][last_tid[br_wid]];
-                        br_src2 = gpr_block[rs2_bank_num][rs2_set_num][last_tid[br_wid]];
+                        br_src1 = gpr_block[core_id][rs1_bank_num][rs1_set_num][last_tid[core_id][br_wid]];
+                        br_src2 = gpr_block[core_id][rs2_bank_num][rs2_set_num][last_tid[core_id][br_wid]];
                         br_target = pc + get_br_offset(b_item);
                    
                         case(instr_array[pc].instr_name)
@@ -237,8 +244,8 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
 
         for(int idx = $bits(VX_tmask_t); idx > 0;idx--)begin
             if (tmask[idx])begin
-                last_tid[wid] = VX_tid_t'(idx);
-                `VX_info("VX_WARP_CTL_SCBD", $sformatf("Set Last_TID: %0d TMASK: 4'b%0b WID: %0d", last_tid[wid], tmask, wid)) 
+                last_tid[core_id][wid] = VX_tid_t'(idx);
+                `VX_info("VX_WARP_CTL_SCBD", $sformatf("Set Last_TID: %0d TMASK: 4'b%0b WID: %0d CORE_ID: %0d",last_tid[core_id][wid], tmask, wid, core_id)) 
                 return;
             end
         end
@@ -286,10 +293,10 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
     endfunction
 
     virtual function void ipdom_stack_push_entry();
-        ipdom_stack_entry.join_tmask = ~expected_tmask & curr_tmask[wid];
-        ipdom_stack_entry.non_dvg_tmask = curr_tmask[wid];
+        ipdom_stack_entry.join_tmask = ~expected_tmask & curr_tmask[core_id][wid];
+        ipdom_stack_entry.non_dvg_tmask = curr_tmask[core_id][wid];
         ipdom_stack_entry.join_is_else = 1;
-        tb_ipdom_stack.push_back(ipdom_stack_entry);
+        tb_ipdom_stack[core_id].push_back(ipdom_stack_entry);
     endfunction
 
     virtual function  risc_v_seq_instr_address_t get_br_offset(VX_risc_v_Btype_seq_item b_item);

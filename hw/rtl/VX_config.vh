@@ -95,7 +95,7 @@
 `endif
 
 `ifndef NUM_CORES
-`define NUM_CORES 1
+`define NUM_CORES 2
 `endif
 
 `ifndef NUM_WARPS

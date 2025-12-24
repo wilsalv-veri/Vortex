@@ -7,22 +7,6 @@ package VX_tb_common_pkg;
     import VX_gpu_pkg::*;
     import VX_tb_top_pkg::*;
 
-    virtual VX_tb_top_if        tb_top_if;
-    virtual VX_gpr_tb_if        gpr_tb_if;
-   
-    //Core Interfaces
-    virtual VX_schedule_if      schedule_if;
-    virtual VX_fetch_if         fetch_if;
-    virtual VX_decode_if        decode_if;
-    virtual VX_sched_csr_if     sched_csr_if;
-    virtual VX_decode_sched_if  decode_sched_if;
-    virtual VX_issue_sched_if   issue_sched_if[`ISSUE_WIDTH];
-    virtual VX_commit_sched_if  commit_sched_if;
-    virtual VX_commit_csr_if    commit_csr_if;
-    virtual VX_branch_ctl_if    branch_ctl_if[`NUM_ALU_BLOCKS];
-    virtual VX_dispatch_if      dispatch_if[NUM_EX_UNITS * `ISSUE_WIDTH];
-    virtual VX_commit_if        commit_if[NUM_EX_UNITS * `ISSUE_WIDTH];
-    
     localparam INST_PER_CACHE_LINE = L2_MEM_DATA_WIDTH / PC_BITS; 
 
     `include "VX_tb_types.svh"
@@ -64,10 +48,6 @@ package VX_tb_common_pkg;
         return max_tmask;
     endfunction
     
-    task VX_wait_n_clks(int n);
-        repeat(n) @(posedge tb_top_if.clk);
-    endtask
-
 endpackage
 
 `endif // VX_TB_COMMON_PKG_VH

@@ -69,8 +69,12 @@
     `define VF_VM_WIDTH     1
     `define VF_NCVT_WIDTH   `REG_NUM_WIDTH    
     `define VF_OPFVV_WIDTH  `FUNCT3_WIDTH  
+
+    `define MAX_CORES       8
+    `define CORE_ID_WIDTH   `CLOG2(`MAX_CORES)
     
     //Sequence Use
+    typedef bit [`CORE_ID_WIDTH - 1:0]       VX_core_id_t;
     typedef bit [`INSTR_ADDRESS_WIDTH -1:0]  risc_v_seq_instr_address_t;
     
     typedef bit [`OPCODE_WIDTH - 1:0 ]       risc_v_seq_opcode_t;

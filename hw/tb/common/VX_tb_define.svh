@@ -1,15 +1,15 @@
 `ifndef VX_TB_DEFINE_VH
 `define VX_TB_DEFINE_VH
 
-`define VX_CORE     VX_tb_top.core
-`define VX_SCHED   `VX_CORE.schedule
-`define VX_FETCH   `VX_CORE.fetch
-`define VX_DECODE  `VX_CORE.decode
-`define VX_ISSUE   `VX_CORE.issue
-`define VX_EXECUTE `VX_CORE.execute
-`define VX_COMMIT  `VX_CORE.commit
+`define VX_CORE(x)    VX_tb_top.g_cores[x].core
+`define VX_SCHED(x)   `VX_CORE(x).schedule
+`define VX_FETCH(x)   `VX_CORE(x).fetch
+`define VX_DECODE(x)  `VX_CORE(x).decode
+`define VX_ISSUE(x)   `VX_CORE(x).issue
+`define VX_EXECUTE(x) `VX_CORE(x).execute
+`define VX_COMMIT(x)  `VX_CORE(x).commit
 
-`define VX_GPR(bank_num)      `VX_ISSUE.g_slices[0].issue_slice.operands.g_collectors[0].opc_unit.g_gpr_rams[bank_num].gpr_ram
+`define VX_GPR(core_id, bank_num)   `VX_ISSUE(core_id).g_slices[0].issue_slice.operands.g_collectors[0].opc_unit.g_gpr_rams[bank_num].gpr_ram
 
 //Access to GPR
 //Need GPR to real access mapping

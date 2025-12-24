@@ -7,19 +7,22 @@ class VX_alu_scbd extends uvm_scoreboard;
     `uvm_analysis_imp_decl (_alu_instr)
     uvm_analysis_imp_alu_instr #(VX_risc_v_instr_seq_item, VX_alu_scbd) receive_riscv_instr;
 
-    `uvm_analysis_imp_decl(_alu_info)
-    uvm_analysis_imp_alu_info #(VX_alu_tb_txn_item, VX_alu_scbd) receive_alu_info;
+    //`uvm_analysis_imp_decl(_alu_info)
+    //uvm_analysis_imp_alu_info #(VX_alu_tb_txn_item, VX_alu_scbd) receive_alu_info;
 
+    uvm_tlm_analysis_fifo #(VX_alu_tb_txn_item) alu_tb_fifo;
+    VX_alu_tb_txn_item                          alu_info;
+    
     uvm_tlm_analysis_fifo #(VX_gpr_tb_txn_item) gpr_tb_fifo;
     VX_gpr_tb_txn_item                          gpr_info;
-    VX_gpr_seq_block_t                          gpr_block;
+    VX_gpr_seq_block_t                          gpr_block[`SOCKET_SIZE];
     VX_gpr_seq_data_entry_t                     operand1_data; 
     VX_gpr_seq_data_entry_t                     operand2_data;;
     VX_gpr_seq_data_entry_t                     expected_result;
     
     VX_risc_v_instr_seq_item                    instr_array[integer]; 
-    VX_alu_tb_txn_item                          alu_info;
      
+    VX_core_id_t                                core_id;
     risc_v_seq_instr_address_t                  pc;
     VX_wid_t                                    wid;
     VX_seq_gpr_bank_num_t                       rs1_bank_num, rs2_bank_num, rd_bank_num;
@@ -46,7 +49,7 @@ class VX_alu_scbd extends uvm_scoreboard;
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
         receive_riscv_instr = new("ALU_SCBD_RECEIVE_RISCV_INSTR", this);
-        receive_alu_info = new("RECEIVE_ALU_INFO", this);
+        alu_tb_fifo      = new("ALU_SCBD_ALU_TB_FIFO",this);
         gpr_tb_fifo      = new("ALU_SCBD_GPR_TB_FIFO", this);
 
     endfunction
@@ -54,10 +57,17 @@ class VX_alu_scbd extends uvm_scoreboard;
     virtual task run_phase (uvm_phase phase);
         super.run_phase(phase);
         
-        forever begin
-            gpr_tb_fifo.get(gpr_info);
-            write_gpr_info(gpr_info);
-        end
+        fork 
+            forever begin
+                gpr_tb_fifo.get(gpr_info);
+                write_gpr_info(gpr_info);
+            end
+
+            forever begin
+                alu_tb_fifo.get(alu_info);
+                write_alu_info(alu_info);
+            end
+        join_none
     endtask
 
     virtual function void write_alu_instr(VX_risc_v_instr_seq_item instr);
@@ -66,7 +76,7 @@ class VX_alu_scbd extends uvm_scoreboard;
     endfunction
 
     virtual function void write_gpr_info(VX_gpr_tb_txn_item gpr_info);
-        write_gpr_entry(gpr_info, gpr_block);
+        write_gpr_entry(gpr_info, gpr_block[gpr_info.core_id]);
         `VX_info(message_id, $sformatf("GPR Info Received BYTEEN: 0x%0h BANK_NUM: %0d SET: %0d DATA_ENTRY: 0x%0x", gpr_info.byteen,  gpr_info.bank_num, gpr_info.bank_set, gpr_info.gpr_data_entry))
     endfunction
 
@@ -76,8 +86,9 @@ class VX_alu_scbd extends uvm_scoreboard;
     endfunction
 
     function void check_alu_result();
-        pc  = alu_info.pc;
-        wid = alu_info.wid;
+        core_id = alu_info.core_id;
+        pc      = alu_info.pc;
+        wid     = alu_info.wid;
        
         if (instr_array.exists(pc)) begin
             
@@ -93,8 +104,8 @@ class VX_alu_scbd extends uvm_scoreboard;
                         VX_risc_v_Rtype_seq_item r_item = VX_risc_v_Rtype_seq_item::create_instruction_with_data("R_TYPE_INST",instr_array[pc].raw_data);
                         set_r_item_gpr_lookup_fields(r_item);
                         
-                        operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
-                        operand2_data[tid]   = gpr_block[rs2_bank_num][rs2_set_num][tid];
+                        operand1_data[tid]   = gpr_block[core_id][rs1_bank_num][rs1_set_num][tid];
+                        operand2_data[tid]   = gpr_block[core_id][rs2_bank_num][rs2_set_num][tid];
                         
                         shfl_bval            = {operand2_data[tid][1],operand2_data[tid][0]}[BVAL_START + NUM_ALU_BITS - 1 : BVAL_START];
                         shfl_cval            = {operand2_data[tid][1],operand2_data[tid][0]}[CVAL_START + NUM_ALU_BITS - 1 : CVAL_START];
@@ -165,7 +176,7 @@ class VX_alu_scbd extends uvm_scoreboard;
                             shfl_instr = 0;
                             
                             if ((shfl_lane >= shfl_minLane) && (shfl_lane <= shfl_maxLane))
-                                expected_result[tid] = gpr_block[rs1_bank_num][rs1_set_num][shfl_lane];
+                                expected_result[tid] = gpr_block[core_id][rs1_bank_num][rs1_set_num][shfl_lane];
                             else
                                 expected_result[tid] = operand1_data[tid];
                         end
@@ -176,7 +187,7 @@ class VX_alu_scbd extends uvm_scoreboard;
                         set_i_item_gpr_lookup_fields(i_item);
                         imm = `SEXT(`XLEN,i_item.imm);
 
-                        operand1_data[tid]   = gpr_block[rs1_bank_num][rs1_set_num][tid];
+                        operand1_data[tid]   = gpr_block[core_id][rs1_bank_num][rs1_set_num][tid];
                                 
                         case(instr_array[pc].instr_name)
                             "ADDI":    expected_result[tid] = operand1_data[tid] + imm;

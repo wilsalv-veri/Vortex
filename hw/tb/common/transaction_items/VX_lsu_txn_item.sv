@@ -1,5 +1,6 @@
 class VX_lsu_tb_txn_item extends uvm_transaction;
 
+    VX_core_id_t               core_id;
     VX_tmask_t                 req_mask;
     VX_lsu_req_addresses_t     req_addresses;
     VX_lsu_req_byteen_t        req_byteen;
@@ -9,6 +10,7 @@ class VX_lsu_tb_txn_item extends uvm_transaction;
     VX_lsu_data                rsp_data;
 
     `uvm_object_utils_begin(VX_lsu_tb_txn_item)
+        `uvm_field_int(core_id,       UVM_DEFAULT)  
         `uvm_field_int(req_mask,      UVM_DEFAULT)
         `uvm_field_int(req_addresses, UVM_DEFAULT)
         `uvm_field_int(req_byteen,    UVM_DEFAULT)

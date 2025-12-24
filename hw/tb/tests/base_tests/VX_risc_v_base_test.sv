@@ -44,11 +44,20 @@ class VX_risc_v_base_test extends uvm_test;
 
     task wait_for_core_idle(uvm_phase phase);
         phase.raise_objection(this);
-            wait(!uvm_test_ifc.core_busy);
+            for(int id = 0; id < `SOCKET_SIZE; id++)begin
+                automatic int core_id = id;
+                fork
+                    wait_for_core_unbusy(core_id);
+                join_none
+            end
+            wait fork;
             `VX_info("VX_RISC_V_BASE_TEST", "END_OF TEST")
         phase.drop_objection(this);
     endtask 
 
+    task wait_for_core_unbusy(int core_id);
+        wait(!uvm_test_ifc.core_busy[core_id]);
+    endtask
     virtual task start_sequence();
          risc_v_base_seq.start(vx_tb_environment.risc_v_agent.vx_risc_v_seqr);
     endtask

@@ -1,5 +1,6 @@
 class VX_ibuffer_tb_txn_item extends uvm_transaction;
 
+    VX_core_id_t                  core_id;
     bit                           valid;
     VX_pipeline_issue_slice_num_t slice_num;
     VX_wid_t                      wid;
@@ -11,6 +12,7 @@ class VX_ibuffer_tb_txn_item extends uvm_transaction;
     VX_pipeline_reg_num_t         rs3;
     
     `uvm_object_utils_begin(VX_ibuffer_tb_txn_item)
+        `uvm_field_int(core_id, UVM_DEFAULT)   
         `uvm_field_int(valid,   UVM_DEFAULT)
         `uvm_field_int(wid,     UVM_DEFAULT)
         `uvm_field_int(wb,      UVM_DEFAULT)

@@ -8,11 +8,11 @@ class VX_operands_scbd extends uvm_scoreboard;
     VX_scoreboard_tb_txn_item  scoreboard_info_clone;    
     VX_scoreboard_tb_txn_item  opc_used_scoreboard_info;    
     
-    VX_scoreboard_tb_txn_item  scoreboard_info_items[$];    
+    VX_scoreboard_tb_txn_item  scoreboard_info_items[`SOCKET_SIZE][$];    
     VX_operands_tb_txn_item    operands_info;    
     VX_gpr_tb_txn_item         gpr_info;
    
-    VX_gpr_seq_block_t         gpr_block;
+    VX_gpr_seq_block_t         gpr_block[`SOCKET_SIZE];
 
     uvm_tlm_analysis_fifo #(VX_scoreboard_tb_txn_item) scoreboard_info_fifo;
     uvm_tlm_analysis_fifo #(VX_operands_tb_txn_item)   operands_info_fifo;
@@ -39,8 +39,8 @@ class VX_operands_scbd extends uvm_scoreboard;
         fork 
             forever begin
                 operands_info_fifo.get(operands_info);  
-                set_opc_used_scorboard_info();  
-                check_operands();
+                set_opc_used_scorboard_info(operands_info.core_id);  
+                check_operands(operands_info.core_id);
             end
             
             forever begin
@@ -49,7 +49,7 @@ class VX_operands_scbd extends uvm_scoreboard;
                 if (!$cast(scoreboard_info_clone, scoreboard_info.clone()))
                     `VX_error(message_id, "Failed to cast scoreboard_info clone into local scoreboard_info object")
             
-                scoreboard_info_items.push_back(scoreboard_info_clone);     
+                scoreboard_info_items[scoreboard_info_clone.core_id].push_back(scoreboard_info_clone);     
             end
 
             forever begin
@@ -60,35 +60,35 @@ class VX_operands_scbd extends uvm_scoreboard;
         join_none
     endtask
 
-    function void check_operands();
+    function void check_operands(VX_core_id_t  core_id);
         
         if (opc_used_scoreboard_info.used_rs.use_rs1)begin
-            if (operands_info.rs1_data != gpr_block[rs1_bank_num][rs1_set_num])
-                `VX_error(message_id, $sformatf("Incorrect Operand RS1 Data Given OPC RS1 Data: 0x%0h GPR Data for GPR %0d: 0x%0h",
-            operands_info.rs1_data, opc_used_scoreboard_info.rs1, gpr_block[rs1_bank_num][rs1_set_num]))
+            if (operands_info.rs1_data != gpr_block[core_id][rs1_bank_num][rs1_set_num])
+                `VX_error(message_id, $sformatf("Incorrect Operand RS1 Data Given OPC CORE_ID: %0d RS1 Data: 0x%0h GPR Data for GPR %0d: 0x%0h",
+            core_id, operands_info.rs1_data, opc_used_scoreboard_info.rs1, gpr_block[core_id][rs1_bank_num][rs1_set_num]))
         end
 
         if (opc_used_scoreboard_info.used_rs.use_rs2)begin
-            if (operands_info.rs2_data != gpr_block[rs2_bank_num][rs2_set_num])
-                `VX_error(message_id, $sformatf("Incorrect Operand RS2 Data Given OPC RS2 Data: 0x%0h GPR Data for GPR %0d: 0x%0h",
-            operands_info.rs2_data, opc_used_scoreboard_info.rs2, gpr_block[rs2_bank_num][rs2_set_num]))  
+            if (operands_info.rs2_data != gpr_block[core_id][rs2_bank_num][rs2_set_num])
+                `VX_error(message_id, $sformatf("Incorrect Operand RS2 Data Given OPC CORE_ID: %0d RS2 Data: 0x%0h GPR Data for GPR %0d: 0x%0h",
+            core_id, operands_info.rs2_data, opc_used_scoreboard_info.rs2, gpr_block[core_id][rs2_bank_num][rs2_set_num]))  
         end
 
         if (opc_used_scoreboard_info.used_rs.use_rs3)begin
-            if (operands_info.rs3_data != gpr_block[rs3_bank_num][rs3_set_num])
-                `VX_error(message_id, $sformatf("Incorrect Operand RS3 Data Given OPC RS3 Data: %0h GPR Data for GPR %0d: %0h",
-            operands_info.rs3_data, opc_used_scoreboard_info.rs3, gpr_block[rs3_bank_num][rs3_set_num]))
+            if (operands_info.rs3_data != gpr_block[core_id][rs3_bank_num][rs3_set_num])
+                `VX_error(message_id, $sformatf("Incorrect Operand RS3 Data Given OPC CORE_ID: %0d RS3 Data: %0h GPR Data for GPR %0d: %0h",
+            core_id, operands_info.rs3_data, opc_used_scoreboard_info.rs3, gpr_block[core_id][rs3_bank_num][rs3_set_num]))
         end
 
     endfunction
 
     virtual function void write_gpr_info(VX_gpr_tb_txn_item gpr_info);
-        write_gpr_entry(gpr_info, gpr_block);
+        write_gpr_entry(gpr_info, gpr_block[gpr_info.core_id]);
         `VX_info(message_id, $sformatf("GPR Info Received BYTEEN: 0x%0h BANK_NUM: %0d SET: %0d DATA_ENTRY: 0x%0x", gpr_info.byteen,  gpr_info.bank_num, gpr_info.bank_set, gpr_info.gpr_data_entry))
     endfunction
 
-    function void set_opc_used_scorboard_info();
-        opc_used_scoreboard_info = scoreboard_info_items.pop_front();
+    function void set_opc_used_scorboard_info( VX_core_id_t  core_id);
+        opc_used_scoreboard_info = scoreboard_info_items[core_id].pop_front();
         set_operands_gpr_bank_num();
         set_operands_gpr_set_num();
     endfunction

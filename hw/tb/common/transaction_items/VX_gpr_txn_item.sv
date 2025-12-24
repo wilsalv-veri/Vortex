@@ -2,6 +2,7 @@ class VX_gpr_tb_txn_item extends uvm_transaction;
 
     `uvm_object_utils(VX_gpr_tb_txn_item)
     
+    VX_core_id_t                core_id;
     VX_seq_gpr_bank_num_t       bank_num;
     VX_seq_gpr_bank_set_t       bank_set;
     VX_seq_gpr_entry_byteen     byteen;

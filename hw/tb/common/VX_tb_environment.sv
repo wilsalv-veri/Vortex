@@ -49,27 +49,35 @@ class VX_tb_environment extends uvm_env;
         risc_v_agent.risc_v_driver.instr_analysis_port.connect(alu_scbd.receive_riscv_instr);
         risc_v_agent.risc_v_driver.instr_analysis_port.connect(lsu_scbd.receive_riscv_instr);
         
-        sched_agent.sched_monitor.sched_info_analysis_port.connect(warp_ctl_scbd.receive_sched_info);
+        for(int core_id=0; core_id < `SOCKET_SIZE; core_id++)begin
+            //sched_agent.sched_monitor.sched_info_analysis_port.connect(warp_ctl_scbd.receive_sched_info);
+            sched_agent.sched_monitor.sched_info_analysis_port[core_id].connect(warp_ctl_scbd.sched_tb_fifo.analysis_export);
 
-        for(int bank_num=0; bank_num  < `NUM_GPR_BANKS; bank_num++) begin
-            gpr_agent.gpr_monitor.gpr_info_analysis_port[bank_num].connect(warp_ctl_scbd.gpr_tb_fifo.analysis_export);
-            gpr_agent.gpr_monitor.gpr_info_analysis_port[bank_num].connect(operands_scbd.gpr_tb_fifo.analysis_export);
-            gpr_agent.gpr_monitor.gpr_info_analysis_port[bank_num].connect(     alu_scbd.gpr_tb_fifo.analysis_export);
-            gpr_agent.gpr_monitor.gpr_info_analysis_port[bank_num].connect(     lsu_scbd.gpr_tb_fifo.analysis_export);
-        end
+            for(int bank_num=0; bank_num  < `NUM_GPR_BANKS; bank_num++) begin
+                gpr_agent.gpr_monitor.gpr_info_analysis_port[core_id][bank_num].connect(warp_ctl_scbd.gpr_tb_fifo.analysis_export);
+                gpr_agent.gpr_monitor.gpr_info_analysis_port[core_id][bank_num].connect(operands_scbd.gpr_tb_fifo.analysis_export);
+                gpr_agent.gpr_monitor.gpr_info_analysis_port[core_id][bank_num].connect(     alu_scbd.gpr_tb_fifo.analysis_export);
+                gpr_agent.gpr_monitor.gpr_info_analysis_port[core_id][bank_num].connect(     lsu_scbd.gpr_tb_fifo.analysis_export);
+            end
 
-        //Issue Scbds
-        for(int issue_slice=0; issue_slice < `ISSUE_WIDTH; issue_slice++)begin
-            issue_agent.issue_monitor.scoreboard_info_analysis_port[issue_slice].connect(data_hazard_scbd.scoreboard_info_fifo.analysis_export);
-            issue_agent.issue_monitor.writeback_info_analysis_port[issue_slice].connect(data_hazard_scbd.writeback_info_fifo.analysis_export);
+            //Issue Scbds
+            for(int issue_slice=0; issue_slice < `ISSUE_WIDTH; issue_slice++)begin
+                issue_agent.issue_monitor.scoreboard_info_analysis_port[core_id][issue_slice].connect(data_hazard_scbd.scoreboard_info_fifo.analysis_export);
+                issue_agent.issue_monitor.writeback_info_analysis_port[core_id][issue_slice].connect(data_hazard_scbd.writeback_info_fifo.analysis_export);
+
+                issue_agent.issue_monitor.scoreboard_info_analysis_port[core_id][issue_slice].connect(operands_scbd.scoreboard_info_fifo.analysis_export);
+                issue_agent.issue_monitor.operands_info_analysis_port[core_id][issue_slice].connect(operands_scbd.operands_info_fifo.analysis_export);
+            end
+
+            //execute_agent.execute_monitor.alu_analysis_port[core_id].connect(alu_scbd.receive_alu_info);
+            //execute_agent.execute_monitor.lsu_analysis_port[core_id].connect(lsu_scbd.receive_lsu_info);
+            //execute_agent.execute_monitor.commit_analysis_port[core_id].connect(lsu_scbd.receive_commit_info);
             
-            issue_agent.issue_monitor.scoreboard_info_analysis_port[issue_slice].connect(operands_scbd.scoreboard_info_fifo.analysis_export);
-            issue_agent.issue_monitor.operands_info_analysis_port[issue_slice].connect(operands_scbd.operands_info_fifo.analysis_export);
+            execute_agent.execute_monitor.alu_analysis_port[core_id].connect(alu_scbd.alu_tb_fifo.analysis_export);
+            execute_agent.execute_monitor.lsu_analysis_port[core_id].connect(lsu_scbd.lsu_tb_fifo.analysis_export);
+            execute_agent.execute_monitor.commit_analysis_port[core_id].connect(lsu_scbd.commit_tb_fifo.analysis_export);
+        
         end
-
-        execute_agent.execute_monitor.alu_analysis_port.connect(alu_scbd.receive_alu_info);
-        execute_agent.execute_monitor.lsu_analysis_port.connect(lsu_scbd.receive_lsu_info);
-        execute_agent.execute_monitor.commit_analysis_port.connect(lsu_scbd.receive_commit_info);
     endfunction
     
 endclass

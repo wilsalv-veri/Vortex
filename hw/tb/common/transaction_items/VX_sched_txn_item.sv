@@ -1,5 +1,6 @@
 class VX_sched_tb_txn_item extends uvm_transaction;
 
+    VX_core_id_t                                       core_id;
     bit                                                sched_info_valid;
     bit                                                wspawn_valid;
     bit                                                join_valid;
@@ -23,11 +24,12 @@ class VX_sched_tb_txn_item extends uvm_transaction;
   
 
     `uvm_object_utils_begin(VX_sched_tb_txn_item)
-        `uvm_field_int   (sched_info_valid, UVM_DEFAULT)
-        `uvm_field_sarray_int (active_warps, UVM_DEFAULT)
+        `uvm_field_int(core_id,               UVM_DEFAULT)   
+        `uvm_field_int   (sched_info_valid,   UVM_DEFAULT)
+        `uvm_field_sarray_int (active_warps,  UVM_DEFAULT)
         `uvm_field_sarray_int (stalled_warps, UVM_DEFAULT)
-        `uvm_field_sarray_int (thread_masks, UVM_DEFAULT)
-        `uvm_field_sarray_int (warp_pcs, UVM_DEFAULT)
+        `uvm_field_sarray_int (thread_masks,  UVM_DEFAULT)
+        `uvm_field_sarray_int (warp_pcs,      UVM_DEFAULT)
     `uvm_object_utils_end
 
     function new(string name="VX_sched_tb_txn_item");

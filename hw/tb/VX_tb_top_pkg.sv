@@ -13,12 +13,9 @@ package VX_tb_top_pkg;
     
     //Core Params
     localparam SOCKET_ID = 0;
-    localparam core_id = 0;
+    //localparam core_id = 0;
     localparam string INSTANCE_ID = "socket0";
     
-    localparam per_core_dcache_bus_if_start = core_id * VX_gpu_pkg::DCACHE_NUM_REQS;
-    localparam per_core_dcache_bus_if_end   = per_core_dcache_bus_if_start + VX_gpu_pkg::DCACHE_NUM_REQS - 1;
-
     localparam RESET_ADDR                   = {`MEM_ADDR_WIDTH - `CLOG2(`L1_LINE_SIZE){1'b0}};
     localparam RESET_TAG                    = {L1_MEM_ARB_TAG_WIDTH{1'b0}};
     localparam RESET_DATA                   = {16{32'hdeadbeef}};
