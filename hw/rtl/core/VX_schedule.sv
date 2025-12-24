@@ -28,10 +28,10 @@ module VX_schedule import VX_gpu_pkg::*; #(
     input base_dcrs_t       base_dcrs,
 
     // inputsdecode_if
-    VX_warp_ctl_if.slave    warp_ctl_if,
-    VX_branch_ctl_if.slave  branch_ctl_if [`NUM_ALU_BLOCKS],
+    VX_warp_ctl_if.slave     warp_ctl_if,
+    VX_branch_ctl_if.slave   branch_ctl_if [`NUM_ALU_BLOCKS],
     VX_decode_sched_if.slave decode_sched_if,
-    VX_issue_sched_if.slave issue_sched_if[`ISSUE_WIDTH],
+    VX_issue_sched_if.slave  issue_sched_if[`ISSUE_WIDTH],
     VX_commit_sched_if.slave commit_sched_if,
 
     // outputs

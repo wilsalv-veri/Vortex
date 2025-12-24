@@ -321,7 +321,9 @@ module VX_tb_top;
         end
 
         for(genvar block_idx=0; block_idx < `NUM_LSU_BLOCKS; block_idx++)begin
-            bind core.execute.lsu_unit.g_blocks[block_idx].lsu_slice VX_lsu_cov lsu_cov (.*);
+            
+            bind core.execute.lsu_unit.g_blocks[block_idx].lsu_slice VX_lsu_cov    lsu_cov (.*);
+            bind core.execute.lsu_unit.g_blocks[block_idx].lsu_slice VX_lsu_assert lsu_assert (.*);
         end
         
         //GPR Cov

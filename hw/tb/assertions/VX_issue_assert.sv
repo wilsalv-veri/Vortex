@@ -18,7 +18,7 @@ module VX_operands_assert(input clk,
                          VX_operands_if.master   operands_if
                         );
 
-                        //and (##[1:5] $rose(operands_if.valid))
+
     collision_clears : assert property ( @ (posedge clk) $rose(has_collision) ##1 has_collision |-> ##[0:3] $fell(has_collision) and (##[1:5] $rose(operands_if.valid)) ) else $error("Bank Conflict Never Gets Cleared");
     operands_valid   : assert property ( @ (posedge clk) $rose(scoreboard_if.valid) |-> ##[1:5] $rose(operands_if.valid)) else $error("Operands Did Not Become Valid After Scoreboard Became Valid");
 
