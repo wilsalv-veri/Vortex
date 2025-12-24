@@ -291,6 +291,39 @@ module VX_tb_top;
                                                     );
 
 
+
+        for (genvar block_idx = 0; block_idx < `NUM_ALU_BLOCKS; block_idx++) begin : g_blocks
+
+            bind core.execute.alu_unit.g_blocks[block_idx].alu_int VX_alu_int_cov alu_int_cov(  .clk          (clk)        , 
+                                                                            .xtype        (execute_if.data.op_args.alu.xtype),
+                                                                            .alu_class    (inst_alu_class(alu_op)), 
+                                                                            .alu_op       (alu_op), 
+                                                                            .is_sub_op    (is_sub_op),
+                                                                            .is_signed    (is_signed),
+                                                                            .use_pc       (execute_if.data.op_args.alu.use_PC),
+                                                                            .use_imm      (execute_if.data.op_args.alu.use_imm),     
+                                                                            .result_valid (result_if.valid),  
+                                                                            
+                                                                            .is_br_op     (is_br_op),
+                                                                            .br_class     (inst_br_class(alu_op)), 
+                                                                            .br_op        (br_op),
+                                                                            .br_enable    (br_enable),           
+                                                                            .is_br_neg    (is_br_neg),
+                                                                            .is_br_less   (is_br_less),
+                                                                            .is_br_static (is_br_static),
+                                                                            .br_wid       (br_wid),            
+                                                                            .br_taken     (br_taken),
+                                                                            .br_valid     (branch_ctl_if.valid)
+                                                                        );
+
+            bind core.execute.alu_unit.g_blocks[block_idx].muldiv_unit VX_alu_muldiv_cov muldiv_cov (.*);
+                       
+        end
+
+        for(genvar block_idx=0; block_idx < `NUM_LSU_BLOCKS; block_idx++)begin
+            bind core.execute.lsu_unit.g_blocks[block_idx].lsu_slice VX_lsu_cov lsu_cov (.*);
+        end
+        
         //GPR Cov
         //genvar gpr_bank_num;
         for (genvar issue_id = 0; issue_id < `ISSUE_WIDTH; ++issue_id) begin : g_slices
