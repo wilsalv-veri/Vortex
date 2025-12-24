@@ -30,9 +30,26 @@ module VX_tb_top;
 
     logic                    clk;
     
+
+    initial begin
+        gbar_bus_if.req_ready = 1'b1;
+    end
+
+    //GBAR_BUS Rsp
+    always @(posedge tb_top_if.clk)begin
+        if (gbar_bus_if.req_valid)begin
+            gbar_bus_if.rsp_valid  <= 1'b1;
+            gbar_bus_if.rsp_data   <= gbar_bus_if.req_data.id;
+        end
+        if (gbar_bus_if.rsp_valid && !gbar_bus_if.req_valid)
+            gbar_bus_if.rsp_valid  <= 1'b0;
+        
+    end
+
     //Clk Gen
     always #1 tb_top_if.clk = ~tb_top_if.clk;
     assign clk              = tb_top_if.clk;
+
     //Initialization Flow
     initial begin
         tb_top_if_v     = tb_top_if;

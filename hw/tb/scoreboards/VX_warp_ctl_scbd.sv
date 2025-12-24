@@ -148,13 +148,15 @@ class VX_warp_ctl_scbd extends uvm_scoreboard;
                             end
                         end
                         "BAR": begin
-                            for(int wid_idx=0; wid_idx < `NUM_WARPS; wid_idx++)begin
-                                if (wid_idx == wid)
-                                    continue;
-                                
-                                if (sched_info.active_warps[wid_idx] && (sched_info.warp_pcs[wid_idx] > sched_info.warp_pcs[wid]))
-                                    `VX_error(message_id, $sformatf("BARRIER NOT SUSTAINED WID: 0x%0h PC: 0x%0h VIOLATING WARP: 0x%0h VIOLATING PC: 0x%0h", 
-                                wid, sched_info.warp_pcs[wid], wid_idx, sched_info.warp_pcs[wid_idx]))
+                            if (!sched_info.bar_is_global)begin
+                                for(int wid_idx=0; wid_idx < `NUM_WARPS; wid_idx++)begin
+                                    if (wid_idx == wid)
+                                        continue;
+
+                                    if (sched_info.active_warps[wid_idx] && (sched_info.warp_pcs[wid_idx] > sched_info.warp_pcs[wid]))
+                                        `VX_error(message_id, $sformatf("BARRIER NOT SUSTAINED WID: 0x%0h PC: 0x%0h VIOLATING WARP: 0x%0h VIOLATING PC: 0x%0h", 
+                                    wid, sched_info.warp_pcs[wid], wid_idx, sched_info.warp_pcs[wid_idx]))
+                                end
                             end
                         end
                         "SPLIT": begin

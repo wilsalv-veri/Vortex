@@ -99,6 +99,13 @@ package VX_tb_top_pkg;
         end
     endtask
 
+    task VX_toggle_gbar_reset(virtual VX_tb_top_if tb_top_if);
+        repeat(2) begin
+            @ (posedge tb_top_if.clk);
+            tb_top_if.gbar_reset = ~ tb_top_if.gbar_reset;
+        end
+    endtask
+
     task VX_toggle_core_reset(virtual VX_tb_top_if tb_top_if);
         repeat(2) begin
             @ (posedge tb_top_if.clk);
@@ -107,10 +114,12 @@ package VX_tb_top_pkg;
     endtask
 
     task VX_toggle_reset_tb_top(virtual VX_tb_top_if tb_top_if);
+
         fork
             VX_toggle_mem_arb_reset(tb_top_if);
             VX_toggle_icache_reset(tb_top_if);
             VX_toggle_dcache_reset(tb_top_if);
+            VX_toggle_gbar_reset(tb_top_if);
             VX_toggle_core_reset(tb_top_if);
 
             VX_toggle_mem_load_reset(tb_top_if);

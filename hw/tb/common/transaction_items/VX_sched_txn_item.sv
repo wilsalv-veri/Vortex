@@ -2,6 +2,7 @@ class VX_sched_tb_txn_item extends uvm_transaction;
 
     VX_core_id_t                                       core_id;
     bit                                                sched_info_valid;
+    bit                                                bar_is_global;
     bit                                                wspawn_valid;
     bit                                                join_valid;
     VX_ipdom_wr_ptrs_t                                 ipdom_wr_ptrs;

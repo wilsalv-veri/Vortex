@@ -7,15 +7,19 @@ class VX_bar_doa_seq extends VX_risc_v_base_instr_seq;
     rand risc_v_seq_reg_num_t bar_warp_num_reg;
     rand VX_warp_num_t        num_warps_spawned; 
     rand risc_v_seq_imm_t     bar_id;
+    rand bit                  is_global;
+    risc_v_seq_imm_t          global_bit_shift;
 
     function new(string name="VX_bar_doa_seq");
         super.new(name);
+        global_bit_shift = 31; //Global = RS1[31]
     endfunction
 
     constraint bar_seq_c {
         bar_id_num_reg   == 2;
         bar_warp_num_reg == 3;
         bar_id           == 0;
+        is_global        == 0;
     }
 
     virtual function void pre_add_instructions();
@@ -24,6 +28,8 @@ class VX_bar_doa_seq extends VX_risc_v_base_instr_seq;
     endfunction
 
     virtual function void add_instructions();
+        instr_queue.push_back(`ADDI(`RS1(bar_id_num_reg),`IMM_BIN(is_global),`RD(bar_id_num_reg)));
+        instr_queue.push_back(`SLLI(`RS1(bar_id_num_reg), global_bit_shift, bar_id_num_reg));
         instr_queue.push_back(`ADDI(`RS1(bar_id_num_reg),`IMM_BIN(bar_id),`RD(bar_id_num_reg)));
         instr_queue.push_back(`ADDI(`RS1(bar_warp_num_reg),`IMM_BIN(num_warps_spawned),`RD(bar_warp_num_reg)));
         instr_queue.push_back(`BAR(`RS1(bar_id_num_reg), `RS2(bar_warp_num_reg)));     

@@ -15,5 +15,6 @@ class VX_bar_rtg_seq extends VX_bar_doa_seq;
         bar_id_num_reg   inside {[2:31]};
         bar_warp_num_reg inside {[2:31]};
         bar_id           dist   {[0:1]:/50};
+        is_global        dist   {0:=20, 1:=80};
     }
 endclass
