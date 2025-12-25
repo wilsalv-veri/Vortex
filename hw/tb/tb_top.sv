@@ -1,3 +1,6 @@
+import VX_tb_top_pkg::*;
+import VX_tb_common_pkg::*;
+
 module VX_tb_top;
    
     //Interfaces

@@ -182,12 +182,11 @@ class filelistIncludeLine:
 
 if __name__ == "__main__":
     
-    sim_params = f"{project_path}/verif/sim_params"
     rtl_path = f"{project_path}/rtl"
     dpi_path = f"{project_path}/dpi"
     tb_path = f"{project_path}/tb"
     
-    paths = [rtl_path, dpi_path, sim_params, tb_path]
+    paths = [rtl_path, dpi_path, tb_path]
     filelist_names = []
 
     for path in paths:

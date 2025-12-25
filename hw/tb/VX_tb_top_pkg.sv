@@ -1,8 +1,12 @@
-
 `ifndef VX_TB_TOP_PKG_VH
 `define VX_TB_TOP_PKG_VH
 
+import uvm_pkg::*;
+import VX_gpu_pkg::*;
+
 package VX_tb_top_pkg;
+
+  
     //Core Params
     localparam SOCKET_ID = 0;
     localparam string INSTANCE_ID = "socket0";

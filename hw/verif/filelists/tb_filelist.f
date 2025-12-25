@@ -31,7 +31,6 @@ $VORTEX/hw/tb/interfaces/VX_gpr_tb_if.sv
 $VORTEX/hw/tb/interfaces/VX_risc_v_inst_if.sv
 $VORTEX/hw/tb/interfaces/VX_mem_load_if.sv
 $VORTEX/hw/tb/interfaces/VX_tb_top_if.sv
-$VORTEX/hw/tb/interfaces/VX_execute_tb_if.sv
 $VORTEX/hw/tb/interfaces/VX_sched_tb_if.sv
 //Include Files under $VORTEX/hw/tb/interfaces/interface_connections
 +incdir+$VORTEX/hw/tb/interfaces/interface_connections
