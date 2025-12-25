@@ -4,8 +4,8 @@
 package VX_sched_pkg;
 
     import uvm_pkg::*;
-    import VX_tb_common_pkg::*;
     import VX_gpu_pkg::*;
+    import VX_tb_common_pkg::*;
     import VX_gpr_pkg::*;
     
     `include "VX_sched_txn_item.sv"

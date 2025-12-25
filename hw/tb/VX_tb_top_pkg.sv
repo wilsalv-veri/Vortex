@@ -2,18 +2,9 @@
 `ifndef VX_TB_TOP_PKG_VH
 `define VX_TB_TOP_PKG_VH
 
-import uvm_pkg::*;
-import VX_gpu_pkg::*;
-
-`include "VX_types.vh"
-
 package VX_tb_top_pkg;
-
-    //Note: For single socket single core simulation
-    
     //Core Params
     localparam SOCKET_ID = 0;
-    //localparam core_id = 0;
     localparam string INSTANCE_ID = "socket0";
     
     localparam RESET_ADDR                   = {`MEM_ADDR_WIDTH - `CLOG2(`L1_LINE_SIZE){1'b0}};

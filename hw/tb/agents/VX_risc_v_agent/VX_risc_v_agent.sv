@@ -3,7 +3,6 @@ class VX_risc_v_agent extends uvm_agent;
     `uvm_component_utils (VX_risc_v_agent)
 
     VX_risc_v_driver                     risc_v_driver;
-    VX_risc_v_monitor                    risc_v_monitor;
     VX_risc_v_sequencer                  vx_risc_v_seqr;
 
     uvm_tlm_fifo #(int) seq_num_inst_fifo;
@@ -16,7 +15,6 @@ class VX_risc_v_agent extends uvm_agent;
         super.build_phase(phase);
 
         risc_v_driver    = VX_risc_v_driver::type_id::create("VX_risc_v_driver", this);
-        risc_v_monitor   = VX_risc_v_monitor::type_id::create("VX_risc_v_monitor", this);
         vx_risc_v_seqr   = VX_risc_v_sequencer::type_id::create("VX_risc_v_seqr", this);
         
         seq_num_inst_fifo = new("SEQ_NUM_INST_FIFO", this);

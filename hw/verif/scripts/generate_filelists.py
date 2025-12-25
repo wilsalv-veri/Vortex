@@ -17,7 +17,6 @@ def generate_filelist(file_name, lines):
 
 def generate_top_filelist_lines(filelist_names):
     top_level_lines = []
-    top_level_lines.append(f"-f {project_env_var}/hw/verif/filelists/{filelist_names[0]}\n")
     top_level_lines.append("// Set the include path for UVM macros and other files")
     top_level_lines.append("+incdir+$UVM_HOME/src\n")
     top_level_lines.append("// Add the UVM package file. It is crucial to compile this before any")
@@ -30,7 +29,7 @@ def generate_top_filelist_lines(filelist_names):
 
     top_level_lines.append("\n//Reference other filelists")
     
-    for filelist_name in filelist_names[1:]:
+    for filelist_name in filelist_names:
         top_level_lines.append(f"-f {project_env_var}/hw/verif/filelists/{filelist_name}")
 
     return top_level_lines
@@ -151,11 +150,6 @@ def sort_by_match(file_entries, match_string=".vh", inc_order=True):
     for idx, entry in enumerate(copy_entries):
         if match_string in entry:
             file_entries.pop(idx)
-
-            #if not inc_order and not inserted_new_line:
-            #    file_entries.insert(insert_idx_dict[inc_order], "")
-            #    inserted_new_line = True
-
             file_entries.insert(insert_idx_dict[inc_order],entry)
         
 class filelistIncludeLine:
@@ -193,7 +187,7 @@ if __name__ == "__main__":
     dpi_path = f"{project_path}/dpi"
     tb_path = f"{project_path}/tb"
     
-    paths = [sim_params, rtl_path,dpi_path, tb_path]
+    paths = [rtl_path, dpi_path, sim_params, tb_path]
     filelist_names = []
 
     for path in paths:

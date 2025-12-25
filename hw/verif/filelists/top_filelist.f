@@ -1,5 +1,3 @@
--f $VORTEX/hw/verif/filelists/sim_params_filelist.f
-
 // Set the include path for UVM macros and other files
 +incdir+$UVM_HOME/src
 
@@ -13,9 +11,9 @@ $UVM_HOME/src/uvm_pkg.sv
 +define+SV_DPI
 +define+SIMULATION
 +define+EXT_M_ENABLE
-+define+
 
 //Reference other filelists
 -f $VORTEX/hw/verif/filelists/rtl_filelist.f
 -f $VORTEX/hw/verif/filelists/dpi_filelist.f
+-f $VORTEX/hw/verif/filelists/sim_params_filelist.f
 -f $VORTEX/hw/verif/filelists/tb_filelist.f

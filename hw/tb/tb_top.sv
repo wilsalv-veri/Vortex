@@ -1,12 +1,3 @@
-import uvm_pkg::*;
-import VX_tb_top_pkg::*;
-import VX_gpu_pkg::*;
-
-`include "uvm_macros.svh"
-//`include "VX_types.vh"
-import VX_tb_common_pkg::*;
-import VX_sched_pkg::*;
-
 module VX_tb_top;
    
     //Interfaces
@@ -23,14 +14,12 @@ module VX_tb_top;
     VX_mem_load_if           mem_load_ifc();
     VX_risc_v_inst_if        riscv_inst_ifc();
 
-
     VX_dcr_bus_if            dcr_bus_if();
     VX_dcr_bus_if            core_dcr_bus_if();
     VX_gbar_bus_if           gbar_bus_if(); // Barrier
 
     logic                    clk;
     
-
     initial begin
         gbar_bus_if.req_ready = 1'b1;
     end

@@ -40,7 +40,6 @@ class VX_tb_environment extends uvm_env;
         lsu_scbd         = VX_lsu_scbd::type_id::create("VX_lsu_scbd", this);
     endfunction
 
-    
     virtual function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
 
@@ -50,7 +49,6 @@ class VX_tb_environment extends uvm_env;
         risc_v_agent.risc_v_driver.instr_analysis_port.connect(lsu_scbd.receive_riscv_instr);
         
         for(int core_id=0; core_id < `SOCKET_SIZE; core_id++)begin
-            //sched_agent.sched_monitor.sched_info_analysis_port.connect(warp_ctl_scbd.receive_sched_info);
             sched_agent.sched_monitor.sched_info_analysis_port[core_id].connect(warp_ctl_scbd.sched_tb_fifo.analysis_export);
 
             for(int bank_num=0; bank_num  < `NUM_GPR_BANKS; bank_num++) begin
@@ -68,11 +66,7 @@ class VX_tb_environment extends uvm_env;
                 issue_agent.issue_monitor.scoreboard_info_analysis_port[core_id][issue_slice].connect(operands_scbd.scoreboard_info_fifo.analysis_export);
                 issue_agent.issue_monitor.operands_info_analysis_port[core_id][issue_slice].connect(operands_scbd.operands_info_fifo.analysis_export);
             end
-
-            //execute_agent.execute_monitor.alu_analysis_port[core_id].connect(alu_scbd.receive_alu_info);
-            //execute_agent.execute_monitor.lsu_analysis_port[core_id].connect(lsu_scbd.receive_lsu_info);
-            //execute_agent.execute_monitor.commit_analysis_port[core_id].connect(lsu_scbd.receive_commit_info);
-            
+  
             execute_agent.execute_monitor.alu_analysis_port[core_id].connect(alu_scbd.alu_tb_fifo.analysis_export);
             execute_agent.execute_monitor.lsu_analysis_port[core_id].connect(lsu_scbd.lsu_tb_fifo.analysis_export);
             execute_agent.execute_monitor.commit_analysis_port[core_id].connect(lsu_scbd.commit_tb_fifo.analysis_export);

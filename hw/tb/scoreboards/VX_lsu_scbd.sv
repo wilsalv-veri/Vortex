@@ -176,7 +176,7 @@ class VX_lsu_scbd extends uvm_scoreboard;
         end
     endfunction
 
-    virtual function void  set_i_item_gpr_lookup_fields( VX_risc_v_Itype_seq_item i_item);
+    virtual function void  set_i_item_gpr_lookup_fields(VX_risc_v_Itype_seq_item i_item);
         set_i_item_gpr_lookup_bank_nums(i_item);
         set_i_item_gpr_lookup_set_nums(i_item);
     endfunction   
@@ -191,7 +191,7 @@ class VX_lsu_scbd extends uvm_scoreboard;
       rd_set_num   = `REG_NUM_TO_SET(wid,i_item.rd);
     endfunction
 
-    virtual function void  set_s_item_gpr_lookup_fields( VX_risc_v_Stype_seq_item s_item);
+    virtual function void  set_s_item_gpr_lookup_fields(VX_risc_v_Stype_seq_item s_item);
         set_s_item_gpr_lookup_bank_nums(s_item);
         set_s_item_gpr_lookup_set_nums(s_item);
     endfunction   
