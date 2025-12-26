@@ -18,7 +18,7 @@ class VX_gpr_monitor extends uvm_monitor;
     
             for(int bank_num=0; bank_num < `NUM_GPR_BANKS; bank_num++)begin
                 gpr_info[core_id][bank_num] = VX_gpr_tb_txn_item::type_id::create($sformatf("core[%0d].VX_gpr_tb_txn_item_bank%0d", core_id, bank_num));
-                gpr_info_analysis_port[core_id][bank_num] = new($sformatf("core[%0d].GPR_MONITOR_ANALYSIS_PORT_BANK%0d", core_id, bank_num), this);
+                gpr_info_analysis_port[core_id][bank_num] = new($sformatf("core[%0d]_gpr_monitor_analysis_port_bank%0d", core_id, bank_num), this);
             end
         
             if(! uvm_config_db #(virtual VX_gpr_tb_if)::get(this,"", $sformatf("core[%0d].gpr_tb_if", core_id), gpr_tb_if[core_id]))

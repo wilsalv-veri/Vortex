@@ -31,9 +31,9 @@ class VX_issue_monitor extends uvm_monitor;
 
             for(int issue_slice=0; issue_slice < `ISSUE_WIDTH; issue_slice++)begin
 
-                scoreboard_info_analysis_port[core_id][issue_slice] = new($sformatf("core[%0d].SCOREBOARD_INFO_ANALYSIS_PORT",core_id), this);
-                writeback_info_analysis_port[core_id][issue_slice]  = new($sformatf("core[%0d].WRITEBACK_INFO_ANALYSIS_PORT", core_id), this);
-                operands_info_analysis_port[core_id][issue_slice]   = new($sformatf("core[%0d].OPERANdS_INFO_ANALYSIS_PORT",  core_id), this);
+                scoreboard_info_analysis_port[core_id][issue_slice] = new($sformatf("core[%0d]_scoreboard_info_analysis_port",core_id), this);
+                writeback_info_analysis_port[core_id][issue_slice]  = new($sformatf("core[%0d]_writeback_info_analysis_port", core_id), this);
+                operands_info_analysis_port[core_id][issue_slice]   = new($sformatf("core[%0d]_operands_info_analysis_port",  core_id), this);
 
                 if (!uvm_config_db #(virtual VX_scoreboard_if)::get(this, "", $sformatf("core[%0d].scoreboard_if[%0d]",core_id, issue_slice), scoreboard_if[core_id][issue_slice]))
                     `VX_error(message_id, $sformatf("Failed to get access to core[%0d].scoreaboard_if", core_id))

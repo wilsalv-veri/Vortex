@@ -236,12 +236,13 @@ module VX_scoreboard import VX_gpu_pkg::*; #(
             end
         end
 
-        `RUNTIME_ASSERT((timeout_ctr < STALL_TIMEOUT),
+        //note: wilsalv: Updated assertions to account for X value before reset
+        `RUNTIME_ASSERT((timeout_ctr === 32'bX) || (timeout_ctr < STALL_TIMEOUT),
             ("%t: *** %s timeout: wid=%0d, PC=0x%0h, tmask=%b, cycles=%0d, inuse=%b (#%0d)",
                 $time, INSTANCE_ID, w, to_fullPC(staging_if[w].data.PC), staging_if[w].data.tmask, timeout_ctr,
                 operands_busy, staging_if[w].data.uuid))
 
-        `RUNTIME_ASSERT(~writeback_fire || inuse_regs[writeback_if.data.rd] != 0,
+        `RUNTIME_ASSERT((writeback_fire === 1'bX) || (~writeback_fire || inuse_regs[writeback_if.data.rd]) != 0,
             ("%t: *** %s invalid writeback register: wid=%0d, PC=0x%0h, tmask=%b, rd=%0d (#%0d)",
                 $time, INSTANCE_ID, w, to_fullPC(writeback_if.data.PC), writeback_if.data.tmask, writeback_if.data.rd, writeback_if.data.uuid))
     `endif

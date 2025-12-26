@@ -180,7 +180,7 @@ module VX_schedule import VX_gpu_pkg::*; #(
                 //      else_mask instrD
                 //     JOIN  (restore active tmask value before split)
                 
-                //FIXME: wilsalv - Removed due to comment above
+                //note: wilsalv - Removed due to comment above
                 //if (join_is_else) begin
                 //    warp_pcs_n[join_wid] = join_pc;
                 //end
@@ -418,7 +418,6 @@ module VX_schedule import VX_gpu_pkg::*; #(
 
     wire no_pending_instr = (& pending_warp_empty);
 
-    //FIXME: Change macro name to something better
     `BUFFER_EX_WITH_SIZE_AND_LINE(1'b1, busy, (active_warps != 0 || ~no_pending_instr), 1'b1, 1, 1, 394);
     
     // export CSRs
@@ -444,7 +443,9 @@ module VX_schedule import VX_gpu_pkg::*; #(
             end
         end
     end
-    `RUNTIME_ASSERT(timeout_ctr < STALL_TIMEOUT, ("%t: *** %s CTR_VALUE: %0d timeout: stalled_warps=%b", $time, timeout_ctr, INSTANCE_ID, stalled_warps))
+
+    //note: wilsalv : Updated assertion to reflect X value before reset
+    `RUNTIME_ASSERT((timeout_ctr ===  32'bX) || (timeout_ctr < STALL_TIMEOUT), ("%t: *** %s CTR_VALUE: %0d timeout: stalled_warps=%b", $time, timeout_ctr, INSTANCE_ID, stalled_warps))
    
 
 `ifdef PERF_ENABLE

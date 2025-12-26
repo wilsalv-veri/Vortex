@@ -495,7 +495,8 @@ package VX_gpu_pkg;
     //////////////////////// instruction arguments ////////////////////////////
 
     localparam INST_ARGS_BITS = ALU_TYPE_BITS + `XLEN + 3;
-
+    int num_bits;
+    
     typedef struct packed {
         logic use_PC;
         logic use_imm;
@@ -503,37 +504,42 @@ package VX_gpu_pkg;
         logic [ALU_TYPE_BITS-1:0] xtype;
         logic [`XLEN-1:0] imm;
     } alu_args_t;
-    //`SIZE_ASSERT($bits(alu_args_t), INST_ARGS_BITS) //FIXME: wilsalv
-
+    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //`SIZE_ASSERT($bits(alu_args_t), INST_ARGS_BITS);
+    
     typedef struct packed {
         logic [(INST_ARGS_BITS-INST_FRM_BITS-INST_FMT_BITS)-1:0] __padding;
         logic [INST_FRM_BITS-1:0] frm;
         logic [INST_FMT_BITS-1:0] fmt;
     } fpu_args_t;
-    //`SIZE_ASSERT($bits(fpu_args_t), INST_ARGS_BITS) //FIXME: wilsalv
-
+    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //`SIZE_ASSERT($bits(fpu_args_t), INST_ARGS_BITS);
+    
     typedef struct packed {
         logic [(INST_ARGS_BITS-1-1-OFFSET_BITS)-1:0] __padding;
         logic is_store;
         logic is_float;
         logic [OFFSET_BITS-1:0] offset;
     } lsu_args_t;
-    //`SIZE_ASSERT($bits(lsu_args_t), INST_ARGS_BITS) //FIXME: wilsalv
-
+    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //`SIZE_ASSERT($bits(lsu_args_t), INST_ARGS_BITS)
+   
     typedef struct packed {
         logic [(INST_ARGS_BITS-1-`VX_CSR_ADDR_BITS-5)-1:0] __padding;
         logic use_imm;
         logic [`VX_CSR_ADDR_BITS-1:0] addr;
         logic [4:0] imm;
     } csr_args_t;
-    //`SIZE_ASSERT($bits(csr_args_t), INST_ARGS_BITS) //FIXME: wilsalv
-
+    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //`SIZE_ASSERT($bits(csr_args_t), INST_ARGS_BITS) 
+   
     typedef struct packed {
         logic [(INST_ARGS_BITS-1)-1:0] __padding;
         logic is_neg;
     } wctl_args_t;
-    //`SIZE_ASSERT($bits(wctl_args_t), INST_ARGS_BITS) //FIXME: wilsalv
-
+    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //`SIZE_ASSERT($bits(wctl_args_t), INST_ARGS_BITS) 
+    
 `ifdef EXT_TCU_ENABLE
     typedef struct packed {
         logic [(INST_ARGS_BITS-16)-1:0] __padding;
@@ -555,7 +561,8 @@ package VX_gpu_pkg;
         tcu_args_t  tcu;
     `endif
     } op_args_t;
-    //`SIZE_ASSERT($bits(op_args_t), INST_ARGS_BITS) //FIXME: wilsalv
+    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //`SIZE_ASSERT($bits(op_args_t), INST_ARGS_BITS)
 
     //////////////////////////// Pipeline Data Types //////////////////////////
 

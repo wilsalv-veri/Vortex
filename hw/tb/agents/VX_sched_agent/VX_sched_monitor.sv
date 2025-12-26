@@ -18,7 +18,7 @@ class VX_sched_monitor extends uvm_monitor;
 
         for(int core_id=0; core_id < `SOCKET_SIZE; core_id++)begin
       
-            sched_info_analysis_port[core_id] = new($sformatf("core[%0d].SCHED_INFO_ANALYSIS_PORT", core_id), this);
+            sched_info_analysis_port[core_id] = new($sformatf("core[%0d]_sched_info_analysis_port", core_id), this);
             sched_info[core_id] = VX_sched_tb_txn_item::type_id::create($sformatf("core[%0d].SCHED_INFO", core_id), this);
 
             if(!uvm_config_db #(virtual VX_sched_tb_if)::get(this, "", $sformatf("core[%0d].sched_tb_if", core_id),sched_tb_if[core_id]))

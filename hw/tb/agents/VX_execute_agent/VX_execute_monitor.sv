@@ -40,9 +40,9 @@ class VX_execute_monitor extends uvm_monitor;
             
             alu_tb_item[core_id]          = VX_alu_tb_txn_item::type_id::create("VX_alu_tb_item");
          
-            alu_analysis_port[core_id]    = new($sformatf("core[%0d].ALU_ANALYSIS_PORT",   core_id), this);
-            lsu_analysis_port[core_id]    = new($sformatf("core[%0d].LSU_ANALYSIS_PORT",   core_id), this);
-            commit_analysis_port[core_id] = new($sformatf("core[%0d].COMMIT_ANALYSIS_PORT",core_id), this);
+            alu_analysis_port[core_id]    = new($sformatf("core[%0d]_alu_analysis_port",   core_id), this);
+            lsu_analysis_port[core_id]    = new($sformatf("core[%0d]_lsu_analysis_port",   core_id), this);
+            commit_analysis_port[core_id] = new($sformatf("core[%0d]_commit_analysis_port",core_id), this);
 
             
             for(int pe_num = 0; pe_num < `VX_PE_COUNT; pe_num++)begin

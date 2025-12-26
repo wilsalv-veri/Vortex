@@ -290,7 +290,7 @@ import VX_fpu_pkg::*;
 
     `UNUSED_VAR (base_dcrs)
 
-    `RUNTIME_ASSERT(~read_enable || read_addr_valid_w, ("%t: *** invalid CSR read address: 0x%0h (#%0d)", $time, read_addr, read_uuid))
+    `RUNTIME_ASSERT((read_enable === 1'bX) || (~read_enable || read_addr_valid_w), ("%t: *** invalid CSR read address: 0x%0h (#%0d)", $time, read_addr, read_uuid))
 
 `ifdef PERF_ENABLE
     `UNUSED_VAR (sysmem_perf.icache);

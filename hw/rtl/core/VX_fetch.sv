@@ -92,7 +92,7 @@ module VX_fetch import VX_gpu_pkg::*; #(
     wire ibuf_ready = 1'b1;
 `endif
 
-    `RUNTIME_ASSERT((!schedule_if.valid || schedule_if.data.PC != 0),
+    `RUNTIME_ASSERT((schedule_if.valid === 1'bX) || (!schedule_if.valid || schedule_if.data.PC != 0),
         ("%t: *** %s invalid PC=0x%0h, wid=%0d, tmask=%b (#%0d)", $time, INSTANCE_ID, to_fullPC(schedule_if.data.PC), schedule_if.data.wid, schedule_if.data.tmask, schedule_if.data.uuid))
 
     // Icache Request
