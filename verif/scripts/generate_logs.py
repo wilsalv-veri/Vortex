@@ -1,8 +1,10 @@
 
 import os
+import sys
 
 VORTEX = os.environ["VORTEX"]
 dsim_log = "dsim.log"
+test_runs_path = f"{VORTEX}/test_runs"
 cwd_path = os.getcwd()
     
 class VX_log:
@@ -15,38 +17,17 @@ class VX_log:
     def add_line(self, line):
         self.lines.append(line)
 
-    def write_log(self):
-        log_dir_path = self.get_log_dir_path()
-        log_path = f"{log_dir_path}/{self.name}"
-
-        #print(f"{self.name} : {len(self.lines)}")
+    def write_log(self, test_run_path):
+        log_path = f"{test_run_path}/{self.name}"
 
         with open(log_path, 'w') as file:
             file.writelines(self.lines)
 
     @staticmethod
-    def get_log_dir_path():
-        dir_entries = [entry for entry in os.listdir(cwd_path) if os.path.isdir(os.path.join(cwd_path, entry))]
-        
-        for entry in dir_entries:
-            dir_name = VX_log.get_last_dir_name(entry)
-            
-            if "_test" in dir_name:
-                return entry
-
-    @staticmethod
-    def get_last_dir_name(dir_path):
-    
-        if "/" in dir_path:
-            dir_path = dir_path.split("/")[-1]
-    
-        return dir_path
-
-    @staticmethod
     def get_formated_name(name):
         return f"VX_{name}.log"
 
-def generate_logs():
+def generate_logs(test_run_path):
 
     func_log_keys =["SEQ","SCBD","MONITOR"] 
     err_log_keys = ["ERROR", "FATAL"]
@@ -58,7 +39,7 @@ def generate_logs():
     
     logs["PASS_FAIL"] = VX_log("PASS_FAIL".lower(), "PASS_FAIL")
 
-    filepath = f"{cwd_path}/{dsim_log}"
+    filepath = f"{VORTEX}/output/{dsim_log}"
     try:
         with open(filepath, 'r') as file:
             for line in file:
@@ -83,7 +64,9 @@ def generate_logs():
             new_formated_name = VX_log.get_formated_name(new_name[new_name_idx].lower())
             logs[key].name = new_formated_name
 
-        logs[key].write_log()
+        logs[key].write_log(test_run_path)
 
 if __name__ == "__main__":
-    generate_logs()
+
+    test_run_path = sys.argv[1]
+    generate_logs(test_run_path)

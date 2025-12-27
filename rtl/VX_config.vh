@@ -259,7 +259,7 @@
 `ifndef DPI_DISABLE
 `define FPU_DPI
 `else
-`define FPU_DSP// FPU_FPNEW
+`define FPU_DSP
 `endif
 `else
 `define FPU_DSP

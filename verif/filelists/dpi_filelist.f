@@ -1,5 +1,13 @@
-//Include Files under $VORTEX/hw/dpi
-+incdir+$VORTEX/hw/dpi
+//Include Files under $VORTEX/dpi
++incdir+$VORTEX/dpi
 
-$VORTEX/hw/dpi/float_dpi.vh
-$VORTEX/hw/dpi/util_dpi.vh
+$VORTEX/dpi/float_dpi.vh
+$VORTEX/dpi/util_dpi.vh
+//Include Files under $VORTEX/dpi/sim
++incdir+$VORTEX/dpi/sim
+
+//Include Files under $VORTEX/dpi/sim/common
++incdir+$VORTEX/dpi/sim/common
+
+
+

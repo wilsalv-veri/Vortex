@@ -1,7 +1,7 @@
 import os 
 
 PROJECT_NAME = "VORTEX"
-project_path = os.getenv(PROJECT_NAME)+'/hw' 
+project_path = os.getenv(PROJECT_NAME)
 project_env_var = f"${PROJECT_NAME}"
 
 generate_filelist_path = os.path.abspath(__file__)
@@ -30,7 +30,7 @@ def generate_top_filelist_lines(filelist_names):
     top_level_lines.append("\n//Reference other filelists")
     
     for filelist_name in filelist_names:
-        top_level_lines.append(f"-f {project_env_var}/hw/verif/filelists/{filelist_name}")
+        top_level_lines.append(f"-f {project_env_var}/verif/filelists/{filelist_name}")
 
     return top_level_lines
 

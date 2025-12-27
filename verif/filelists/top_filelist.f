@@ -13,6 +13,6 @@ $UVM_HOME/src/uvm_pkg.sv
 +define+EXT_M_ENABLE
 
 //Reference other filelists
--f $VORTEX/hw/verif/filelists/rtl_filelist.f
--f $VORTEX/hw/verif/filelists/dpi_filelist.f
--f $VORTEX/hw/verif/filelists/tb_filelist.f
+-f $VORTEX/verif/filelists/rtl_filelist.f
+-f $VORTEX/verif/filelists/dpi_filelist.f
+-f $VORTEX/verif/filelists/tb_filelist.f
