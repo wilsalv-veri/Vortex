@@ -49,7 +49,7 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
         dir_entries = [entry for entry in os.listdir(cwd_path) if os.path.isdir(os.path.join(cwd_path, entry))]
         
         if cwd == 'tb':
-            sort_by_match(dir_entries, "tests")
+            #sort_by_match(dir_entries, "tests")
             sort_by_match(dir_entries, "seqs")
             sort_by_match(dir_entries, "scoreboards")
             sort_by_match(dir_entries, "agents")
@@ -85,7 +85,7 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
             directory = os.path.isdir(abs_path)
             path = abs_path.replace(entry,"")
 
-            if not directory:
+            if not directory and "." in entry:
                 format = entry.split(".")[1]
             else:
                 format = "dir"
@@ -109,7 +109,8 @@ def addLinesUnderCurrentDirectory(cwd_path,include_files):
             skip_list.append(cwd == 'interface_connections')
             skip_list.append(cwd == 'transaction_items')
             skip_list.append('_agent' in cwd)
-            
+            skip_list.append('Makefile' in entry)
+   
             if True in skip_list:
                 continue          
             
@@ -182,11 +183,12 @@ class filelistIncludeLine:
 
 if __name__ == "__main__":
     
-    rtl_path = f"{project_path}/rtl"
-    dpi_path = f"{project_path}/dpi"
-    tb_path = f"{project_path}/tb"
+    rtl_path   = f"{project_path}/rtl"
+    dpi_path   = f"{project_path}/dpi"
+    tb_path    = f"{project_path}/tb"
+    tests_path = f"{project_path}/tests"
     
-    paths = [rtl_path, dpi_path, tb_path]
+    paths = [rtl_path, dpi_path, tb_path, tests_path]
     filelist_names = []
 
     for path in paths:

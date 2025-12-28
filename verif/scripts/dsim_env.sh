@@ -1,4 +1,4 @@
-#DSIM_LICENCE VAR : Uncomment Below
+#DSIM_LICENSE VAR : Uncomment Below
 #export DSIM_LICENSE=path/to/license/here
 
 #DSIM VAR : Uncomment Below

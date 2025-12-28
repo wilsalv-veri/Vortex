@@ -1,13 +1,11 @@
-# --- Makefile for alternate_dpi.so ---
+# --- Makefile for vortex_dpi.so ---
 
 # --- Variables ---
 
 # Compiler and Flags
 CXX         = g++
-CXXFLAGS    = -shared -fPIC -Wall -Wextra  # Use -std=c++11 or higher
+CXXFLAGS    = -shared -fPIC -Wall -Wextra  
 OUTPUT      = vortex_dpi.so
-
-#-std=c++11 
 
 # Define Environment Variables (Assuming $VORTEX is set in your shell environment)
 # NOTE: If $VORTEX is not set when you run 'make', you MUST uncomment and set it here.

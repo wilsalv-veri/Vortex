@@ -16,3 +16,4 @@ $UVM_HOME/src/uvm_pkg.sv
 -f $VORTEX/verif/filelists/rtl_filelist.f
 -f $VORTEX/verif/filelists/dpi_filelist.f
 -f $VORTEX/verif/filelists/tb_filelist.f
+-f $VORTEX/verif/filelists/tests_filelist.f
