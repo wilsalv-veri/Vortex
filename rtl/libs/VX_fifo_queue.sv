@@ -126,8 +126,10 @@ module VX_fifo_queue #(
         end
     end
 
-    //note: wilsalv :Updated assertion to account for X value before reset
+    //NOTE: wilsalv :BUGID18
     `RUNTIME_ASSERT((push === 1'bX) || ~(push && ~pop) || ~full, ("%t: runtime error: incrementing full queue", $time))
+    
+    //NOTE: wilsalv :BUGID19
     `RUNTIME_ASSERT((push === 1'bX) || ~(pop && ~push) || ~empty, ("%t: runtime error: decrementing empty queue", $time))
 
 endmodule

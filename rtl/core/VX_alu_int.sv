@@ -160,7 +160,7 @@ module VX_alu_int import VX_gpu_pkg::*; #(
             wire [LANE_BITS-1:0] cval = alu_in2[i][cval_end : cval_start]; 
             wire [LANE_BITS-1:0] mask = alu_in2[i][mask_end : mask_start];  
             
-            //note: wilsalv Incorrrect minLane and maxLane calculation
+            //NOTE: wilsalv :BUGID5 
             //wire [LANE_BITS-1:0] minLane = (LANE_BITS'(i) & mask);
             //wire [LANE_BITS-1:0] maxLane = minLane | (cval & ~(mask));
 
@@ -177,22 +177,30 @@ module VX_alu_int import VX_gpu_pkg::*; #(
                 lane = LANE_BITS'(i);
                 case (alu_op[1:0])
                     INST_SHFL_UP: begin
-                        if (($signed(lane_up) >= $signed({1'b0, minLane})) && ($signed(lane_up) <= $signed({1'b0, maxLane}))) begin //note: wilsalv Does not Include maxLane check here
+                        //NOTE: wilsalv :BUGID6
+                        //if (($signed(lane_up) >= $signed({1'b0, minLane})) begin 
+                        if (($signed(lane_up) >= $signed({1'b0, minLane})) && ($signed(lane_up) <= $signed({1'b0, maxLane}))) begin
                             lane = lane_up[LANE_BITS-1:0];
                         end
                     end
                     INST_SHFL_DOWN: begin
-                        if ((lane_down >= {1'b0, minLane}) && (lane_down <= {1'b0, maxLane})) begin //note: wilsalv Does not Include minLane check here
+                        //NOTE: wilsalv :BUGID7
+                        //if (lane_down <= {1'b0, maxLane}) begin 
+                        if ((lane_down >= {1'b0, minLane}) && (lane_down <= {1'b0, maxLane})) begin
                             lane = lane_down[LANE_BITS-1:0];
                         end
                     end
                     INST_SHFL_BFLY: begin
-                        if ((lane_bfly >= minLane) && (lane_bfly <= maxLane)) begin //note: wilsalv Does not Include minLane check here
+                        //NOTE: wilsalv :BUGID8
+                        //if (lane_bfly <= maxLane) begin
+                        if ((lane_bfly >= minLane) && (lane_bfly <= maxLane)) begin
                             lane = lane_bfly;
                         end
                     end
                     INST_SHFL_IDX: begin 
-                        if ((lane_idx >= minLane) && (lane_idx <= maxLane))  begin //note: wilsalv Does not Include minLane check here
+                        //NOTE: wilsalv :BUGID9
+                        //if (lane_idx <= maxLane) begin
+                        if ((lane_idx >= minLane) && (lane_idx <= maxLane))  begin
                             lane = lane_idx;
                         end
                     end

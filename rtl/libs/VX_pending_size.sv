@@ -82,13 +82,9 @@ module VX_pending_size #(
                     alm_full_r  <= 0;
                     size_r      <= '0;
                 end else begin
-                    //note: wilsalv 
-                    //You can't always be either overflowing or underflowing. 
-                    //Assertions fire in many cases where they shouldn't
+                    //NOTE: wilsalv :BUGID10 & BUGID11
                     //`ASSERT((DELTAW'(incr) <= DELTAW'(decr)) || (size_n >= size_r), ("runtime error: counter overflow"));
                     //`ASSERT((DELTAW'(incr) >= DELTAW'(decr)) || (size_n <= size_r), ("runtime error: counter underflow"));
-                    
-                    //Changing implementation to the following
                     `ASSERT((incr && !full_r) || (decr) || ((!incr  || incr === 1'bx) && !decr), ("runtime error: counter overflow"));
                     `ASSERT((decr && !empty)  || (incr) || ((!incr  || incr === 1'bx) && !decr), ("runtime error: counter underflow"));
                     

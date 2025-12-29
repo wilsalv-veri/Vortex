@@ -46,13 +46,8 @@ module VX_split_join import VX_gpu_pkg::*; #(
         wire [(`NUM_THREADS + PC_BITS)-1:0] ipdom_d0 = {split.then_tmask | split.else_tmask, PC_BITS'(0)};
         wire [(`NUM_THREADS + PC_BITS)-1:0] ipdom_d1 = {split.else_tmask, split.next_pc};
 
-        //note: wilsalv
-        //When sjoin_is_dvg is based on RS1 value being different from current 
-        //stack pointer, you create many cases where it can assert, creating
-        //many possibilities for it to assert based on the incorrect input. Since
-        //there is only one case when we want to pop, we should change implementation
-        //to match the only case in which we want to pop, and never assert sjoin_is_dvg
-        //otherwise 
+        //NOTE: wilsalv :BUGID4
+        //wire sjoin_is_dvg = (sjoin.stack_ptr != ipdom_wr_ptr[wid]);
         wire sjoin_is_dvg = (sjoin.stack_ptr == (ipdom_wr_ptr[wid] - DV_STACK_SIZEW'(1)));
 
         wire ipdom_push = split_valid && split.is_dvg;

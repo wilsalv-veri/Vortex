@@ -236,7 +236,7 @@ module VX_scoreboard import VX_gpu_pkg::*; #(
             end
         end
 
-        //note: wilsalv: Updated assertions to account for X value before reset
+        //NOTE: wilsalv :BUGID20
         `RUNTIME_ASSERT((timeout_ctr === 32'bX) || (timeout_ctr < STALL_TIMEOUT),
             ("%t: *** %s timeout: wid=%0d, PC=0x%0h, tmask=%b, cycles=%0d, inuse=%b (#%0d)",
                 $time, INSTANCE_ID, w, to_fullPC(staging_if[w].data.PC), staging_if[w].data.tmask, timeout_ctr,

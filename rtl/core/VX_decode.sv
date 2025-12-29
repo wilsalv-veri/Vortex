@@ -341,9 +341,7 @@ module VX_decode import VX_gpu_pkg::*; #(
                     alu_args.use_imm = 1;
                     alu_args.use_PC  = 1;
                     
-                    // ecall/ebreak/uret/sret/mret
-                    //NOTE: wilsalv :These instructions do nothing (NOP)
-                    //Changing code to do something
+                    //NOTE: wilsalv :BUGID1
                     case(s_type)
                         INST_BR_EBREAK: alu_args.imm = `XLEN'd0;
                         default:        alu_args.imm = `XLEN'd4;

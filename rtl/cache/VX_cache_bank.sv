@@ -421,7 +421,7 @@ module VX_cache_bank import VX_gpu_pkg::*; #(
 
     assign addr_st1 = {line_tag_st1, line_idx_st1};
 
-    //note: wilsalv : Updated assertion to account for X value before reset
+    //NOTE: wilsalv :BUGID12
     // ensure mshr replay always get a hit
     `RUNTIME_ASSERT ((valid_st1 === 1'bX) || ~(valid_st1 && is_replay_st1 && ~is_hit_st1), ("%t: missed mshr replay", $time))
 

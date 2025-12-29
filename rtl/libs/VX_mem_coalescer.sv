@@ -81,8 +81,10 @@ module VX_mem_coalescer #(
     `STATIC_ASSERT (`IS_DIVISBLE(NUM_REQS * DATA_IN_WIDTH, DATA_OUT_WIDTH), ("invalid parameter"))
     `STATIC_ASSERT ((NUM_REQS * DATA_IN_WIDTH >= DATA_OUT_WIDTH), ("invalid parameter"))
     
-    //note: wilsalv :Update assertions to account for X value
+    //NOTE: wilsalv :BUGID24
     `RUNTIME_ASSERT ((in_req_valid === 1'bX)  || (~in_req_valid || in_req_mask != 0), ("%t: invalid request mask", $time))
+    
+    //NOTE: wilsalv :BUGID25
     `RUNTIME_ASSERT ((out_rsp_valid === 1'bX) || (~out_rsp_valid || out_rsp_mask != 0), ("%t: invalid request mask", $time))
 
     localparam TAG_ID_WIDTH = TAG_WIDTH - UUID_WIDTH;

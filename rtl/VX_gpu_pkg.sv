@@ -504,7 +504,7 @@ package VX_gpu_pkg;
         logic [ALU_TYPE_BITS-1:0] xtype;
         logic [`XLEN-1:0] imm;
     } alu_args_t;
-    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //NOTE: wilsalv: Incompatible with DSIM, fails to compile
     //`SIZE_ASSERT($bits(alu_args_t), INST_ARGS_BITS);
     
     typedef struct packed {
@@ -512,7 +512,7 @@ package VX_gpu_pkg;
         logic [INST_FRM_BITS-1:0] frm;
         logic [INST_FMT_BITS-1:0] fmt;
     } fpu_args_t;
-    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //NOTE: wilsalv: Incompatible with DSIM, fails to compile
     //`SIZE_ASSERT($bits(fpu_args_t), INST_ARGS_BITS);
     
     typedef struct packed {
@@ -521,7 +521,7 @@ package VX_gpu_pkg;
         logic is_float;
         logic [OFFSET_BITS-1:0] offset;
     } lsu_args_t;
-    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //NOTE: wilsalv: Incompatible with DSIM, fails to compile
     //`SIZE_ASSERT($bits(lsu_args_t), INST_ARGS_BITS)
    
     typedef struct packed {
@@ -530,14 +530,14 @@ package VX_gpu_pkg;
         logic [`VX_CSR_ADDR_BITS-1:0] addr;
         logic [4:0] imm;
     } csr_args_t;
-    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //NOTE: wilsalv: Incompatible with DSIM, fails to compile
     //`SIZE_ASSERT($bits(csr_args_t), INST_ARGS_BITS) 
    
     typedef struct packed {
         logic [(INST_ARGS_BITS-1)-1:0] __padding;
         logic is_neg;
     } wctl_args_t;
-    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //NOTE: wilsalv: Incompatible with DSIM, fails to compile
     //`SIZE_ASSERT($bits(wctl_args_t), INST_ARGS_BITS) 
     
 `ifdef EXT_TCU_ENABLE
@@ -561,7 +561,7 @@ package VX_gpu_pkg;
         tcu_args_t  tcu;
     `endif
     } op_args_t;
-    //note: wilsalv: Incompatible with DSIM, fails to compile
+    //NOTE: wilsalv: Incompatible with DSIM, fails to compile
     //`SIZE_ASSERT($bits(op_args_t), INST_ARGS_BITS)
 
     //////////////////////////// Pipeline Data Types //////////////////////////

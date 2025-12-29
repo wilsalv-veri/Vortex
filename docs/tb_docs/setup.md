@@ -65,19 +65,19 @@ From the Vortex repository root directory:
 ## 6. Compile RTL, Testbench, and DPI Library
 Compile the full environment using the provided helper script:
 ```bash
-    compile_vortex
-```
-
-## 7. Run Test
-Run any test using the following command:
-```bash
-    run_vortex Test_Name
+compile_vortex
 ```
 ---
 
-## 8. Test List
+## 7. Run Test
+Run any test from the test list below using the following command:
+```bash
+run_vortex testname
+```
 
-### Warp Control Tests
+### Test List
+
+#### Warp Control Tests
 -  `VX_bar_doa_test`
 -  `VX_bar_test`
 -  `VX_branch_doa_test`
@@ -94,11 +94,11 @@ Run any test using the following command:
 -  `VX_wspawn_test`
 -  `VX_wspawn_twice_test`
 
-### Data Hazard Tests
+#### Data Hazard Tests
 - `VX_data_hazard_base_test`
 - `VX_data_hazard_rtg_test`
 
-### Execute Tests
+#### Execute Tests
 - `VX_arithmetic_doa_test`
 - `VX_arithmetic_rtg_test`
 - `VX_arithmetic_simd_test`

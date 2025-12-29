@@ -124,12 +124,7 @@ module VX_schedule import VX_gpu_pkg::*; #(
         end
 
         // wspawn handling
-        //NOTE: wilsalv
-        //By having is_single_warp at the top condition, you risk
-        //keeping the warp locked and having a deadlock. Changed implementation
-        //such that warp_pcs are still updated based on is_single_warp but the
-        //warp lock should be released. Hence instr should be no harm if it its "invalid"  
-            
+        //NOTE: wilsalv :BUGID2       
         if (wspawn.valid ) begin
             if (is_single_warp) begin
                 active_warps_n |= wspawn.wmask;
@@ -164,23 +159,7 @@ module VX_schedule import VX_gpu_pkg::*; #(
         if (join_valid) begin
             if (join_is_dvg) begin
 
-                //note: wilsalv
-                //JOIN_PC is set to (SPLIT_PC + 4) from wctl_unit
-                //This makes it such that join reruns same instructions
-                //as then_mask but now with else_mask, making the
-                //thread divergence essentially non-existant. 
-                //To FIX this, we can remove the PC manipulation aspect of 
-                //join and instead insert 2 joins in the instructions stream
-                //making it look as the following
-                // eg) SPLIT (set active tmask to pred mask)
-                //      then_mask instrA
-                //      then_mask instrB
-                //     JOIN (set active tmask to else mask)
-                //      else_mask instrC
-                //      else_mask instrD
-                //     JOIN  (restore active tmask value before split)
-                
-                //note: wilsalv - Removed due to comment above
+                //NOTE: wilsalv :BUGID3
                 //if (join_is_else) begin
                 //    warp_pcs_n[join_wid] = join_pc;
                 //end
@@ -277,8 +256,9 @@ module VX_schedule import VX_gpu_pkg::*; #(
                 wspawn.pc    <= warp_ctl_if.wspawn.pc;
                 wspawn_wid   <= warp_ctl_if.wid;
             end
-            //NOTE: wilsalv
-            //Removed is_single_warp condition. Valid should only stay high for one clock regardless 
+            
+            //NOTE: wilsalv :BUGID2       
+            //if (wspawn.valid && is_single_warp)
             if (wspawn.valid)
                 wspawn.valid <= 0;
             
@@ -444,7 +424,7 @@ module VX_schedule import VX_gpu_pkg::*; #(
         end
     end
 
-    //note: wilsalv : Updated assertion to reflect X value before reset
+    //NOTE: wilsalv :BUGID16
     `RUNTIME_ASSERT((timeout_ctr ===  32'bX) || (timeout_ctr < STALL_TIMEOUT), ("%t: *** %s CTR_VALUE: %0d timeout: stalled_warps=%b", $time, timeout_ctr, INSTANCE_ID, stalled_warps))
    
 
