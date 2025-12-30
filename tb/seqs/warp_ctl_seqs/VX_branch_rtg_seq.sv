@@ -23,8 +23,8 @@ class VX_branch_rtg_seq extends VX_branch_doa_seq;
         solve pos_only before br_cmp_val1, br_cmp_val2;
         taken   dist {0:=90, 1:=10};
         unique {br_cmp_src1, br_cmp_src2};
-        br_cmp_src1 inside {[1:31]};
-        br_cmp_src2 inside {[1:31]};
+        br_cmp_src1 inside {[1:RV_REGS - 1]};
+        br_cmp_src2 inside {[1:RV_REGS - 1]};
 
         if (taken){
             if (br_instr_type == BEQ){

@@ -43,7 +43,6 @@ class VX_tb_environment extends uvm_env;
     virtual function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
 
-        //Warp_Ctl_Scbd
         risc_v_agent.risc_v_driver.instr_analysis_port.connect(warp_ctl_scbd.receive_riscv_instr);
         risc_v_agent.risc_v_driver.instr_analysis_port.connect(alu_scbd.receive_riscv_instr);
         risc_v_agent.risc_v_driver.instr_analysis_port.connect(lsu_scbd.receive_riscv_instr);

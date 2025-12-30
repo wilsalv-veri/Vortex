@@ -21,7 +21,6 @@ class VX_risc_v_instr_seq_item extends VX_risc_v_seq_item;
     rand risc_v_seq_instr_type_t      instr_type;
     string                            instr_name;
     rand risc_v_seq_opcode_t          opcode;
-    
 
     `uvm_object_utils_begin(VX_risc_v_instr_seq_item);    
         `uvm_field_enum(risc_v_seq_instr_type_t, instr_type, UVM_ALL_ON)  

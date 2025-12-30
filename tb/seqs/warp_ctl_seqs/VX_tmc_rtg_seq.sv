@@ -21,8 +21,8 @@ class VX_tmc_rtg_seq extends VX_risc_v_base_instr_seq;
     endfunction
 
     constraint tmc_seq_operands_c {
-        src_reg inside {[2:31]};
-        dst_reg inside {[2:31]};
+        src_reg inside {[2:RV_REGS - 1]};
+        dst_reg inside {[2:RV_REGS - 1]};
         imm_add inside {[0:15]};
         num_of_iterations inside {[2:10]};
     }

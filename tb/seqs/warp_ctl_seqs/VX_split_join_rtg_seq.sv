@@ -24,11 +24,11 @@ class VX_split_join_rtg_seq extends VX_split_join_doa_seq;
         else_store_val      inside {[1:15]};
         all_store_val       inside {[1:15]};
 
-        pred_reg            inside {[2:31]};
-        ipdom_stack_ptr_reg inside {[2:31]};
-        then_val_reg        inside {[2:31]};
-        else_val_reg        inside {[2:31]};
-        all_val_reg         inside {[2:31]};
+        pred_reg            inside {[2:RV_REGS - 1]};
+        ipdom_stack_ptr_reg inside {[2:RV_REGS - 1]};
+        then_val_reg        inside {[2:RV_REGS - 1]};
+        else_val_reg        inside {[2:RV_REGS - 1]};
+        all_val_reg         inside {[2:RV_REGS - 1]};
 
         ipdom_top_stack_reg == ipdom_stack_ptr_reg;
     }

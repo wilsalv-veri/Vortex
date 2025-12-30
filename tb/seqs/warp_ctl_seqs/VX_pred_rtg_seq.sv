@@ -23,10 +23,10 @@ class VX_pred_rtg_seq extends VX_risc_v_base_instr_seq;
 
         unique {first_tmask_reg, pred_val_reg, else_tmask_reg, alternate_tmask_reg};
        
-        first_tmask_reg      inside {[1:31]};
-        pred_val_reg         inside {[2:31]};
-        else_tmask_reg       inside {[2:31]};
-        alternate_tmask_reg  inside {[2:31]};
+        first_tmask_reg      inside {[1:RV_REGS - 1]};
+        pred_val_reg         inside {[2:RV_REGS - 1]};
+        else_tmask_reg       inside {[2:RV_REGS - 1]};
+        alternate_tmask_reg  inside {[2:RV_REGS - 1]};
 
         first_tmask inside {[0:15]};
         else_tmask inside {[0:15]};

@@ -8,7 +8,7 @@ package VX_tb_common_pkg;
     import VX_tb_top_pkg::*;
 
     localparam INST_PER_CACHE_LINE = L2_MEM_DATA_WIDTH / PC_BITS; 
-
+    `include "VX_risc_v_types.svh"
     `include "VX_tb_types.svh"
     
     `include "VX_sequence_items.sv"
